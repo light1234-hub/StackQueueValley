@@ -2,10 +2,8 @@ package game.item;
 
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.effect.HealingEffect;
@@ -34,16 +32,14 @@ public class StrawberryItem extends Item implements Consumable {
 
     @Override
     public String consume(Actor actor){
+        actor.getInventory().remove(this);
         if(isRotten()){
-            actor.getInventory().add(new PoisonEffect());
-            actor.getInventory().remove(this);
+            actor.addStatus(new PoisonEffect(actor));
             return "A rotten strawberry! You have been poisoned.";
         }else{
-            actor.getInventory().add(new HealingEffect());
-            actor.getInventory().remove(this);
+            actor.addStatus(new HealingEffect(actor));
             return "A fresh strawberry! You feel a regenerative healing effect.";
         }
-
     }
 
     /**
