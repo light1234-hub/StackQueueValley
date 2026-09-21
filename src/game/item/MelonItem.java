@@ -12,7 +12,7 @@ import game.blueprint.Consumable;
 public class MelonItem extends Item implements Consumable {
 
     public MelonItem(){
-        super("Melon Item",'q');
+        super("Melon",'q');
         this.makePortable();
     }
 
