@@ -70,7 +70,7 @@ public class ParsnipCrop extends Ground implements Harvestable, Waterable {
 
         double destructionChance =(10.0 + timeWatered)/100.0;
 
-        if(Math.random() <= destructionChance){
+        if(Math.random() < destructionChance){
             location.setGround(new Dirt());
             return "Watered Parsnip, but the crop was destroyed";
         }
