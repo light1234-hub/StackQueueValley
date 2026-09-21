@@ -53,6 +53,6 @@ public class HarvestAction extends Action {
      */
     @Override
     public String menuDescription(Actor actor){
-        return actor + " harvest the crop";
+        return actor + " harvest " + crop;
     }
 }
