@@ -13,4 +13,5 @@ public interface Tillable {
      * @return a description of the tilling result
      */
     String till (Location location);
+    int tillstamina();
 }
