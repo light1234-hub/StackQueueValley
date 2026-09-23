@@ -35,9 +35,9 @@ public class TillAction extends Action {
     public String execute(Actor actor, GameMap map) {
         Location location = map.locationOf(actor);
         Tillable ground = targetground;
-
-        if (actor.hasAbility(ToolAbility.TILL) && actor.getStatistic(ActorStatistics.STAMINA) >= 2) {
-            actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE, 2);
+        int cost = targetground.tillstamina();
+        if (actor.hasAbility(ToolAbility.TILL) && actor.getStatistic(ActorStatistics.STAMINA) >= cost) {
+            actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE, cost);
 
             return ground.till(location);
         }
