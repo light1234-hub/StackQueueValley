@@ -46,6 +46,8 @@ public class Dirt extends Ground implements Tillable, Waterable {
         return super.toString()+ " turn to puddle!";
     }
 
+    @Override
+    public int tillstamina(){return 2;}
 
     /**
      * Returns the stamina required to water the crop.
