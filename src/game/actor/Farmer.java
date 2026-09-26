@@ -33,6 +33,7 @@ public class Farmer extends Actor
 
         //init the the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
+        this.addNewStatistic(FinanceStatistics.COINS,new BaseStatistic(MAX_COINS));
 
         // give farmer the Item
         this.getInventory().add(new Hoe());
