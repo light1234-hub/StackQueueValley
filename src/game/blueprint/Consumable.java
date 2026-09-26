@@ -14,10 +14,5 @@ public interface Consumable {
      */
     String consume(Actor actor);
 
-    /**
-     * A method applies the effect of consuming the item onto the Farmer
-     * @param actor
-     */
-    void applyEffect(Actor actor);
 }
 
