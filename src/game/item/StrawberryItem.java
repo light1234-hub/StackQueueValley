@@ -9,12 +9,14 @@ import game.blueprint.Consumable;
 import game.effect.HealingEffect;
 import game.effect.PoisonEffect;
 
-public class StrawberryItem extends Item implements Consumable {
+public class StrawberryItem extends ConsumableItem
+{
     private boolean isRotten;
     /**
      * Creates a Strawberry item and determines if it is rotten.
      */
-    public StrawberryItem(){
+    public StrawberryItem()
+    {
         super("Strawberry",'s');
         this.makePortable();
 
@@ -31,13 +33,27 @@ public class StrawberryItem extends Item implements Consumable {
     }
 
     @Override
+    public void applyEffect(Actor actor)
+    {
+        if (isRotten())
+        {
+            actor.addStatus(new PoisonEffect(actor));
+        }
+        else
+        {
+            actor.addStatus(new HealingEffect(actor));
+        }
+    }
+
+    @Override
     public String consume(Actor actor){
         actor.getInventory().remove(this);
-        if(isRotten()){
-            actor.addStatus(new PoisonEffect(actor));
+        if(isRotten())
+        {
             return "A rotten strawberry! You have been poisoned.";
-        }else{
-            actor.addStatus(new HealingEffect(actor));
+        }
+        else
+        {
             return "A fresh strawberry! You feel a regenerative healing effect.";
         }
     }

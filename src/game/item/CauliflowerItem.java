@@ -2,12 +2,15 @@ package game.item;
 
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 
-public class CauliflowerItem extends Item implements Consumable {
+public class CauliflowerItem extends ConsumableItem
+{
 
     public CauliflowerItem(){
         super("Cauliflower",'y');
@@ -15,13 +18,25 @@ public class CauliflowerItem extends Item implements Consumable {
     }
 
     @Override
-    public String consume(Actor actor){
-        actor.heal(25);
+    public void applyEffect(Actor actor)
+    {
+        actor.modifyStatistic(ActorStatistics.HEALTH, StatisticOperations.INCREASE
+        ,25);
+
+        if (Math.random() >= 0.5)
+        {
+            actor.getInventory().add(new CauliflowerItem());
+        }
+    }
+
+    @Override
+    public String consume(Actor actor)
+    {
+
 
         if(Math.random()>=0.5){
             return actor+ " heals 25 HP, and the Cauliflower miraculously survives!";
         }
-        actor.getInventory().remove(this);
         return actor +" heals 25 HP and fully consumes the Cauliflower.";
     }
     /**

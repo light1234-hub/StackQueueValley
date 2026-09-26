@@ -1,54 +1,56 @@
 package game.item;
 
-import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
-import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.farmeraction.ConsumeAction;
-import game.blueprint.Consumable;
+import game.blueprint.Food;
+import game.blueprint.Processable;
 
 /**
- * A harvested tomato that can be consumed, fed to animals, or dried.
+ * Represents a Tomato in the Farmer's Inventory
  */
-public class TomatoItem extends Item implements Consumable {
+public class TomatoItem extends ConsumableItem implements Food, Processable
+{
+    private static final int MAX_HEALTH_GAIN = 2;
 
     /**
-     * Creates a portable tomato.
+     * A constructor that creates an object of the Tomato class
      */
-    public TomatoItem(){
-        super("Tomato",'o');
-        this.makePortable();
+    public TomatoItem()
+    {
+        super("Tomato", 'o');
     }
 
     /**
-     * Increases the actor's maximum health and removes the tomato.
-     *
-     * @param actor actor consuming the tomato
-     * @return a description of the consumption result
-     */
-    @Override
-    public String consume(Actor actor){
-        actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,2);
-        actor.getInventory().remove(this);
-
-        return "Consumed tomato! Max HP increase by 2";
-    }
-
-    /**
-     * Adds the action that allows the actor to consume this tomato.
-     *
-     * @param actor actor interacting with the tomato
-     * @param map current game map
-     * @return available actions
+     * A method that applies the effect of consuming a raw Tomato including bonuses
+     * @param actor
      */
     @Override
-    public ActionList allowableActions(Actor actor, GameMap map) {
-        ActionList actions = super.allowableActions(actor, map);
-        actions.add(new ConsumeAction(this));
-        return actions;
+    public void applyEffect(Actor actor)
+    {
+        actor.modifyStatisticMaximum(ActorStatistics.HEALTH,
+                StatisticOperations.INCREASE,MAX_HEALTH_GAIN);
     }
 
+    /**
+     * A method that describes the result and effects of consuming a raw Tomato
+     * @param actor
+     * @return a String describing the consumption of the Tomato
+     */
+    @Override
+    public String consume(Actor actor)
+    {
+        return actor + " eats a Tomato, increasing their MAX Health by " + MAX_HEALTH_GAIN;
+    }
+
+    /**
+     * A method that increases the Max Health of the Farmer by 2
+     * after using a Tomato to feed an animal
+     * @param actor
+     */
+    @Override
+    public void applyFarmerBonus(Actor actor)
+    {
+        actor.modifyStatisticMaximum(ActorStatistics.HEALTH,StatisticOperations.INCREASE,MAX_HEALTH_GAIN);
+    }
 }
-
