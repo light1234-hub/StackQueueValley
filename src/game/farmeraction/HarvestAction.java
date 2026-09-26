@@ -12,8 +12,8 @@ import game.blueprint.Harvestable;
  * Action that harvests a crop when the actor has sufficient stamina.
  */
 public class HarvestAction extends Action {
-    private Harvestable crop;
-    private Location croploc;
+    private final Harvestable crop;
+    private final Location croploc;
 
     /**
      * Creates a harvest action for a crop.

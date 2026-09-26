@@ -14,7 +14,7 @@ import game.blueprint.Waterable;
  * Action that waters ground using a watering can and stamina.
  */
 public class WaterAction extends Action{
-    private Waterable targetground;
+    private final Waterable targetground;
 
     /**
      * Creates a watering action for ground.

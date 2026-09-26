@@ -12,7 +12,7 @@ import game.blueprint.Consumable;
  */
 public class ConsumeAction extends Action {
 
-    private Consumable item;
+    private final Consumable item;
 
     /**
      * Creates a consume action for an item.
