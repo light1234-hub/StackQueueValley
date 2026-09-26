@@ -9,8 +9,9 @@ import game.blueprint.Sellable;
 
 import java.util.Random;
 
+
 /**
- * Represents Milk that is dropped by feeding a Cow
+ * Milk produced by a cow.
  */
 public class Milk extends Item implements Sellable
 {
@@ -19,10 +20,9 @@ public class Milk extends Item implements Sellable
     private final Random random = new Random();
 
     /**
-     * A Constructor that creates an object of the Milk class
+     * Creates portable milk.
      */
-    public Milk()
-    {
+    public Milk(){
         super("Milk",'M');
         this.makePortable();
     }
@@ -33,7 +33,7 @@ public class Milk extends Item implements Sellable
         if (random.nextDouble() < SUCCESSFUL_SALE)
         {
             seller.modifyStatistic(FinanceStatistics.COINS,StatisticOperations.INCREASE
-            ,SALE_PRICE);
+                    ,SALE_PRICE);
 
             return seller + " sells Milk to the " + merchant + " for "
                     + SALE_PRICE + " coins.";
@@ -44,4 +44,5 @@ public class Milk extends Item implements Sellable
                     + " without paying.";
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package game.item;
 
 import edu.monash.fit2099.engine.items.Item;
+
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
@@ -20,8 +21,7 @@ public class StoneItem extends Item implements Sellable
     private static final int ROCK_RADIUS = 1;
     private final Random random = new Random();
 
-    public StoneItem()
-    {
+    public StoneItem() {
         super("Stone", 'o');
         this.makePortable();
     }
@@ -50,4 +50,5 @@ public class StoneItem extends Item implements Sellable
         return seller + " sells a Stone to the " + merchant + " for "
                 + SALE_PRICE + " coins.";
     }
+
 }

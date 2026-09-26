@@ -9,7 +9,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.farmeraction.BuyAction;
 import game.farmeraction.SellAction;
-import game.behaviours.WanderBehaviour;
+import game.behaviour.WanderBehaviour;
 import game.products.TomatoCropProduct;
 import game.products.ParsnipCropProduct;
 import game.products.SwordProduct;

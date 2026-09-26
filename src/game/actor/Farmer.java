@@ -16,54 +16,23 @@ import game.tool.WateringCan;
 /**
  * The player-controlled farmer who manages the farm and performs actions.
  */
-public class Farmer extends Actor
-{
-    private int coins;
-    private static final int MAX_COINS = 10000;
-
+public class Farmer extends Actor {
     /**
      * Creates a farmer with starting stamina and farming tools.
      *
      * @param name farmer's name
      */
-    public Farmer(String name)
-    {
+    public Farmer(String name) {
         super("Farmer " + name, '@', 100);
-        this.coins = MAX_COINS;
 
         //init the the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
-        this.addNewStatistic(FinanceStatistics.COINS,new BaseStatistic(MAX_COINS));
+        this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(10000));
 
         // give farmer the Item
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
 
-    }
-
-    public int getCoins()
-    {
-        return coins;
-    }
-
-    public void addCoins(int amount)
-    {
-        this.coins = this.coins + amount;
-
-        if (this.coins > MAX_COINS)
-        {
-            this.coins = MAX_COINS;
-        }
-    }
-
-    public void deductCoins(int amount)
-    {
-        this.coins = this.coins - amount;
-
-        if (this.coins < 0)
-        {
-            this.coins = 0;
-        }
     }
 
     @Override
