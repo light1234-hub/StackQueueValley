@@ -5,6 +5,8 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
+import game.actor.Chicken;
+import game.actor.Cow;
 import game.actor.Farmer;
 import game.item.AlienDevice;
 import game.terrain.*;
@@ -48,10 +50,16 @@ public class StackQueueValleyWorld extends World {
         GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
 
+        inheritedFarmMap.at(1,1).addActor(new Cow());
+        inheritedFarmMap.at(8,1).addActor(new Chicken());
+
         inheritedFarmMap.at(3, 2).setGround(new ParsnipCrop());
         inheritedFarmMap.at(4, 2).setGround(new StrawberryCrop());
         inheritedFarmMap.at(6, 2).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
+        inheritedFarmMap.at(9, 2).setGround(new TomatoCrop());
+
+        inheritedFarmMap.at(1,3).setGround(new DryingRack());
 
         // REQ2: place the farm-side ladder and teleportation circle. Set with
         // .setGround() the same way crops are, rather than baking them into

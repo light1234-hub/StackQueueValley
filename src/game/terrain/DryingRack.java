@@ -17,7 +17,7 @@ public class DryingRack extends Ground {
      * Creates a drying rack.
      */
     public DryingRack(){
-        super('R',"DryingRack");
+        super('D',"DryingRack");
     }
 
     /**
