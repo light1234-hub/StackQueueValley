@@ -1,4 +1,4 @@
-package game;
+package game.display;
 
 public class FancyMessage {
     public static String GAME_TITLE = "   ,-,--.  ,--.--------.   ,---.       _,.----.  ,--.-.,-.                \n" +

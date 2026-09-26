@@ -1,6 +1,8 @@
-package game;
+package game.app;
 
 import edu.monash.fit2099.engine.displays.Display;
+import game.display.FancyMessage;
+import game.map.StackQueueValleyWorld;
 
 public class Application {
     public static void main(String[] args) {
