@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actor.Chicken;
 import game.actor.Cow;
 import game.actor.Farmer;
+import game.actor.Merchant;
 import game.item.AlienDevice;
 import game.terrain.*;
 import game.tool.Pickaxe;
@@ -52,6 +53,7 @@ public class StackQueueValleyWorld extends World {
 
         inheritedFarmMap.at(1,1).addActor(new Cow());
         inheritedFarmMap.at(8,1).addActor(new Chicken());
+        inheritedFarmMap.at(8,2).addActor(new Merchant());
 
         inheritedFarmMap.at(3, 2).setGround(new ParsnipCrop());
         inheritedFarmMap.at(4, 2).setGround(new StrawberryCrop());
