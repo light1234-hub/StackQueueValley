@@ -32,8 +32,9 @@ public class ConsumeAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-
-        return item.consume(actor);
+        String result = item.consume(actor);
+        actor.getInventory().remove(item.getItem());
+        return result;
     }
 
     /**

@@ -26,6 +26,10 @@ public class CauliflowerCrop extends Ground implements Harvestable, Waterable {
         super('Y',"Cauliflower crop");
     }
 
+    @Override
+    public boolean canHarvest() {
+        return timeWatered >= 5;
+    }
     /**
      * Harvests the crop, replacing the plot with dirt and having a 50% chance
      * to drop a Cauliflower item.
@@ -105,10 +109,8 @@ public class CauliflowerCrop extends Ground implements Harvestable, Waterable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
-        if(this.timeWatered >=5) {
-            actions.add(new HarvestAction(this, location));
-        }
-        actions.add(new WaterAction(this));
+        actions.add(new HarvestAction(this, location));
+        actions.add(new WaterAction(this,location));
         return actions;
     }
 }

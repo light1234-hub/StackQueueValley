@@ -36,7 +36,6 @@ public class DriedItem extends Item implements Processable {
 
         String message = item.consume(actor);
         actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.INCREASE, 5);
-        actor.getInventory().remove(this);
 
         return message + " restored 5 SP!";
     }

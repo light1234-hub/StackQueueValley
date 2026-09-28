@@ -21,7 +21,6 @@ public class MelonItem extends Item implements Consumable{
     public String consume(Actor actor)
     {
         actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,10);
-        actor.getInventory().remove(this);
         return actor + " consumed the Melon! Maximum HP increased by 10.";
     }
     /**
@@ -36,6 +35,16 @@ public class MelonItem extends Item implements Consumable{
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    /**
+     * Returns this Melonitem as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 
 }

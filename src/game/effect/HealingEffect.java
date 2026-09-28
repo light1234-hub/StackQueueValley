@@ -6,7 +6,7 @@ import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
 
 /**
- * An invisible item that Heal the actor over 2 turns.
+ * A healing status effect that restores health over 2 turns.
  */
 public class HealingEffect implements Status{
     private int duration = 2;
@@ -15,7 +15,7 @@ public class HealingEffect implements Status{
     /**
      * Creates a healing effect tied directly to the actor who consumed it.
      *
-     * @param victim the actor who will take damage from this poison
+     * @param victim the actor who will receive healing
      */
     public HealingEffect(Actor victim){
         this.victim = victim;

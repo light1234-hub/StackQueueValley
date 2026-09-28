@@ -34,7 +34,6 @@ public class StrawberryItem extends Item implements Consumable
 
     @Override
     public String consume(Actor actor){
-        actor.getInventory().remove(this);
         if(isRotten()){
             actor.addStatus(new PoisonEffect(actor));
             return "A rotten strawberry! You have been poisoned.";
@@ -56,6 +55,16 @@ public class StrawberryItem extends Item implements Consumable
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    /**
+     * Returns this Straberryitem as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 
 }

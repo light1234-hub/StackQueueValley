@@ -15,14 +15,15 @@ import game.blueprint.Waterable;
  */
 public class WaterAction extends Action{
     private final Waterable targetground;
-
+    private final Location targetLocation;
     /**
      * Creates a watering action for ground.
      *
      * @param targetground ground to water
      */
-    public WaterAction(Waterable targetground){
-        this.targetground=targetground;
+    public WaterAction(Waterable targetground, Location targetLocation) {
+        this.targetground = targetground;
+        this.targetLocation = targetLocation;
     }
 
     /**
@@ -34,15 +35,14 @@ public class WaterAction extends Action{
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        Location location = map.locationOf(actor);
-        Waterable ground = targetground;
+        int cost = targetground.waterStamina();
 
-        if (actor.hasAbility(ToolAbility.WATER) && actor.getStatistic(ActorStatistics.STAMINA) >= 2) {
-            actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE, 2);
+        if (actor.hasAbility(ToolAbility.WATER) && actor.getStatistic(ActorStatistics.STAMINA) >= cost) {
+            actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE, cost);
 
-            return ground.water(actor,location);
+            return targetground.water(actor, targetLocation);
         }
-        return "Can't water " + targetground.toString() + "due to insufficent energy or dont have a Watering Can!";
+        return "Can't water " + targetground + "due to insufficent energy or dont have a Watering Can!";
     }
 
     /**

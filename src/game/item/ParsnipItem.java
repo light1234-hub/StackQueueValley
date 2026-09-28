@@ -33,8 +33,6 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
     @Override
     public String consume(Actor actor){
         actor.heal(1);
-        actor.getInventory().remove(this);
-
         return "Consumed Parsnip! Restore 1 HP";
     }
 
@@ -47,7 +45,6 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
     @Override
     public String foodEffect(Actor actor){
         actor.modifyStatisticMaximum(ActorStatistics.STAMINA, StatisticOperations.INCREASE,1);
-        actor.getInventory().remove(this);
         return actor +" Max Stamina increased by 1";
     }
 
