@@ -59,9 +59,15 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(4, 2).setGround(new StrawberryCrop());
         inheritedFarmMap.at(6, 2).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
+<<<<<<< Updated upstream
         inheritedFarmMap.at(9, 2).setGround(new TomatoCrop());
 
         inheritedFarmMap.at(1,3).setGround(new DryingRack());
+=======
+        inheritedFarmMap.addActor(new Cow(), inheritedFarmMap.at(2, 4));
+        inheritedFarmMap.addActor(new Chicken(), inheritedFarmMap.at(7, 4));
+        inheritedFarmMap.at(8, 4).setGround(new DryingRack());
+>>>>>>> Stashed changes
 
         // REQ2: place the farm-side ladder and teleportation circle. Set with
         // .setGround() the same way crops are, rather than baking them into
