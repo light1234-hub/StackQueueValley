@@ -72,7 +72,7 @@ public class Dirt extends Ground implements Tillable, Waterable {
         ActionList actions = super.allowableActions(actor,location,direction);
         if (direction.isEmpty()){
             actions.add(new TillAction(this));
-            actions.add(new WaterAction(this));
+            actions.add(new WaterAction(this,location));
         }
 
         return actions;

@@ -33,7 +33,6 @@ public class TomatoItem extends Item implements Consumable, AnimalFood, Processa
     @Override
     public String consume(Actor actor){
         actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,2);
-        actor.getInventory().remove(this);
 
         return "Consumed tomato! Max HP increase by 2";
     }
@@ -47,7 +46,6 @@ public class TomatoItem extends Item implements Consumable, AnimalFood, Processa
     @Override
     public String foodEffect(Actor actor){
         actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,2);
-        actor.getInventory().remove(this);
         return actor +" Max HP increased by 2";
     }
 

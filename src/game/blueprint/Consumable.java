@@ -1,6 +1,7 @@
 package game.blueprint;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.Item;
 
 /**
  * Represents an object that an actor can consume.
@@ -14,5 +15,11 @@ public interface Consumable {
      */
     String consume(Actor actor);
 
+    /**
+     * Returns the item represented by this consumable.
+     *
+     * @return the corresponding item
+     */
+    Item getItem();
 }
 

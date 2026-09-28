@@ -23,9 +23,9 @@ public class CauliflowerItem extends Item implements Consumable
         actor.heal(25);
 
         if(Math.random()>=0.5){
+            actor.getInventory().add(new CauliflowerItem());
             return actor+ " heals 25 HP, and the Cauliflower miraculously survives!";
         }
-        actor.getInventory().remove(this);
         return actor +" heals 25 HP and fully consumes the Cauliflower.";
     }
     /**
@@ -40,5 +40,15 @@ public class CauliflowerItem extends Item implements Consumable
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    /**
+     * Returns this Caulifloweritem as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 }

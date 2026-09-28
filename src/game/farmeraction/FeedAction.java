@@ -44,6 +44,9 @@ public class FeedAction extends Action {
 
         String feedBonus = food.foodEffect(actor);
         String animalFeeding = animal.feed(actor,map.locationOf(actor));
+
+        actor.getInventory().remove(food.getItem());
+
         return actor + " fed the animal. " + feedBonus + " " + animalFeeding;
     }
 

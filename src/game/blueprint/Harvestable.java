@@ -22,4 +22,8 @@ public interface Harvestable {
      * @return harvest stamina cost
      */
     int staminaCost();
+
+    default boolean canHarvest() {
+        return true;
+    }
 }

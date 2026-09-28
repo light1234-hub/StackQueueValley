@@ -40,14 +40,22 @@ public class MelonCrop extends Ground implements Harvestable, Waterable {
         location.setGround(new Dirt());
 
         if(Math.random() >= 0.5){
+            int damage = 20 - this.timeWatered;
+
+            //actor stnading on the melon itself
+            if(location.containsAnActor()){
+                Actor victim = location.getActor();
+                if (damage > 0){
+                    victim.hurt(damage);
+                }
+            }
+
             List<Exit> exits = location.getExits();
             for(Exit exit:exits){
                 Location plot = exit.getDestination();
 
                 if(plot.containsAnActor()){
                     Actor victim = plot.getActor();
-
-                    int damage = 20 - this.timeWatered;
 
                     if(damage > 0){
                         victim.hurt(damage);
@@ -111,7 +119,7 @@ public class MelonCrop extends Ground implements Harvestable, Waterable {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
         actions.add(new HarvestAction(this,location));
-        actions.add(new WaterAction(this));
+        actions.add(new WaterAction(this,location));
         return actions;
     }
 

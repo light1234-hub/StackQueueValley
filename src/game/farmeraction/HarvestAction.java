@@ -36,7 +36,11 @@ public class HarvestAction extends Action {
     @Override
     public String execute(Actor actor, GameMap map){
 
-        if (actor.getStatistic(ActorStatistics.STAMINA) < crop.staminaCost()){
+        if (!crop.canHarvest()) {
+            return "The crop is not ready to be harvested yet.";
+        }
+
+        if (actor.getStatistic(ActorStatistics.STAMINA) < crop.staminaCost()) {
             return "You are too tired to harvest this crop";
         }
 
