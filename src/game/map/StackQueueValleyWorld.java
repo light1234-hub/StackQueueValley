@@ -6,6 +6,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actor.Farmer;
+import game.actor.Bat;
+import game.actor.Slime;
+import game.actor.CaveGhost;
+import game.actor.Merchant;
 import game.item.AlienDevice;
 import game.terrain.*;
 import game.tool.Pickaxe;
@@ -89,6 +93,7 @@ public class StackQueueValleyWorld extends World {
         // --- Farmer setup ---
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
+        inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
 
         // REQ2: give the farmer a pickaxe and an alien device with one fixed
         // destination on each map.
@@ -98,5 +103,9 @@ public class StackQueueValleyWorld extends World {
         device.addDestination(inheritedFarmMap.at(5, 3));
         device.addDestination(minesMap.at(5, 3));
         farmer.getInventory().add(device);
+
+        minesMap.addActor(new Bat(), minesMap.at(3, 2));
+        minesMap.addActor(new Slime(), minesMap.at(6, 3));
+        minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
     }
 }
