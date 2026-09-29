@@ -4,9 +4,15 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 
 /**
- * An interface that is implemented by all items that can be fed
+ * Represents an actor that can be fed at a location.
  */
-public interface Feedable
-{
+public interface Feedable {
+    /**
+     * Feeds the object and applies its feeding effect.
+     *
+     * @param actor actor performing the feeding
+     * @param location location where the feeding occurs
+     * @return a description of the feeding result
+     */
     String feed(Actor actor, Location location);
 }

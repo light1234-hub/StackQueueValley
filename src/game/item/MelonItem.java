@@ -9,21 +9,18 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 
-public class MelonItem extends ConsumableItem {
+public class MelonItem extends Item implements Consumable{
 
     public MelonItem(){
         super("Melon",'q');
         this.makePortable();
     }
 
-    @Override
-    public void applyEffect(Actor actor)
-    {
-        actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,10);
-    }
 
     @Override
-    public String consume(Actor actor){
+    public String consume(Actor actor)
+    {
+        actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE,10);
         return actor + " consumed the Melon! Maximum HP increased by 10.";
     }
     /**
@@ -38,6 +35,16 @@ public class MelonItem extends ConsumableItem {
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    /**
+     * Returns this Melonitem as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 
 }

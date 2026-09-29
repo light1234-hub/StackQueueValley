@@ -1,71 +1,63 @@
 package game.farmeraction;
-
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
-import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.blueprint.AnimalFood;
 import game.blueprint.Feedable;
-import game.blueprint.Food;
 
 /**
- * Represents the act of Feeding an animal food
+ * Action that feeds an animal using food from the actor's inventory.
  */
-public class FeedAction extends Action
-{
-    private static final int STAM_DRAIN = 2;
-
+public class FeedAction extends Action {
     private final Feedable animal;
-    private final Item foodItem;
+    private final AnimalFood food;
+    private final String direction;
 
     /**
-     * A constructor that creates an object of the FeedAction class
-     * @param animal
-     * @param foodItem
+     * Creates a feeding action.
+     *
+     * @param animal animal to feed
+     * @param food food used for feeding
+     * @param direction direction to the animal
      */
-    public FeedAction(Feedable animal, Item foodItem)
-    {
-        this.animal = animal;
-        this.foodItem = foodItem;
+    public FeedAction(Feedable animal,AnimalFood food,String direction){
+        this.animal=animal;
+        this.food=food;
+        this.direction=direction;
     }
 
     /**
-     * A method describing the result of trying to feed the animal
-     * @param actor The actor performing the action.
-     * @param map The map the actor is on.
-     * @return a String describing either a successful fed or an unsuccesful feed
+     * Performs the feeding operation and deducts stamina.
+     *
+     * @param actor actor performing the action
+     * @param map current game map
+     * @return a description of the feeding result
      */
     @Override
-    public String execute(Actor actor, GameMap map)
-    {
-        if (actor.getStatistic(ActorStatistics.STAMINA) >= STAM_DRAIN)
-        {
-            actor.modifyStatistic(ActorStatistics.STAMINA,StatisticOperations.DECREASE,STAM_DRAIN);
-            actor.getInventory().remove(foodItem);
-
-            foodItem.asCapability(Food.class).ifPresent(food -> food.applyFarmerBonus(actor));
-
-            Location farmerLocation = map.locationOf(actor);
-            String feedResult = animal.feed(actor,farmerLocation);
-
-            return actor + " feeds " + foodItem + " to a " + animal;
+    public String execute(Actor actor, GameMap map){
+        if(actor.getStatistic(ActorStatistics.STAMINA)<2){
+            return "You are too tired to feed this animal.";
         }
-        else
-        {
-            return "You are too tired to feed this animal!";
-        }
+        actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE,2);
+
+        String feedBonus = food.foodEffect(actor);
+        String animalFeeding = animal.feed(actor,map.locationOf(actor));
+
+        actor.getInventory().remove(food.getItem());
+
+        return actor + " fed the animal. " + feedBonus + " " + animalFeeding;
     }
 
     /**
-     * A method that returns the menu option of feeding a food item to an animal
-     * @param actor The actor performing the action.
-     * @return a String describing the option
+     * Returns the action text shown in the menu.
+     *
+     * @param actor actor performing the action
+     * @return menu description
      */
     @Override
-    public String menuDescription(Actor actor)
-    {
-        return actor + " feeds " + animal + " with a " + foodItem;
+    public String menuDescription(Actor actor) {
+        return actor + " feeds the animal at " + direction + " with " + food.toString();
     }
 }

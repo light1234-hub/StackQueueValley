@@ -1,6 +1,7 @@
 package game.item;
 
 import edu.monash.fit2099.engine.items.Item;
+
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
@@ -13,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 /**
- * Represents an Egg that is dropped by feeding a Chicken
+ * An egg produced by a chicken.
  */
 public class Egg extends Item implements Sellable
 {
@@ -24,11 +24,11 @@ public class Egg extends Item implements Sellable
     private static final int ADJACENT_RADIUS = 1;
     private final Random random = new Random();
 
+
     /**
-     * A Constructor that creates an object of the Egg class
+     * Creates a portable egg.
      */
-    public Egg()
-    {
+    public Egg(){
         super("Egg",'0');
         this.makePortable();
     }
@@ -86,4 +86,5 @@ public class Egg extends Item implements Sellable
         return message;
 
     }
+
 }

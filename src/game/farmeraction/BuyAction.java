@@ -28,7 +28,7 @@ public class BuyAction extends Action
         else
         {
             actor.modifyStatistic(FinanceStatistics.COINS,StatisticOperations.DECREASE
-            , product.getBuyCost());
+                    , product.getBuyCost());
 
             return product.bought(actor,merchant,map.locationOf(merchant));
         }

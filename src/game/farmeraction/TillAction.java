@@ -13,7 +13,7 @@ import game.blueprint.Tillable;
  * Action that tills ground using a hoe and stamina.
  */
 public class TillAction extends Action {
-    private Tillable targetground;
+    private final Tillable targetground;
 
     /**
      * Creates a tilling action for ground.

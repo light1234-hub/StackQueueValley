@@ -22,8 +22,7 @@ public class DiamondItem extends Item implements Sellable
     private static final double THEFT_CHANCE = 0.5;
     private static final Random random = new Random();
 
-    public DiamondItem()
-    {
+    public DiamondItem() {
         super("Diamond", 'd');
         this.makePortable();
     }
@@ -67,10 +66,12 @@ public class DiamondItem extends Item implements Sellable
             {
                 seller.getInventory().remove(stolen);
                 message += " " + merchant + " also steals " +
-                            stolen + " from the " + seller;
+                        stolen + " from the " + seller;
             }
         }
 
         return message;
     }
 }
+
+

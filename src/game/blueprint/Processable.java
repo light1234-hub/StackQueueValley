@@ -1,10 +1,9 @@
 package game.blueprint;
 
-import edu.monash.fit2099.engine.displays.Printable;
+import edu.monash.fit2099.engine.items.Item;
 
 /**
- * An interface that is implemented by any item that can be Processed by a Processing Facility
+ * Represents an item that can be consumed and processed into another item.
  */
-public interface Processable extends Consumable, Printable
-{
+public interface Processable extends Consumable{
 }

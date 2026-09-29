@@ -111,7 +111,7 @@ public class ParsnipCrop extends Ground implements Harvestable, Waterable {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
         actions.add(new HarvestAction(this,location));
-        actions.add(new WaterAction(this));
+        actions.add(new WaterAction(this,location));
         return actions;
     }
 }

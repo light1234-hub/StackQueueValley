@@ -9,7 +9,7 @@ import game.blueprint.Consumable;
 import game.effect.HealingEffect;
 import game.effect.PoisonEffect;
 
-public class StrawberryItem extends ConsumableItem
+public class StrawberryItem extends Item implements Consumable
 {
     private boolean isRotten;
     /**
@@ -33,27 +33,12 @@ public class StrawberryItem extends ConsumableItem
     }
 
     @Override
-    public void applyEffect(Actor actor)
-    {
-        if (isRotten())
-        {
-            actor.addStatus(new PoisonEffect(actor));
-        }
-        else
-        {
-            actor.addStatus(new HealingEffect(actor));
-        }
-    }
-
-    @Override
     public String consume(Actor actor){
-        actor.getInventory().remove(this);
-        if(isRotten())
-        {
+        if(isRotten()){
+            actor.addStatus(new PoisonEffect(actor));
             return "A rotten strawberry! You have been poisoned.";
-        }
-        else
-        {
+        }else{
+            actor.addStatus(new HealingEffect(actor));
             return "A fresh strawberry! You feel a regenerative healing effect.";
         }
     }
@@ -70,6 +55,16 @@ public class StrawberryItem extends ConsumableItem
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    /**
+     * Returns this Straberryitem as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 
 }
