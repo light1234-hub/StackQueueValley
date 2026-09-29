@@ -46,6 +46,8 @@ public class FireEffect implements Status {
         this.burnDamagePerTurn = burnDamagePerTurn;
     }
 
+    public boolean isActive() { return duration > 0; }
+
     @Override
     public void tickStatus(GameEntity currEntity, Location location) {
         if (duration > 0) {
@@ -62,6 +64,6 @@ public class FireEffect implements Status {
 
     @Override
     public boolean isStatusActive() {
-        return duration > 0;
+        return isActive();
     }
 }

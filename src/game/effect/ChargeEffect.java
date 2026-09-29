@@ -30,6 +30,8 @@ public class ChargeEffect implements Status {
         this.duration = duration;
     }
 
+    public boolean isActive() { return duration > 0; }
+
     /**
      * Deals 20 damage to whoever is standing on the charged ground this
      * turn, then ticks down the remaining duration.
@@ -49,6 +51,6 @@ public class ChargeEffect implements Status {
 
     @Override
     public boolean isStatusActive() {
-        return duration > 0;
+        return isActive();
     }
 }
