@@ -17,10 +17,16 @@ public class StrawberryItem extends Item implements Consumable
      */
     public StrawberryItem()
     {
+        this(Math.random() <= 0.5);
+    }
+
+    /** Creates a strawberry with the requested freshness. */
+    public StrawberryItem(boolean rotten)
+    {
         super("Strawberry",'s');
         this.makePortable();
 
-        this.isRotten = Math.random() <= 0.5;
+        this.isRotten = rotten;
     }
 
     /**
