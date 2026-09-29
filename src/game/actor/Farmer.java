@@ -12,6 +12,11 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.tool.Hoe;
 import game.tool.WateringCan;
+import game.effect.ChargeEffect;
+import game.effect.FireEffect;
+import game.farmeraction.ApplySwordCoatingAction;
+import game.item.MelonItem;
+import game.item.Sword;
 
 /**
  * The player-controlled farmer who manages the farm and performs actions.
@@ -58,6 +63,8 @@ public class Farmer extends Actor {
         // this regen stamina
         this.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.INCREASE,1);
 
+        addSwordCoatingActions(actions, map);
+
         //Display menu
         display.println(this.name);
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
@@ -67,5 +74,25 @@ public class Farmer extends Actor {
         // return/print the console menu
         Menu menu = new Menu(actions);
         return menu.showMenu(this, display);
+    }
+
+    private void addSwordCoatingActions(ActionList actions, GameMap map) {
+        boolean carryingMelon = this.getInventory().getItems().stream().anyMatch(MelonItem.class::isInstance);
+        java.util.List<edu.monash.fit2099.engine.positions.Location> nearby = new java.util.ArrayList<>();
+        edu.monash.fit2099.engine.positions.Location here = map.locationOf(this);
+        nearby.add(here);
+        for (edu.monash.fit2099.engine.positions.Exit exit : here.getExits()) nearby.add(exit.getDestination());
+
+        for (edu.monash.fit2099.engine.items.Item item : this.getInventory().getItems()) {
+            if (!(item instanceof Sword)) continue;
+            Sword sword = (Sword) item;
+            if (carryingMelon) actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.MELON, "Melon"));
+            for (edu.monash.fit2099.engine.positions.Location source : nearby) {
+                if (source.getGround().statusesOf(FireEffect.class).stream().anyMatch(FireEffect::isActive))
+                    actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.FIRE, "Fire"));
+                if (source.getGround().statusesOf(ChargeEffect.class).stream().anyMatch(ChargeEffect::isActive))
+                    actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.CHARGED, "charged ground"));
+            }
+        }
     }
 }
