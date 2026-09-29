@@ -35,10 +35,6 @@ public class WaterAction extends Action{
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-<<<<<<< Updated upstream
-=======
-        Location location = map.locationOf(actor);
->>>>>>> Stashed changes
         int cost = targetground.waterStamina();
 
         if (actor.hasAbility(ToolAbility.WATER) && actor.getStatistic(ActorStatistics.STAMINA) >= cost) {
