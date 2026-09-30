@@ -6,13 +6,15 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.blueprint.AnimalFood;
+import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 
 /**
  * A harvested parsnip that can be consumed, fed to animals, or dried.
  */
-public class ParsnipItem extends Item implements Consumable {
+public class ParsnipItem extends Item implements Consumable, AnimalFood, Processable {
     /**
      * Creates a portable parsnip.
      */
@@ -31,9 +33,29 @@ public class ParsnipItem extends Item implements Consumable {
     @Override
     public String consume(Actor actor){
         actor.heal(1);
-        actor.getInventory().remove(this);
-
         return "Consumed Parsnip! Restore 1 HP";
+    }
+
+    /**
+     * Applies the parsnip's feeding effect to an actor.
+     *
+     * @param actor actor receiving the food effect
+     * @return a description of the effect
+     */
+    @Override
+    public String foodEffect(Actor actor){
+        actor.modifyStatisticMaximum(ActorStatistics.STAMINA, StatisticOperations.INCREASE,1);
+        return actor +" Max Stamina increased by 1";
+    }
+
+    /**
+     * Returns this parsnip as an engine item.
+     *
+     * @return this item
+     */
+    @Override
+    public Item getItem(){
+        return this;
     }
 
     /**

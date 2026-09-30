@@ -25,7 +25,6 @@ public class StrawberryCrop extends Ground implements Harvestable, Waterable {
         super('S',"Strawberry crop");
     }
 
-
     /**
      * Harvests the crop, collecting two strawberries and potentially replacing
      * the plot with dirt depending on the crop's watered state.
@@ -103,7 +102,7 @@ public class StrawberryCrop extends Ground implements Harvestable, Waterable {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
         actions.add(new HarvestAction(this,location));
-        actions.add(new WaterAction(this));
+        actions.add(new WaterAction(this,location));
         return actions;
     }
 }

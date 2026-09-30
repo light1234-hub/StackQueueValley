@@ -1,9 +1,10 @@
 package game.ability;
 
 /**
- * Abilities provided by farming tools.
+ * Abilities provided by farming and mining tools.
  */
 public enum ToolAbility {
     TILL,
-    WATER;
+    WATER,
+    MINE;
 }
