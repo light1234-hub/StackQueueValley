@@ -30,13 +30,15 @@ public class Farmer extends Actor {
     public Farmer(String name) {
         super("Farmer " + name, '@', 100);
 
-        //init the the Stamina attribute
+        //init the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
         this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(10000));
 
         // give farmer the Item
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
+
+        this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
 
     }
 
