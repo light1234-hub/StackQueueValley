@@ -6,7 +6,6 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actor.Zombie;
 import game.actor.ZombieTarget;
 import game.behaviour.SeekFoodBehaviour;
 import game.blueprint.Consumable;
