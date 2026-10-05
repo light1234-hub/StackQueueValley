@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actor.Zombie;
 import game.actor.ZombieTarget;
 import game.behaviour.SeekFoodBehaviour;
 import game.blueprint.Consumable;
@@ -131,15 +132,15 @@ public class HealingState implements CreatureState{
         boolean target = hasTargetNearby(zombie,map);
         boolean food = hasFoodNearby(zombie,map);
 
-        /**
+
         if(recovered && target){
-            return new AttackingState();
+            return zombie.getAttackingState();
         }
 
         if (recovered && !target && !food){
-            return new WanderingState();
+            return zombie.getWanderingState();
         }
-         **/
+
 
         return this;
     }

@@ -2,6 +2,7 @@ package game.state;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.positions.GameMap;
+import game.actor.Zombie;
 
 /**
  * Represents a state that a zombie can be in
