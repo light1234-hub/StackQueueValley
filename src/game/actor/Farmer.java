@@ -14,9 +14,12 @@ import game.tool.Hoe;
 import game.tool.WateringCan;
 import game.effect.ChargeEffect;
 import game.effect.FireEffect;
-import game.farmeraction.ApplySwordCoatingAction;
+import game.effect.ChargedGroundCoating;
+import game.effect.FireCoating;
+import game.effect.MelonCoating;
+import game.farmeraction.ApplyCoatingAction;
+import game.blueprint.Coatable;
 import game.item.MelonItem;
-import game.item.Sword;
 
 /**
  * The player-controlled farmer who manages the farm and performs actions.
@@ -30,15 +33,13 @@ public class Farmer extends Actor {
     public Farmer(String name) {
         super("Farmer " + name, '@', 100);
 
-        //init the Stamina attribute
+        //init the the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
         this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(10000));
 
         // give farmer the Item
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
-
-        this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
 
     }
 
@@ -65,7 +66,7 @@ public class Farmer extends Actor {
         // this regen stamina
         this.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.INCREASE,1);
 
-        addSwordCoatingActions(actions, map);
+        addCoatingActions(actions, map);
 
         //Display menu
         display.println(this.name);
@@ -78,23 +79,26 @@ public class Farmer extends Actor {
         return menu.showMenu(this, display);
     }
 
-    private void addSwordCoatingActions(ActionList actions, GameMap map) {
-        boolean carryingMelon = this.getInventory().getItems().stream().anyMatch(MelonItem.class::isInstance);
+    /** Adds coating actions for carried coatable items and available sources. */
+    private void addCoatingActions(ActionList actions, GameMap map) {
+        edu.monash.fit2099.engine.items.Item melon = this.getInventory().getItems().stream()
+                .filter(MelonItem.class::isInstance).findFirst().orElse(null);
         java.util.List<edu.monash.fit2099.engine.positions.Location> nearby = new java.util.ArrayList<>();
         edu.monash.fit2099.engine.positions.Location here = map.locationOf(this);
         nearby.add(here);
         for (edu.monash.fit2099.engine.positions.Exit exit : here.getExits()) nearby.add(exit.getDestination());
 
+        boolean fireAvailable = nearby.stream().anyMatch(location ->
+                location.getGround().statusesOf(FireEffect.class).stream().anyMatch(FireEffect::isActive));
+        boolean chargeAvailable = nearby.stream().anyMatch(location ->
+                location.getGround().statusesOf(ChargeEffect.class).stream().anyMatch(ChargeEffect::isActive));
+
         for (edu.monash.fit2099.engine.items.Item item : this.getInventory().getItems()) {
-            if (!(item instanceof Sword)) continue;
-            Sword sword = (Sword) item;
-            if (carryingMelon) actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.MELON, "Melon"));
-            for (edu.monash.fit2099.engine.positions.Location source : nearby) {
-                if (source.getGround().statusesOf(FireEffect.class).stream().anyMatch(FireEffect::isActive))
-                    actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.FIRE, "Fire"));
-                if (source.getGround().statusesOf(ChargeEffect.class).stream().anyMatch(ChargeEffect::isActive))
-                    actions.add(new ApplySwordCoatingAction(sword, Sword.Coating.CHARGED, "charged ground"));
-            }
+            if (!(item instanceof Coatable)) continue;
+            Coatable target = (Coatable) item;
+            if (melon != null) actions.add(new ApplyCoatingAction(item, target, new MelonCoating(), melon));
+            if (fireAvailable) actions.add(new ApplyCoatingAction(item, target, new FireCoating(), null));
+            if (chargeAvailable) actions.add(new ApplyCoatingAction(item, target, new ChargedGroundCoating(), null));
         }
     }
 }
