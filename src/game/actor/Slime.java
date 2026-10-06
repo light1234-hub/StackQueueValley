@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/** Mine creature that may spawn another slime whenever it is attacked. */
 public class Slime extends HostileCreature {
+    /** Creates a slime with 150 health points. */
     public Slime() { super("Slime", 's', 150); }
+    /** @return the slime's 15 attack damage */
     @Override protected int damage() { return 15; }
+    /** @return the slime's 50 percent hit chance */
     @Override protected int hitChance() { return 50; }
+
+    /** Has a 50 percent chance to spawn a slime on a free adjacent tile. */
     @Override public void onAttacked(Location location, boolean killed) {
         if (new Random().nextBoolean()) {
             List<Location> choices = new ArrayList<>();
