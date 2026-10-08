@@ -89,7 +89,7 @@ public final class ZombieSensor {
      * @return true if reachable food is found
      */
     public static boolean hasFoodNearby(Zombie zombie, GameMap map,int range) {
-        return !locationsWithin(zombie, map, range,
+        return locationsWithin(zombie, map, range,
                 location -> !location.getItemsAs(Consumable.class).isEmpty(),true);
     }
 
