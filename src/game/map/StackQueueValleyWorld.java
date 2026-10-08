@@ -104,7 +104,7 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
-
+        minesMap.addActor(new Zombie(), minesMap.at(2, 4));
         // TEMP HEALING TEST
         Zombie zombie = new Zombie();
         zombie.hurt(60);
