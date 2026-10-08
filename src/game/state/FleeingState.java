@@ -3,16 +3,12 @@ package game.state;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
-import game.actor.ZombieTarget;
 import game.behaviour.FleeBehaviour;
-import game.blueprint.Consumable;
 
-import javax.management.QueryEval;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
@@ -21,25 +17,25 @@ import java.util.Set;
 public class FleeingState implements CreatureState
 {
     private final FleeBehaviour fleeBehaviour = new FleeBehaviour();
-    private static final int SCAN_RANGE = 4;
+    private static final int SCAN_RANGE = 3;
+    private static final int ADJACENT_RANGE = 1;
+    private static final int FOOD_SCAN_RANGE = 2;
 
     @Override
     public CreatureState nextState(Zombie zombie, GameMap map)
     {
-        int currentHp = zombie.getStatistic(ActorStatistics.HEALTH);
-        int maxHp = zombie.getMaximumStatistic(ActorStatistics.HEALTH);
-        int hpPercent = (currentHp * 100) / maxHp;
+        int hpPercent = ZombieSensor.healthPercent(zombie);
 
-        boolean hasAdjThreat = hasAdjacentThreat(zombie, map);
-        boolean hasFoodNearby = hasFoodNearby(zombie,map);
-        boolean hasThreatInScanRange = hasThreatInScanRange(zombie,map);
+        boolean hasAdjThreat = ZombieSensor.hasTargetNearby(zombie,map,ADJACENT_RANGE);
+        boolean hasFoodNearby = ZombieSensor.hasFoodNearby(zombie,map,FOOD_SCAN_RANGE);
+        boolean hasThreatInScanRange = ZombieSensor.hasTargetNearby(zombie,map,SCAN_RANGE);
 
-        if (hpPercent < 50 && (!hasAdjThreat || hasFoodNearby))
+        if (hpPercent < ZombieSensor.HEAL_BELOW_PERCENT && (!hasAdjThreat || hasFoodNearby))
         {
             return zombie.getHealingState();
         }
 
-        if (!hasThreatInScanRange && hpPercent >= 70)
+        if (!hasThreatInScanRange && hpPercent >= ZombieSensor.RECOVERED_PERCENT)
         {
             return zombie.getWanderingState();
         }
@@ -74,7 +70,7 @@ public class FleeingState implements CreatureState
             if (distance > 0 && distance <= 2 && current.containsAnActor())
             {
                 Actor victim = current.getActor();
-                if (victim.hasAbility(ZombieTarget.ZOMBIE_TARGET))
+                if (ZombieSensor.isTarget(victim))
                 {
                     int pushDx = Integer.compare(current.x(), zombieLoc.x());
                     int pushDy = Integer.compare(current.y(), zombieLoc.y());
@@ -107,70 +103,6 @@ public class FleeingState implements CreatureState
                 }
             }
         }
-    }
-
-    private boolean hasAdjacentThreat(Zombie zombie, GameMap map)
-    {
-        for (Exit exit : map.locationOf(zombie).getExits())
-        {
-            Location destination = exit.getDestination();
-            if (destination.containsAnActor() && destination.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean hasFoodNearby(Zombie zombie, GameMap map)
-    {
-        Location start = map.locationOf(zombie);
-        for (Exit exit : start.getExits())
-        {
-            if (!exit.getDestination().getItemsAs(Consumable.class).isEmpty())
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean hasThreatInScanRange(Zombie zombie, GameMap map)
-    {
-        Location start = map.locationOf(zombie);
-        Queue<Location> queue = new ArrayDeque<>();
-        Set<Location> visited = new HashSet<>();
-
-        queue.add(start);
-        visited.add(start);
-
-        while (!queue.isEmpty())
-        {
-            Location current = queue.poll();
-            int distance = Math.max(Math.abs(current.x() - start.x()), Math.abs(current.y() - start.y()));
-
-            if (distance > 0 && current.containsAnActor() && current.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))
-            {
-                return true;
-            }
-
-            if (distance < SCAN_RANGE)
-            {
-                for (Exit exit : current.getExits())
-                {
-                    Location destination = exit.getDestination();
-                    if (!visited.contains(destination))
-                    {
-                        visited.add(destination);
-                        queue.add(destination);
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     private Location getRelativeLocation(GameMap map, Location base, int deltaX, int deltaY)
