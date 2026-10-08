@@ -40,7 +40,7 @@ public class Milk extends Item implements Sellable
         }
         else
         {
-            return seller + " takes the Milk from the  " + merchant
+            return merchant + " takes the Milk from the  " + seller
                     + " without paying.";
         }
     }
