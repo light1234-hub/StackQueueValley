@@ -7,12 +7,7 @@ import edu.monash.fit2099.engine.positions.Location;
 
 import java.util.Random;
 
-/**
- * Attempts to teleport the actor to a chosen destination via the alien
- * device. 50% of the time it malfunctions instead, dropping the actor at a
- * random (enterable) location on whatever map they're currently on, rather
- * than the destination they picked.
- */
+
 public class AlienDeviceAction extends Action {
     private final Location destination;
     private final Random random = new Random();
@@ -34,14 +29,18 @@ public class AlienDeviceAction extends Action {
                         + random.nextInt(currentMap.getYRange().max() - currentMap.getYRange().min() + 1);
                 malfunctionLocation = currentMap.at(x, y);
                 attempts++;
-            } while (!malfunctionLocation.canActorEnter(actor) && attempts < 20);
+            } while (!SafeArrival.isFree(malfunctionLocation, actor) && attempts < 20);
 
-            if (malfunctionLocation.canActorEnter(actor)) {
+            if (SafeArrival.isFree(malfunctionLocation, actor)) {
                 currentMap.moveActor(actor, malfunctionLocation);
             }
             return actor + "'s alien device malfunctions and drops them elsewhere on " + currentMap + "!";
         }
-        map.moveActor(actor, destination);
+        Location arrival = SafeArrival.resolve(destination, actor);
+        if (arrival == null) {
+            return actor + "'s alien device fails: there is no free space at the destination.";
+        }
+        map.moveActor(actor, arrival);
         return actor + " uses the alien device to teleport to " + destination.map() + ".";
     }
 
