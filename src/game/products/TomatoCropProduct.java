@@ -63,4 +63,10 @@ public class TomatoCropProduct implements Buyable
         }
 
     }
+
+    @Override
+    public String toString()
+    {
+        return "Tomato crop";
+    }
 }
