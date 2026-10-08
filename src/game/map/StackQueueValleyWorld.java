@@ -5,12 +5,9 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
-import game.actor.Farmer;
-import game.actor.Bat;
-import game.actor.Slime;
-import game.actor.CaveGhost;
-import game.actor.Merchant;
+import game.actor.*;
 import game.item.AlienDevice;
+import game.item.CauliflowerItem;
 import game.terrain.*;
 import game.tool.Pickaxe;
 
@@ -56,6 +53,7 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(4, 2).setGround(new StrawberryCrop());
         inheritedFarmMap.at(6, 2).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
+
 
         // REQ2: place the farm-side ladder and teleportation circle. Set with
         // .setGround() the same way crops are, rather than baking them into
@@ -107,5 +105,11 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+
+        Zombie zombie = new Zombie();
+        minesMap.addActor(zombie, minesMap.at(5, 2));
+
+        minesMap.at(4, 2).addItem(new CauliflowerItem());
+        minesMap.at(6, 2).addItem(new CauliflowerItem());
     }
 }
