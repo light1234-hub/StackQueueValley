@@ -39,7 +39,7 @@ public class StrawberryCrop extends Ground implements Harvestable, Waterable {
         actor.getInventory().add(new StrawberryItem());
         actor.getInventory().add(new StrawberryItem());
 
-        double destructionChance =(50.0 - timeWatered)/100.0;
+        double destructionChance =Math.max(0, 50.0 - timeWatered) / 100.0;
 
         if(Math.random() < destructionChance){
             location.setGround(new Dirt());
