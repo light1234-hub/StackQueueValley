@@ -132,15 +132,15 @@ public class HealingState implements CreatureState{
         boolean target = hasTargetNearby(zombie,map);
         boolean food = hasFoodNearby(zombie,map);
 
-        /**
+
         if(recovered && target){
-            return new AttackingState();
+            return zombie.getAttackingState();
         }
 
         if (recovered && !target && !food){
-            return new WanderingState();
+            return zombie.getWanderingState();
         }
-         **/
+
 
         return this;
     }

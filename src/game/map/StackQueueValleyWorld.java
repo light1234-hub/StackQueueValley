@@ -5,9 +5,12 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
-import game.actor.*;
+import game.actor.Farmer;
+import game.actor.Bat;
+import game.actor.Slime;
+import game.actor.CaveGhost;
+import game.actor.Merchant;
 import game.item.AlienDevice;
-import game.item.ParsnipItem;
 import game.terrain.*;
 import game.tool.Pickaxe;
 
@@ -104,6 +107,7 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+<<<<<<< HEAD
         minesMap.addActor(new Zombie(), minesMap.at(2, 4));
         // TEMP HEALING TEST
         Zombie zombie = new Zombie();
@@ -116,5 +120,7 @@ public class StackQueueValleyWorld extends World {
 
         inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
         inheritedFarmMap.at(2, 1).addItem(new ParsnipItem());
+=======
+>>>>>>> origin/req5-dylan
     }
 }
