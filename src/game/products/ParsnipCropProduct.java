@@ -3,6 +3,7 @@ package game.products;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.GroundAbility;
 import game.actor.FinanceStatistics;
 import game.blueprint.Harvestable;
 import game.blueprint.Buyable;
@@ -34,7 +35,10 @@ public class ParsnipCropProduct implements Buyable
 
         for (Location nearby : nearbyLocations)
         {
-            if (nearby.getGroundAs(Harvestable.class) == null)
+            boolean isFertile = nearby.getGround().hasAbility(GroundAbility.FERTILE);
+            boolean hasNoCrop = (nearby.getGroundAs(Harvestable.class) == null);
+
+            if (isFertile && hasNoCrop)
             {
                 plantableLocations.add(nearby);
             }
