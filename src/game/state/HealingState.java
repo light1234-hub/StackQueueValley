@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.behaviour.SeekFoodBehaviour;
 import game.blueprint.Consumable;
+import game.item.ParsnipItem;
 
 import java.util.*;
 
@@ -41,13 +42,6 @@ public class HealingState implements CreatureState{
      */
     @Override
     public  CreatureState nextState(Zombie zombie, GameMap map){
-        // An active poison prevents healing, even if it began while already in this state.
-        if (ZombieSensor.isPoisoned(zombie)) {
-            return ZombieSensor.hasTargetNearby(zombie, map, TARGET_SCAN_RANGE)
-                    ? zombie.getAttackingState()
-                    : zombie.getWanderingState();
-        }
-
         boolean recovered = ZombieSensor.healthPercent(zombie) >= ZombieSensor.RECOVERED_PERCENT;
         boolean target = ZombieSensor.hasTargetNearby(zombie,map,TARGET_SCAN_RANGE);
         boolean food = ZombieSensor.hasFoodNearby(zombie,map,FOOD_SCAN_RANGE);
@@ -85,7 +79,8 @@ public class HealingState implements CreatureState{
     /**
      * Performs the one-time effect when the Zombie enters the healing state
      * When the zombie enters HealingState, it checks all adjacent tiles and pulls
-     * any consumable items onto its own tile
+     * any consumable items onto its own tiles
+     * if there is no food it spawns food on the
      * @param zombie zombie the Zombie entering the state
      * @param map map the current game map
      */
@@ -93,13 +88,45 @@ public class HealingState implements CreatureState{
     public void onEnter(Zombie zombie,GameMap map){
         Location zombieLoc = map.locationOf(zombie);
 
-        for(Exit exit:zombieLoc.getExits()){
-            Location adjacentLoc =  exit.getDestination();
-            List<Consumable> foods = new ArrayList<>(adjacentLoc.getItemsAs(Consumable.class));
-            for(Consumable food: foods){
-                adjacentLoc.removeItem(food.getItem());
-                zombieLoc.addItem(food.getItem());
+        int foodMove = 0;
+
+        Queue<Location> queue = new ArrayDeque<>();
+        Map<Location,Integer> distance = new HashMap<>();
+
+        queue.add(zombieLoc);
+        distance.put(zombieLoc,0);
+
+        while(!queue.isEmpty()){
+            Location current = queue.poll();
+            int steps = distance.get(current);
+
+            if(steps >= FOOD_SCAN_RANGE){
+                continue;
             }
+            for (Exit exit: current.getExits()){
+                Location next = exit.getDestination();
+
+                if(distance.containsKey(next) || !next.canActorEnter(zombie)){
+                    continue;
+
+                }
+                distance.put(next, steps +1);
+                queue.add(next);
+
+                List<Consumable> foods = new ArrayList<>(next.getItemsAs(Consumable.class));
+
+                for(Consumable food : foods){
+                    next.removeItem(food.getItem());
+                    zombieLoc.addItem(food.getItem());
+                    foodMove++;
+                }
+
+            }
+        }
+        if(foodMove == 0){
+            zombieLoc.addItem(new ParsnipItem());
+            zombieLoc.addItem(new ParsnipItem());
+
         }
 
     }

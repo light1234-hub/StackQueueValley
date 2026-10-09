@@ -10,6 +10,9 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.actor.ZombieTarget;
 import game.behaviour.WanderBehaviour;
+import game.effect.ChargeEffect;
+import game.effect.FireEffect;
+import game.effect.PoisonTrap;
 import game.farmeraction.CreatureAttackAction;
 
 import java.util.ArrayDeque;
@@ -75,6 +78,28 @@ public class AttackingState implements CreatureState {
     @Override
     public void onEnter(Zombie zombie, GameMap map) {
         zombie.boostAttackForCurrentTurn();
+
+        Location originalLocation = map.locationOf(zombie);
+        boolean trapAlreadyPresent = originalLocation.getGround().statusesOf(PoisonTrap.class)
+                .stream().anyMatch(PoisonTrap::isStatusActive);
+        if (!trapAlreadyPresent) {
+            originalLocation.getGround().addStatus(new PoisonTrap());
+        }
+
+        Exit step = firstStepToTarget(zombie, map);
+        if (step != null) {
+            Location destination = step.getDestination();
+            boolean onFire = destination.getGround().statusesOf(FireEffect.class)
+                    .stream().anyMatch(FireEffect::isStatusActive);
+            boolean charged = destination.getGround().statusesOf(ChargeEffect.class)
+                    .stream().anyMatch(ChargeEffect::isStatusActive);
+            boolean trapped = destination.getGround().statusesOf(PoisonTrap.class)
+                    .stream().anyMatch(PoisonTrap::isStatusActive);
+            if (!destination.containsAnActor() && destination.canActorEnter(zombie)
+                    && !onFire && !charged && !trapped) {
+                map.moveActor(zombie, destination);
+            }
+        }
     }
 
     private boolean healthBelow(Zombie zombie, int percentage) {

@@ -8,32 +8,19 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.behaviour.FleeBehaviour;
-import game.zombieaction.TwoStepMoveAction;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-/**
- * Represents the fleeing state of the zombie
- * When in this state
- */
 public class FleeingState implements CreatureState
 {
     private final FleeBehaviour fleeBehaviour = new FleeBehaviour();
     private static final int SCAN_RANGE = 3;
     private static final int ADJACENT_RANGE = 1;
     private static final int FOOD_SCAN_RANGE = 2;
-    private int sprint_turns = 2;
 
-    /**
-     * Determines the next state of the zombie based on the health level
-     * and presence of adjacent threats and food scans
-     * @param zombie the Zombie whose state is being evaluated
-     * @param map the current game map
-     * @return the next creature state for the zombie
-     */
     @Override
     public CreatureState nextState(Zombie zombie, GameMap map)
     {
@@ -58,45 +45,17 @@ public class FleeingState implements CreatureState
         return this;
     }
 
-    /**
-     * Computes the action for the zombie in the fleeing states
-     * the first 2 turns upon entering the fleeing state allows the zombie to move 2 turns
-     * @param zombie the Zombie performing the action
-     * @param map the current game map
-     * @return the action that the zombie will perform in this turn
-     */
     @Override
     public Action getAction(Zombie zombie, GameMap map)
     {
-        Location zombielocation = map.locationOf(zombie);
+        Action fleeAction = fleeBehaviour.operate(zombie,map.locationOf(zombie));
 
-        if (sprint_turns > 0)
-        {
-            sprint_turns--;
-            Action twoStep = calculateTwoStep(zombie, zombielocation);
-
-            if (twoStep != null)
-            {
-                return twoStep;
-            }
-        }
-
-
-        Action fleeAction = fleeBehaviour.operate(zombie, zombielocation);
         return fleeAction != null ? fleeAction : new DoNothingAction();
     }
 
-    /**
-     * Performs the one time effect when the zombie enters the fleeing state
-     * (pushing back any actors and resetting the sprint_turns back to 2)
-     * @param zombie zombie the Zombie entering the state
-     * @param map map the current game map
-     */
     @Override
     public void onEnter(Zombie zombie, GameMap map)
     {
-        sprint_turns = 2;
-
         Location zombieLoc = map.locationOf(zombie);
         Queue<Location> queue = new ArrayDeque<>();
         Set<Location> visited = new HashSet<>();
@@ -108,7 +67,7 @@ public class FleeingState implements CreatureState
         {
             Location current = queue.poll();
             int distance = Math.max(Math.abs(current.x() - zombieLoc.x())
-                    , Math.abs(current.y() - zombieLoc.y()));
+            , Math.abs(current.y() - zombieLoc.y()));
 
             if (distance > 0 && distance <= 2 && current.containsAnActor())
             {
@@ -118,17 +77,17 @@ public class FleeingState implements CreatureState
                     int pushDx = Integer.compare(current.x(), zombieLoc.x());
                     int pushDy = Integer.compare(current.y(), zombieLoc.y());
 
-                    Location pushDestination = getRelativeLocation(map, current, pushDx * 2, pushDy * 2);
+                    Location pushDestination = getRelativeLocation(map,current,pushDx * 2, pushDy * 2);
                     if (pushDestination == null || pushDestination.containsAnActor()
-                            || !pushDestination.canActorEnter(victim))
+                    || !pushDestination.canActorEnter(victim))
                     {
-                        pushDestination = getRelativeLocation(map, current, pushDx, pushDy);
+                        pushDestination = getRelativeLocation(map,current,pushDx,pushDy);
                     }
 
                     if (pushDestination != null && !pushDestination.containsAnActor()
-                            && pushDestination.canActorEnter(victim))
+                    && pushDestination.canActorEnter(victim))
                     {
-                        map.moveActor(victim, pushDestination);
+                        map.moveActor(victim,pushDestination);
                     }
                 }
             }
@@ -148,48 +107,6 @@ public class FleeingState implements CreatureState
         }
     }
 
-    /**
-     * Calculates a 2-step move action away from the nearest threat location.
-     */
-    private Action calculateTwoStep(Zombie zombie, Location location)
-    {
-        // We temporarily utilize FleeBehaviour's threat finding mechanism or replicate it here
-        // For simplicity, we scan for threat using the internal helper logic or reuse direction calculations
-        // Assuming a threat search is accessible:
-        Location threatLocation = findNearestThreat(location,zombie);
-        if (threatLocation == null)
-        {
-            return null;
-        }
-
-        int dx = threatLocation.x() - location.x();
-        int dy = threatLocation.y() - location.y();
-
-        int fleeDx = Integer.compare(0, dx);
-        int fleeDy = Integer.compare(0, dy);
-
-        Location twoStepLocation = getRelativeLocation(location.map(), location, fleeDx * 2, fleeDy * 2);
-        Location midStepLocation = getRelativeLocation(location.map(), location, fleeDx, fleeDy);
-
-        if (twoStepLocation != null && midStepLocation != null
-                && !twoStepLocation.containsAnActor() && twoStepLocation.canActorEnter(zombie)
-                && !midStepLocation.containsAnActor() && midStepLocation.canActorEnter(zombie))
-        {
-            return new TwoStepMoveAction(twoStepLocation, getDirectionString(fleeDx, fleeDy));
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Retrieves a relative offset location from the base location on the game map
-     * @param map
-     * @param base
-     * @param deltaX
-     * @param deltaY
-     * @return
-     */
     private Location getRelativeLocation(GameMap map, Location base, int deltaX, int deltaY)
     {
         try
@@ -200,72 +117,4 @@ public class FleeingState implements CreatureState
             return null;
         }
     }
-
-    /**
-     * Converts the coordinate direction into readable string name
-     * @param dx
-     * @param dy
-     * @return
-     */
-    private String getDirectionString(int dx, int dy)
-    {
-        int directionKey = (Integer.compare(dx,0) +1) * 3 + (Integer.compare(dy,0) + 1);
-
-        return switch (directionKey)
-        {
-            case 0 -> "North-West";
-            case 1 -> "West";
-            case 2 -> "South-West";
-            case 3 -> "North";
-            case 5 -> "South";
-            case 6 -> "North-East";
-            case 7 -> "East";
-            case 8 -> "South-East";
-            default ->  "away";
-        };
-    }
-
-    /**
-     * Finds the nearest target within the scan radius using breadth first search (BFS)
-     * @param start
-     * @param actor
-     * @return
-     */
-    private Location findNearestThreat(Location start, Actor actor)
-    {
-        Queue<Location> queue = new ArrayDeque<>();
-        HashSet<Location> visited = new HashSet<>();
-        queue.add(start);
-        visited.add(start);
-
-        while (!queue.isEmpty())
-        {
-            Location current = queue.poll();
-
-            if (!current.equals(start) && current.containsAnActor() && ZombieSensor.isTarget(current.getActor()))
-            {
-                return current;
-            }
-
-            int distance = Math.max(Math.abs(current.x() - start.x()), Math.abs(current.y() - start.y()));
-
-            if (distance >= SCAN_RANGE)
-            {
-                continue;
-            }
-
-            for (Exit exit : current.getExits())
-            {
-                Location destination = exit.getDestination();
-                if (!visited.contains((destination)))
-                {
-                    visited.add(destination);
-                    queue.add(destination);
-                }
-            }
-        }
-
-        return null;
-    }
-
 }
