@@ -2,15 +2,15 @@ package game.farmeraction;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.blueprint.Coatable;
 import game.blueprint.Coating;
 import game.blueprint.CoatingSource;
-import edu.monash.fit2099.engine.capabilities.Status;
 
-/** Applies a coating to any carried item that implements {@link Coatable}. */
+/** Applies a coating from a carried or adjacent source to a carried {@link Coatable} item. */
 public class ApplyCoatingAction extends Action {
     private final Item targetItem;
     private final Coatable target;
@@ -24,9 +24,9 @@ public class ApplyCoatingAction extends Action {
      * @param targetItem carried item being coated
      * @param target coatable behavior provided by that item
      * @param source provider of the coating
-     * @param sourceItem source item, or {@code null} for a terrain/status source
-     * @param sourceLocation location of a ground source or a source item lying on the ground;
-     *                       {@code null} when the source item is carried
+     * @param sourceItem source item, or {@code null} for a ground or status source
+     * @param sourceLocation location of an adjacent source item or ground source;
+     *                       {@code null} when the source is carried
      */
     public ApplyCoatingAction(Item targetItem, Coatable target, CoatingSource source,
                               Item sourceItem, Location sourceLocation) {

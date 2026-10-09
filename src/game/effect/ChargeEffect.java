@@ -4,7 +4,6 @@ import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
 import game.blueprint.CoatingSource;
-import game.blueprint.Coating;
 
 /**
  * An electrical charge sitting on a piece of ground (e.g. a Puddle), released
@@ -34,9 +33,9 @@ public class ChargeEffect implements Status, CoatingSource {
 
     public boolean isActive() { return duration > 0; }
 
-    /** Creates the charged-ground coating provided by this effect. */
+    /** Creates the charged-ground coating provided by this active effect. */
     @Override
-    public Coating createCoating() {
+    public ChargedGroundCoating createCoating() {
         return new ChargedGroundCoating();
     }
 

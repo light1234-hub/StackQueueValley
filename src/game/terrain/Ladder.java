@@ -6,15 +6,6 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.farmeraction.TravelAction;
 
-/**
- * A ladder connecting a fixed location on one map to a fixed location on
- * another (e.g. one tile on the farm to one tile in the mines). Two Ladder
- * instances must be paired up with setDestination() once both maps have
- * been built -- see the world setup example.
- * <p>
- * Climbing carries a 50% chance of losing footing and falling for 25
- * damage; the fall never prevents arrival at the destination.
- */
 public class Ladder extends Ground {
     private Location destination;
 

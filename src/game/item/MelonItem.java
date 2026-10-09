@@ -11,7 +11,7 @@ import game.blueprint.Consumable;
 import game.blueprint.CoatingSource;
 import game.effect.MelonCoating;
 
-public class MelonItem extends Item implements Consumable, CoatingSource{
+public class MelonItem extends Item implements Consumable, CoatingSource {
 
     public MelonItem(){
         super("Melon",'q');
@@ -49,13 +49,13 @@ public class MelonItem extends Item implements Consumable, CoatingSource{
         return this;
     }
 
-    /** Creates the explosive coating provided by this melon. */
+    /** Creates the coating supplied by this melon. */
     @Override
     public MelonCoating createCoating() {
         return new MelonCoating();
     }
 
-    /** A melon is used up when it is applied as a coating source. */
+    /** A melon is consumed when it is used as a coating source. */
     @Override
     public boolean isConsumedOnUse() {
         return true;

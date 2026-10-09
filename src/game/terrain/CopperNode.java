@@ -5,17 +5,13 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.ToolAbility;
 import game.blueprint.Breakable;
 import game.blueprint.Chargeable;
 import game.farmeraction.BreakAction;
 import game.item.CopperItem;
 
-/**
- * An impassable copper node found in the mines. Must be broken with a
- * pickaxe. Breaking it always drops a copper and turns the tile to dirt, and
- * charges any adjacent ground capable of holding a charge (in the current
- * version of the game, that's only Puddle).
- */
+
 public class CopperNode extends Ground implements Breakable {
 
     public CopperNode() {
@@ -51,7 +47,9 @@ public class CopperNode extends Ground implements Breakable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
-        actions.add(new BreakAction(this, location));
+        if (actor.hasAbility(ToolAbility.MINE)) {
+            actions.add(new BreakAction(this, location));
+        }
         return actions;
     }
 }

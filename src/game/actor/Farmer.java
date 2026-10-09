@@ -22,7 +22,6 @@ import game.blueprint.CoatingSource;
 
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * The player-controlled farmer who manages the farm and performs actions.
  */
@@ -42,6 +41,8 @@ public class Farmer extends Actor {
         // give farmer the Item
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
+
+        this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
 
     }
 

@@ -5,6 +5,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -24,25 +26,43 @@ public class AlienDeviceAction extends Action {
     @Override
     public String execute(Actor actor, GameMap map) {
         if (random.nextDouble() < 0.5) {
-            GameMap currentMap = map.locationOf(actor).map();
-            Location malfunctionLocation;
-            int attempts = 0;
-            do {
-                int x = currentMap.getXRange().min()
-                        + random.nextInt(currentMap.getXRange().max() - currentMap.getXRange().min() + 1);
-                int y = currentMap.getYRange().min()
-                        + random.nextInt(currentMap.getYRange().max() - currentMap.getYRange().min() + 1);
-                malfunctionLocation = currentMap.at(x, y);
-                attempts++;
-            } while (!malfunctionLocation.canActorEnter(actor) && attempts < 20);
+            return malfunction(actor, map);
+        }
 
-            if (malfunctionLocation.canActorEnter(actor)) {
-                currentMap.moveActor(actor, malfunctionLocation);
-            }
-            return actor + "'s alien device malfunctions and drops them elsewhere on " + currentMap + "!";
+        if (map.locationOf(actor) == destination) {
+            return actor + " is already at that destination.";
+        }
+        // The destination is fixed: if someone is standing there, the teleport simply fails.
+        if (destination.containsAnActor() || !destination.canActorEnter(actor)) {
+            return actor + "'s alien device cannot teleport: the destination is occupied.";
         }
         map.moveActor(actor, destination);
         return actor + " uses the alien device to teleport to " + destination.map() + ".";
+    }
+
+    /**
+     * The device malfunctions: the actor is dropped on a random free tile of the map
+     * they are currently on. Every free tile is collected first and one is picked,
+     * instead of guessing random coordinates and hoping one is free.
+     */
+    private String malfunction(Actor actor, GameMap map) {
+        GameMap currentMap = map.locationOf(actor).map();
+        List<Location> landingSpots = new ArrayList<>();
+        for (int x = currentMap.getXRange().min(); x <= currentMap.getXRange().max(); x++) {
+            for (int y = currentMap.getYRange().min(); y <= currentMap.getYRange().max(); y++) {
+                Location candidate = currentMap.at(x, y);
+                if (candidate.canActorEnter(actor) && !candidate.containsAnActor()) {
+                    landingSpots.add(candidate);
+                }
+            }
+        }
+
+        if (landingSpots.isEmpty()) {
+            return actor + "'s alien device malfunctions, but there is nowhere free to land, so they stay put.";
+        }
+        Location landing = landingSpots.get(random.nextInt(landingSpots.size()));
+        currentMap.moveActor(actor, landing);
+        return actor + "'s alien device malfunctions and drops them elsewhere on " + currentMap + "!";
     }
 
     @Override

@@ -5,24 +5,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
 import game.blueprint.CoatingSource;
-import game.blueprint.Coating;
 
-/**
- * Fire sitting on a piece of ground, exactly like ChargeEffect but for
- * flames instead of electricity. Attached to the Ground at a Location.
- * <p>
- * Two things happen each turn while active, matching REQ2's wording for
- * both the teleportation circle and the exploding geode:
- * <ol>
- *   <li>if groundDamagePerTurn &gt; 0, whoever is standing on the burning
- *   tile takes that much damage directly (used for the geode explosion's
- *   fire; the teleportation circle's fire deals 0 here since the spec only
- *   describes the walk-through burn for that case)</li>
- *   <li>whoever is standing there also catches a {@link BurnEffect}, which
- *   keeps damaging them for a number of turns even after they leave the
- *   tile</li>
- * </ol>
- */
+
 public class FireEffect implements Status, CoatingSource {
     private int duration;
     private final int groundDamagePerTurn;
@@ -50,9 +34,9 @@ public class FireEffect implements Status, CoatingSource {
 
     public boolean isActive() { return duration > 0; }
 
-    /** Creates the fire coating provided by active flames. */
+    /** Creates the fire coating provided by this active ground effect. */
     @Override
-    public Coating createCoating() {
+    public FireCoating createCoating() {
         return new FireCoating();
     }
 
@@ -64,7 +48,13 @@ public class FireEffect implements Status, CoatingSource {
                 if (groundDamagePerTurn > 0) {
                     victim.hurt(groundDamagePerTurn);
                 }
-                victim.addStatus(new BurnEffect(victim, burnDuration, burnDamagePerTurn));
+                // Standing in fire re-applies the burn once the old one ends, but
+                // burns must not stack or the damage would multiply every turn.
+                boolean alreadyBurning = victim.statusesOf(BurnEffect.class).stream()
+                        .anyMatch(BurnEffect::isStatusActive);
+                if (!alreadyBurning) {
+                    victim.addStatus(new BurnEffect(victim, burnDuration, burnDamagePerTurn));
+                }
             }
             duration--;
         }

@@ -19,11 +19,17 @@ import game.blueprint.Buyable;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Represents the merchant that wanders around the map that can buy and sell items to the farmer
+ */
 public class Merchant extends Actor
 {
     private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
     private final List<Buyable> productsForSale = new ArrayList<>();
 
+    /**
+     * A constructor that creates an object of the merchant with an inventory of sellable items
+     */
     public Merchant()
     {
         super("Merchant", '&', 100);
@@ -32,6 +38,16 @@ public class Merchant extends Actor
         productsForSale.add(new TomatoCropProduct());
     }
 
+    /**
+     * Determines the action for the merchant to perform during it's turn
+     * If the merchant is unconscious it does nothing, if not it randomly wanders around the map
+     * @param actions collection of possible Actions for this Actor
+     * @param lastAction The Action this Actor took last turn. Can do
+     * interesting things in conjunction with Action.getNextAction()
+     * @param map the map containing the Actor
+     * @param display the I/O object to which messages may be written
+     * @return The action performed by the merchant for a singular turn (wandering or do nothing)
+     */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display)
     {
@@ -48,6 +64,13 @@ public class Merchant extends Actor
         }
     }
 
+    /**
+     * Returns a list of actions that the farmer can perform on/too the merchant
+     * @param otherActor the Actor that might be performing attack
+     * @param direction String representing the direction of the other Actor
+     * @param map current GameMap
+     * @return a list of allowable actions
+     */
     @Override
     public ActionList allowableActions(Actor otherActor, String direction, GameMap map)
     {

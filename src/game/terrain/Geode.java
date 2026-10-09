@@ -4,16 +4,12 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.ToolAbility;
 import game.blueprint.Breakable;
 import game.farmeraction.BreakAction;
 import game.farmeraction.PickUpGeodeAction;
 
-/**
- * A geode lying on the ground. Unlike Rock and CopperNode, a geode can also
- * be picked up and carried instead of broken immediately -- see
- * PickUpGeodeAction and game.item.GeodeItem. Breaking it, whether from the
- * ground or from inventory, is resolved identically via GeodeMechanics.
- */
+
 public class Geode extends Ground implements Breakable {
 
     public Geode() {
@@ -39,7 +35,9 @@ public class Geode extends Ground implements Breakable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
-        actions.add(new BreakAction(this, location));
+        if (actor.hasAbility(ToolAbility.MINE)) {
+            actions.add(new BreakAction(this, location));
+        }
         actions.add(new PickUpGeodeAction(location));
         return actions;
     }
