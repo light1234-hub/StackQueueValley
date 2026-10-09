@@ -59,7 +59,7 @@ java -cp out game.app.Application
 The Zombie uses interchangeable states for wandering, attacking, fleeing, and healing. Its attacking behavior searches for the nearest reachable `ZombieTarget`, attacks when a target is adjacent, and wanders when it cannot find a reachable target.
 
 
-## REQ5 Zombie AttackingState
+## REQ5- AttackingState
 When the Zombie enters `AttackingState`, it receives a temporary 10% attack damage increase and 15% hit chance increase for that turn. It also leaves a temporary poison trap on its original tile and attempts to lunge one safe tile toward the nearest reachable target. The lunge is skipped if no target is reachable or the first tile is unsafe. The trap remains in either case. A `PoisonTrap` lasts up to 10 turns and poisons the first `ZombieTarget` that occupies its tile; the resulting `PoisonEffect` lasts three turns.
 
 Key classes and interfaces:
@@ -88,7 +88,7 @@ Key classes and interfaces:
 | `src/game/terrain` | Ground types and crops |
 | `src/edu/monash/fit2099/engine` | FIT2099 game engine source |
 
-## REQ5 Zombie: Kavin Pusparajans part
+## REQ5- WanderingState
 The Zombie can switch between states such, as wandering, attacking, fleeing and healing. This part shows what Kavin wrote: the Zombie character, the WanderingState, the shared ZombieSensor helper and the dirt corruption feature. The remaining states are handled by the team (see the REQ5 section).
 WanderingState
 WanderingState is the default state for the Zombie. Every turn it checks with ZombieSensor to find out the Zombies health and if there is a target or food within SCAN_RANGE tiles then it decides on the state:
@@ -98,7 +98,7 @@ WanderingState is the default state for the Zombie. Every turn it checks with Zo
 4.If none of these conditions are met the Zombie continues to wander using WanderBehaviour. It does nothing if it cannot move.
 ZombieSensor contains the logic, for sensing health level nearby targets and nearby food. ZombieSensor also holds the health thresholds. Every state uses the same rules instead of repeating them.
 
-## Corrupting Dirt
+### Corrupting Dirt
 When the Zombie enters WanderingState the onEnter action corrupts the ground on every tile next to it. WanderingState does not check what type of ground it is. It checks for the CAN_BE_CORRUPTED terrain ability. Then calls the corrupt function on the Corruptible ground.
 
 “Each ground decides for itself what it will become. - Only Dirt is corruptible for now, it replaces itself with CorruptedDirt. Ladders, other terrain, tilled soil, puddles, crops are left alone. To add a new corruptible ground, implement Corruptible and set CAN_BE_CORRUPTED to true. The Zombie code stays the same.
