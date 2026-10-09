@@ -23,6 +23,11 @@ public interface Harvestable {
      */
     int staminaCost();
 
+    /**
+     * Checks whether this harvestable object is currently ready to harvest.
+     *
+     * @return true if it can be harvested
+     */
     default boolean canHarvest() {
         return true;
     }

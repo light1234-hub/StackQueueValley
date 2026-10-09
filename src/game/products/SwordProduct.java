@@ -34,5 +34,11 @@ public class SwordProduct implements Buyable
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return "Sword";
+    }
+
 
 }

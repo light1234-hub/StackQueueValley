@@ -57,7 +57,7 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         Exit bestExit = null;
 
         double maxDistance = location.x() == threatLocation.x() && location.y() == threatLocation.y()
-                ? 0 : Math.hypot(location.x() - threatLocation.y(), location.y() - threatLocation.y());
+                ? 0 : Math.hypot(location.x() - threatLocation.x(), location.y() - threatLocation.y());
 
         for (Exit exit : location.getExits())
         {

@@ -41,6 +41,8 @@ public class Farmer extends Actor {
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
 
+        this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
+
     }
 
     @Override
