@@ -12,6 +12,9 @@ import game.terrain.Dirt;
 
 
 public class WanderingState implements CreatureState {
+    /** How many tiles away the zombie notices targets and food while wandering. */
+    private static final int SCAN_RANGE = 3;
+
     private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
 
     @Override
@@ -19,11 +22,11 @@ public class WanderingState implements CreatureState {
         int health = ZombieSensor.healthPercent(zombie);
 
         // severely injured: healing takes priority over fleeing
-        if (health < ZombieSensor.HEAL_BELOW_PERCENT && ZombieSensor.hasFoodNearby(zombie, map)) {
+        if (health < ZombieSensor.HEAL_BELOW_PERCENT && ZombieSensor.hasFoodNearby(zombie, map, SCAN_RANGE)) {
             return zombie.getHealingState();
         }
 
-        if (ZombieSensor.hasTargetNearby(zombie, map)) {
+        if (ZombieSensor.hasTargetNearby(zombie, map, SCAN_RANGE)) {
             if (health < ZombieSensor.ATTACK_MIN_PERCENT) {
                 return zombie.getFleeingState();
             }
@@ -39,7 +42,11 @@ public class WanderingState implements CreatureState {
         return action != null ? action : new DoNothingAction();
     }
 
-
+    /**
+     * Entry effect: as the zombie starts to wander it corrupts the plain
+     * dirt on every tile next to it. Only Dirt is affected, so tilled soil,
+     * crops, ladders and other terrain are left alone.
+     */
     @Override
     public void onEnter(Zombie zombie, GameMap map) {
         for (Exit exit : map.locationOf(zombie).getExits()) {
