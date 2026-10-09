@@ -43,15 +43,7 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         int fleeDx = Integer.compare(0,dx);
         int fleeDy = Integer.compare(0,dy);
 
-        Location twoStepLocation = getRelativeLocation(location, fleeDx * 2, fleeDy * 2);
         Location midStepLocation = getRelativeLocation(location, fleeDx, fleeDy);
-
-        if (twoStepLocation != null && midStepLocation != null
-            && !twoStepLocation.containsAnActor() && twoStepLocation.canActorEnter(entity)
-            && !midStepLocation.containsAnActor() && midStepLocation.canActorEnter(entity))
-        {
-            return new TwoStepMoveAction(twoStepLocation,getDirectionString(fleeDx,fleeDy));
-        }
 
         if (midStepLocation != null && !midStepLocation.containsAnActor()
                 && midStepLocation.canActorEnter(entity))
@@ -156,27 +148,5 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         }
     }
 
-    /**
-     * Converts the coordinate direction into readable string name
-     * @param dx
-     * @param dy
-     * @return
-     */
-    private String getDirectionString(int dx, int dy)
-    {
-        int directionKey = (Integer.compare(dx,0) +1) * 3 + (Integer.compare(dy,0) + 1);
 
-        return switch (directionKey)
-        {
-            case 0 -> "North-West";
-            case 1 -> "West";
-            case 2 -> "South-West";
-            case 3 -> "North";
-            case 5 -> "South";
-            case 6 -> "North-East";
-            case 7 -> "East";
-            case 8 -> "South-East";
-            default ->  "away";
-        };
-    }
 }
