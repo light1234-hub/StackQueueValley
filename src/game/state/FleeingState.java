@@ -35,7 +35,7 @@ public class FleeingState implements CreatureState
             return zombie.getHealingState();
         }
 
-        if (!hasThreatInScanRange && hpPercent >= ZombieSensor.RECOVERED_PERCENT)
+        if (!hasThreatInScanRange && hpPercent >= ZombieSensor.HEAL_BELOW_PERCENT)
         {
             return zombie.getWanderingState();
         }
