@@ -5,11 +5,7 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
-import game.actor.Farmer;
-import game.actor.Bat;
-import game.actor.Slime;
-import game.actor.CaveGhost;
-import game.actor.Merchant;
+import game.actor.*;
 import game.item.AlienDevice;
 import game.terrain.*;
 import game.tool.Pickaxe;
@@ -90,6 +86,14 @@ public class StackQueueValleyWorld extends World {
         ((TeleportationCircle) farmCircleLocation.getGround()).setDestination(minesCircleLocation);
         ((TeleportationCircle) minesCircleLocation.getGround()).setDestination(farmCircleLocation);
 
+        // Extra travel points: three ladders and three teleportation circles in total.
+        // Ladders: (0,5) above, plus these two pairs.
+        linkLadders(inheritedFarmMap.at(0, 1), minesMap.at(1, 1));
+        linkLadders(inheritedFarmMap.at(9, 1), minesMap.at(8, 1));
+        // Circles: (9,6) above, plus these two pairs.
+        linkCircles(inheritedFarmMap.at(3, 6), minesMap.at(4, 5));
+        linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
+
         // --- Farmer setup ---
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
@@ -107,20 +111,30 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
-<<<<<<< HEAD
+
+        // REQ5: the zombie is a hostile creature, so it lives in the mines with the others
         minesMap.addActor(new Zombie(), minesMap.at(2, 4));
-        // TEMP HEALING TEST
-        Zombie zombie = new Zombie();
-        zombie.hurt(60);
+    }
 
-        inheritedFarmMap.addActor(
-                zombie,
-                inheritedFarmMap.at(2, 4)
-        );
+    /**
+     * Places a ladder on each location and links the two so that each leads to the other.
+     * Call this after both maps exist.
+     */
+    private void linkLadders(Location a, Location b) {
+        a.setGround(new Ladder());
+        b.setGround(new Ladder());
+        ((Ladder) a.getGround()).setDestination(b);
+        ((Ladder) b.getGround()).setDestination(a);
+    }
 
-        inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
-        inheritedFarmMap.at(2, 1).addItem(new ParsnipItem());
-=======
->>>>>>> origin/req5-dylan
+    /**
+     * Places a teleportation circle on each location and links the two so that each
+     * leads to the other. Call this after both maps exist.
+     */
+    private void linkCircles(Location a, Location b) {
+        a.setGround(new TeleportationCircle());
+        b.setGround(new TeleportationCircle());
+        ((TeleportationCircle) a.getGround()).setDestination(b);
+        ((TeleportationCircle) b.getGround()).setDestination(a);
     }
 }
