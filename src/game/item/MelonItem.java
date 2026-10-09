@@ -8,8 +8,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
+import game.blueprint.CoatingSource;
+import game.effect.MelonCoating;
 
-public class MelonItem extends Item implements Consumable{
+public class MelonItem extends Item implements Consumable, CoatingSource{
 
     public MelonItem(){
         super("Melon",'q');
@@ -45,6 +47,18 @@ public class MelonItem extends Item implements Consumable{
     @Override
     public Item getItem(){
         return this;
+    }
+
+    /** Creates the explosive coating provided by this melon. */
+    @Override
+    public MelonCoating createCoating() {
+        return new MelonCoating();
+    }
+
+    /** A melon is used up when it is applied as a coating source. */
+    @Override
+    public boolean isConsumedOnUse() {
+        return true;
     }
 
 }

@@ -4,6 +4,8 @@ import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
+import game.blueprint.CoatingSource;
+import game.blueprint.Coating;
 
 /**
  * Fire sitting on a piece of ground, exactly like ChargeEffect but for
@@ -21,7 +23,7 @@ import edu.monash.fit2099.engine.positions.Location;
  *   tile</li>
  * </ol>
  */
-public class FireEffect implements Status {
+public class FireEffect implements Status, CoatingSource {
     private int duration;
     private final int groundDamagePerTurn;
     private final int burnDuration;
@@ -47,6 +49,12 @@ public class FireEffect implements Status {
     }
 
     public boolean isActive() { return duration > 0; }
+
+    /** Creates the fire coating provided by active flames. */
+    @Override
+    public Coating createCoating() {
+        return new FireCoating();
+    }
 
     @Override
     public void tickStatus(GameEntity currEntity, Location location) {
