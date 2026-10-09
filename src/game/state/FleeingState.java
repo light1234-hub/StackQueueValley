@@ -72,11 +72,11 @@ public class FleeingState implements CreatureState
 
         if (sprint_turns > 0)
         {
-            sprint_turns--;
             Action twoStep = calculateTwoStep(zombie, zombielocation);
 
             if (twoStep != null)
             {
+                sprint_turns--;
                 return twoStep;
             }
         }
