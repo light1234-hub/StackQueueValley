@@ -7,7 +7,17 @@ import edu.monash.fit2099.engine.positions.Location;
 
 import java.util.Random;
 
-
+/**
+ * A generic action for moving an actor to a fixed Location, which may be on
+ * a different GameMap (this works because GameMap.moveActor() just updates
+ * the shared ActorLocationsIterator -- it doesn't care which map the actor
+ * came from). Optionally rolls a chance of the actor taking fall damage
+ * along the way, without ever preventing the travel itself.
+ * <p>
+ * Used by Ladder. Not used by TeleportationCircle or AlienDevice, since
+ * those have their own side effects (fire, malfunction) that don't fit this
+ * shape -- see TeleportAction and AlienDeviceAction.
+ */
 public class TravelAction extends Action {
     private final Location destination;
     private final String travelMethod;
@@ -42,13 +52,13 @@ public class TravelAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
-        Location arrival = SafeArrival.resolve(destination, actor);
-        if (arrival == null) {
-            return actor + " cannot use " + travelMethod + ": there is no free space at the other end.";
+        // The destination is fixed: if someone is standing there, the actor stays where they are.
+        if (destination.containsAnActor() || !destination.canActorEnter(actor)) {
+            return actor + " cannot use " + travelMethod + ": the other end is occupied.";
         }
         boolean fell = fallChance > 0 && random.nextDouble() < fallChance;
         // The fall never stops the travel -- the actor still arrives either way.
-        map.moveActor(actor, arrival);
+        map.moveActor(actor, destination);
         if (fell) {
             actor.hurt(fallDamage);
             return actor + " loses their footing on " + travelMethod + " and falls, taking " + fallDamage + " damage!";
