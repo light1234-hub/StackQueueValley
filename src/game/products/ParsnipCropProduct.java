@@ -84,4 +84,10 @@ public class ParsnipCropProduct implements Buyable
 
         return merchant + " plants a Parsnip Crop costing you " + PURCHASE_PRICE;
     }
+
+    @Override
+    public String toString()
+    {
+        return "Parsnip crop";
+    }
 }

@@ -23,6 +23,10 @@ public class TeleportAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
+        // The destination is fixed: if someone is standing there, the circle does nothing.
+        if (destination.containsAnActor() || !destination.canActorEnter(actor)) {
+            return actor + " cannot use the teleportation circle: the destination is occupied.";
+        }
         map.moveActor(actor, destination);
         for (Exit exit : destination.getExits()) {
             Location adjacent = exit.getDestination();

@@ -52,6 +52,10 @@ public class TravelAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
+        // The destination is fixed: if someone is standing there, the actor stays where they are.
+        if (destination.containsAnActor() || !destination.canActorEnter(actor)) {
+            return actor + " cannot use " + travelMethod + ": the other end is occupied.";
+        }
         boolean fell = fallChance > 0 && random.nextDouble() < fallChance;
         // The fall never stops the travel -- the actor still arrives either way.
         map.moveActor(actor, destination);
