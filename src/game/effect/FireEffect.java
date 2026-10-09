@@ -4,9 +4,10 @@ import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
+import game.blueprint.CoatingSource;
 
 
-public class FireEffect implements Status {
+public class FireEffect implements Status, CoatingSource {
     private int duration;
     private final int groundDamagePerTurn;
     private final int burnDuration;
@@ -32,6 +33,12 @@ public class FireEffect implements Status {
     }
 
     public boolean isActive() { return duration > 0; }
+
+    /** Creates the fire coating provided by this active ground effect. */
+    @Override
+    public FireCoating createCoating() {
+        return new FireCoating();
+    }
 
     @Override
     public void tickStatus(GameEntity currEntity, Location location) {
