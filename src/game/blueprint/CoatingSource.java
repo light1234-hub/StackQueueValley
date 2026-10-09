@@ -11,6 +11,11 @@ public interface CoatingSource {
     /** Creates the coating provided by this source. */
     Coating createCoating();
 
+    /** Indicates whether this source can currently be used. */
+    default boolean isAvailable() {
+        return true;
+    }
+
     /**
      * Indicates whether an item source is consumed after use. Ground effects
      * and reusable sources should keep the default value.

@@ -1,9 +1,8 @@
 package game.effect;
 
 import edu.monash.fit2099.engine.GameEntity;
-import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
-import game.blueprint.CoatingSource;
+import game.blueprint.CoatingStatus;
 
 /**
  * An electrical charge sitting on a piece of ground (e.g. a Puddle), released
@@ -14,7 +13,7 @@ import game.blueprint.CoatingSource;
  * so it can hold statuses the same way an Actor can), not to an actor --
  * that's what lets it keep damaging whoever happens to be standing there.
  */
-public class ChargeEffect implements Status, CoatingSource {
+public class ChargeEffect implements CoatingStatus {
     private int duration;
 
     /**

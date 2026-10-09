@@ -7,16 +7,19 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviour.WanderBehaviour;
+import game.blueprint.AttackReactive;
 import game.blueprint.Coatable;
 import game.farmeraction.SwordAttackAction;
 import game.farmeraction.CreatureAttackAction;
 import edu.monash.fit2099.engine.weapons.Weapon;
+import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.positions.Exit;
 
 /**
  * Shared turn, wandering, and attack behavior for hostile mine creatures.
  * Concrete creatures provide their own attack damage and hit chance.
  */
-public abstract class HostileCreature extends Actor {
+public abstract class HostileCreature extends Actor implements AttackReactive {
     private final WanderBehaviour wander = new WanderBehaviour();
 
     /**
@@ -40,6 +43,7 @@ public abstract class HostileCreature extends Actor {
      * @param location creature's location when attacked
      * @param killed whether the attack has reduced the creature to zero health
      */
+    @Override
     public void onAttacked(Location location, boolean killed) { }
 
     /** Attacks an adjacent farmer; otherwise wanders to an available tile. */
@@ -50,10 +54,10 @@ public abstract class HostileCreature extends Actor {
             return new edu.monash.fit2099.engine.actions.DoNothingAction();
         }
         Location here = map.locationOf(this);
-        for (edu.monash.fit2099.engine.positions.Exit exit : here.getExits()) {
+        for (Exit exit : here.getExits()) {
             Location next = exit.getDestination();
-            if (next.containsAnActor() && next.getActor() instanceof Farmer)
-                return new CreatureAttackAction((Farmer) next.getActor(), exit.getName(), damage(), hitChance());
+            if (next.containsAnActor() && next.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))
+                return new CreatureAttackAction(next.getActor(), exit.getName(), damage(), hitChance());
         }
         Action action = wander.operate(this, here);
         return action == null ? new edu.monash.fit2099.engine.actions.DoNothingAction() : action;
@@ -63,10 +67,11 @@ public abstract class HostileCreature extends Actor {
     @Override
     public ActionList allowableActions(Actor other, String direction, GameMap map) {
         ActionList actions = new ActionList();
-        if (other instanceof Farmer) {
-            for (edu.monash.fit2099.engine.items.Item item : other.getInventory().getItems()) {
-                if (item instanceof Weapon && item instanceof Coatable)
-                    actions.add(new SwordAttackAction(this, direction, item, (Weapon) item, (Coatable) item));
+        if (other.hasAbility(ZombieTarget.ZOMBIE_TARGET)) {
+            for (Item item : other.getInventory().getItems()) {
+                item.asCapability(Weapon.class).ifPresent(weapon ->
+                        item.asCapability(Coatable.class).ifPresent(coatable ->
+                                actions.add(new SwordAttackAction(this, direction, item, weapon, coatable))));
             }
         }
         return actions;

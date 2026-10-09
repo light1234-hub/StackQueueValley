@@ -2,7 +2,6 @@ package game.farmeraction;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -39,7 +38,7 @@ public class ApplyCoatingAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
-        if (source instanceof Status && !((Status) source).isStatusActive()) {
+        if (!source.isAvailable()) {
             return "The coating source is no longer active.";
         }
         if (sourceItem != null && source.isConsumedOnUse()) {

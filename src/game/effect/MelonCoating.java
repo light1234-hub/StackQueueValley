@@ -4,7 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actor.HostileCreature;
+import game.blueprint.AttackReactive;
 import game.blueprint.Coating;
 
 /**
@@ -24,9 +24,8 @@ public class MelonCoating implements Coating {
             Actor splashTarget = adjacent.getActor();
             splashTarget.hurt(15);
             boolean killed = !splashTarget.isConscious();
-            if (splashTarget instanceof HostileCreature) {
-                ((HostileCreature) splashTarget).onAttacked(adjacent, killed);
-            }
+            splashTarget.asCapability(AttackReactive.class)
+                    .ifPresent(reactive -> reactive.onAttacked(adjacent, killed));
             if (killed) result.append(System.lineSeparator())
                     .append(splashTarget.unconscious(attacker, map));
         }

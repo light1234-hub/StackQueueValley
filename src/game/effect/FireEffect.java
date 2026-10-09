@@ -2,12 +2,11 @@ package game.effect;
 
 import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
-import game.blueprint.CoatingSource;
+import game.blueprint.CoatingStatus;
 
 
-public class FireEffect implements Status, CoatingSource {
+public class FireEffect implements CoatingStatus {
     private int duration;
     private final int groundDamagePerTurn;
     private final int burnDuration;
