@@ -8,14 +8,16 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.ability.ToolAbility;
 import game.blueprint.Breakable;
 import game.farmeraction.BreakAction;
-import game.farmeraction.SafeArrival;
 import game.item.StoneItem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * An impassable rock found in the mines. Must be broken with a pickaxe to
+ * clear the way.
+ */
 public class Rock extends Ground implements Breakable {
     private final Random random = new Random();
 
@@ -28,7 +30,11 @@ public class Rock extends Ground implements Breakable {
         return false;
     }
 
-
+    /**
+     * Breaking always drops a stone and turns the tile to dirt. There's also
+     * a 50% chance of a shockwave that throws the breaking actor onto a
+     * random tile adjacent to the rock.
+     */
     @Override
     public String breakBlock(Actor actor, Location location) {
         location.addItem(new StoneItem());
@@ -42,7 +48,7 @@ public class Rock extends Ground implements Breakable {
             List<Location> landingSpots = new ArrayList<>();
             for (Exit exit : location.getExits()) {
                 Location candidate = exit.getDestination();
-                if (SafeArrival.isFree(candidate, actor)) {
+                if (candidate.canActorEnter(actor) && !candidate.containsAnActor()) {
                     landingSpots.add(candidate);
                 }
             }
