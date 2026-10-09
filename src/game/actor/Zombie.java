@@ -72,21 +72,9 @@ public class Zombie extends HostileCreature {
 
         CreatureState next = currentState.nextState(this, map);
         if (next != currentState) {
-            System.out.println(
-                    "Zombie: "
-                            + currentState.getClass().getSimpleName()
-                            + " -> "
-                            + next.getClass().getSimpleName()
-            );
-
             currentState = next;
             currentState.onEnter(this, map);
         }
-
-        System.out.println(
-                "Current state: "
-                        + currentState.getClass().getSimpleName()
-        );
 
         Action action = currentState.getAction(this, map);
         return action == null ? new DoNothingAction() : action;

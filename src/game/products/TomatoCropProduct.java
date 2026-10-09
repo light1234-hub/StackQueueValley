@@ -55,18 +55,12 @@ public class TomatoCropProduct implements Buyable
         {
             buyer.modifyStatistic(FinanceStatistics.COINS,StatisticOperations.INCREASE,PURCHASE_PRICE);
 
-            return merchant + " plants a Tomato Crop for free!";
+            return merchant + " plants a Parsnip Crop for free!";
         }
         else
         {
             return merchant + " plants a Tomato Crop costing you " + PURCHASE_PRICE;
         }
 
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Tomato crop";
     }
 }

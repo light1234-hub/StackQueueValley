@@ -15,18 +15,8 @@ public class Puddle extends Ground implements Chargeable {
         super('~', "Puddle");
     }
 
-    /**
-     * Charges this puddle. A puddle only ever holds one active charge, so
-     * charging it again while it is still charged does nothing. Otherwise every
-     * extra charge would shock the actor standing on it again (20 damage each).
-     */
     @Override
     public void charge() {
-        boolean alreadyCharged = this.statusesOf(ChargeEffect.class).stream()
-                .anyMatch(ChargeEffect::isActive);
-        if (alreadyCharged) {
-            return;
-        }
         // The spec doesn't give an exact duration for how long charged
         // ground stays charged -- 999 is a stand-in for "a long time".
         // Adjust if your marking rubric expects a specific number of turns.

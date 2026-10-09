@@ -3,11 +3,14 @@ package game.farmeraction;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.ability.ToolAbility;
 import game.item.GeodeItem;
 import game.terrain.GeodeMechanics;
 
-
+/**
+ * Breaks a geode directly from the farmer's inventory. Per the spec, the
+ * explosion (if that's the outcome) is centred on the farmer's own current
+ * location rather than wherever the geode was originally found.
+ */
 public class BreakGeodeFromInventoryAction extends Action {
     private final GeodeItem geode;
 
@@ -17,9 +20,6 @@ public class BreakGeodeFromInventoryAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
-        if (!actor.hasAbility(ToolAbility.MINE)) {
-            return actor + " needs a Pickaxe to break this.";
-        }
         actor.getInventory().remove(geode);
         return GeodeMechanics.resolve(actor, map.locationOf(actor));
     }

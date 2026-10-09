@@ -29,6 +29,7 @@ import java.util.Set;
  */
 public class AttackingState implements CreatureState {
     private final WanderBehaviour wander = new WanderBehaviour();
+    private boolean attackBonusForNextTurn;
 
     /**
      * Transitions to fleeing below 70% health when a safe escape tile is
@@ -53,12 +54,21 @@ public class AttackingState implements CreatureState {
     /** Attacks an adjacent target, pursues a reachable target, or wanders if none is reachable. */
     @Override
     public Action getAction(Zombie zombie, GameMap map) {
+        boolean boostedTurn = attackBonusForNextTurn;
+        attackBonusForNextTurn = false;
+
         Location here = map.locationOf(zombie);
         for (Exit exit : here.getExits()) {
             Location next = exit.getDestination();
             if (isTarget(next)) {
                 Actor target = next.getActor();
-                return new CreatureAttackAction(target, exit.getName(), zombie.damage(), zombie.hitChance());
+                int damage = zombie.damage();
+                int hitChance = zombie.hitChance();
+                if (boostedTurn) {
+                    damage = (int) Math.round(damage * 1.10);
+                    hitChance = Math.min(100, (int) Math.round(hitChance * 1.15));
+                }
+                return new CreatureAttackAction(target, exit.getName(), damage, hitChance);
             }
         }
 
@@ -72,9 +82,11 @@ public class AttackingState implements CreatureState {
         return action == null ? new DoNothingAction() : action;
     }
 
-    /** No one-time effect is needed when entering the attacking state. */
+    /** Arms a one-turn increase to attack damage and hit chance. */
     @Override
-    public void onEnter(Zombie zombie, GameMap map) { }
+    public void onEnter(Zombie zombie, GameMap map) {
+        attackBonusForNextTurn = true;
+    }
 
     private boolean healthBelow(Zombie zombie, int percentage) {
         return zombie.getStatistic(ActorStatistics.HEALTH) * 100

@@ -4,10 +4,15 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.ability.ToolAbility;
 import game.farmeraction.BreakGeodeFromInventoryAction;
 
-
+/**
+ * A geode being carried in the farmer's inventory, rather than lying on the
+ * ground. It can be broken directly from here -- see
+ * {@link BreakGeodeFromInventoryAction}. Uses a different display character
+ * to the ground version (game.terrain.Geode) purely so the two are easy to
+ * tell apart on screen.
+ */
 public class GeodeItem extends Item {
     public GeodeItem() {
         super("Geode", 'q');
@@ -24,9 +29,7 @@ public class GeodeItem extends Item {
     @Override
     public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actions = super.allowableActions(owner, map);
-        if (owner.hasAbility(ToolAbility.MINE)) {
-            actions.add(new BreakGeodeFromInventoryAction(this));
-        }
+        actions.add(new BreakGeodeFromInventoryAction(this));
         return actions;
     }
 }

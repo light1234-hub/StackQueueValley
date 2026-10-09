@@ -26,11 +26,6 @@ public class CauliflowerCrop extends Ground implements Harvestable, Waterable {
         super('Y',"Cauliflower crop");
     }
 
-    /**
-     * Checks whether the cauliflower has been watered at least five times.
-     *
-     * @return true if ready to harvest
-     */
     @Override
     public boolean canHarvest() {
         return timeWatered >= 5;

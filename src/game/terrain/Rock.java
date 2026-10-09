@@ -5,12 +5,10 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
-import game.ability.ToolAbility;
 import game.blueprint.Breakable;
 import game.farmeraction.BreakAction;
 import game.item.StoneItem;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -43,19 +41,15 @@ public class Rock extends Ground implements Breakable {
         String message = actor + " breaks the rock and a stone drops out.";
 
         if (random.nextBoolean()) {
-            // Only tiles the actor can actually land on are candidates, so the
-            // throw never fails just because a random pick happened to be blocked.
-            List<Location> landingSpots = new ArrayList<>();
-            for (Exit exit : location.getExits()) {
-                Location candidate = exit.getDestination();
-                if (candidate.canActorEnter(actor) && !candidate.containsAnActor()) {
-                    landingSpots.add(candidate);
+            List<Location> adjacent = location.getExits().stream()
+                    .map(Exit::getDestination)
+                    .toList();
+            if (!adjacent.isEmpty()) {
+                Location shockDestination = adjacent.get(random.nextInt(adjacent.size()));
+                if (shockDestination.canActorEnter(actor)) {
+                    location.map().moveActor(actor, shockDestination);
+                    message += " A shockwave throws " + actor + " onto a nearby tile!";
                 }
-            }
-            if (!landingSpots.isEmpty()) {
-                Location shockDestination = landingSpots.get(random.nextInt(landingSpots.size()));
-                location.map().moveActor(actor, shockDestination);
-                message += " A shockwave throws " + actor + " onto a nearby tile!";
             }
         }
         return message;
@@ -69,9 +63,7 @@ public class Rock extends Ground implements Breakable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
-        if (actor.hasAbility(ToolAbility.MINE)) {
-            actions.add(new BreakAction(this, location));
-        }
+        actions.add(new BreakAction(this, location));
         return actions;
     }
 }
