@@ -14,6 +14,9 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an Parsnip crop that can be purchased from the merchant
+ */
 public class ParsnipCropProduct implements Buyable
 {
     private static final int PURCHASE_PRICE = 250;
@@ -22,12 +25,21 @@ public class ParsnipCropProduct implements Buyable
 
     private final Random random = new Random();
 
+    /**
+     * A getter that returns the cost of the purchase
+     * @return the cost of buying a parsnip crop
+     */
     @Override
     public int getBuyCost()
     {
         return PURCHASE_PRICE;
     }
 
+    /**
+     * Scans all nearby locations around a certain point to find all plantable locations
+     * @param location
+     * @return a list of plantable locations
+     */
     private List<Location> plantableLocations(Location location)
     {
         List<Location> plantableLocations = new ArrayList<>();
@@ -47,6 +59,11 @@ public class ParsnipCropProduct implements Buyable
         return plantableLocations;
     }
 
+    /**
+     * Drops a set number of parsnips into randomly selected tiles
+     * that are adjacent to the planted parsnip
+     * @param cropLocation
+     */
     private void dropParsnipsNearby(Location cropLocation)
     {
         List<Location> adjacentLocations = cropLocation.getNearbyLocations(ADJACENT_RADIUS);
@@ -65,6 +82,13 @@ public class ParsnipCropProduct implements Buyable
         }
     }
 
+    /**
+     * Carries out the logic of the parsnip crop purchase after it has been bought
+     * @param buyer
+     * @param merchant
+     * @param merchantLocation
+     * @return a string describing the result of the purchase (successful or refund)
+     */
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)
     {
@@ -85,6 +109,10 @@ public class ParsnipCropProduct implements Buyable
         return merchant + " plants a Parsnip Crop costing you " + PURCHASE_PRICE;
     }
 
+    /**
+     * Returns a string representation of the product
+     * @return a string representing the name of the parsnip crop product
+     */
     @Override
     public String toString()
     {

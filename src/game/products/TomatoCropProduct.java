@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Represents a Tomato crop that can be purchased from the merchant
+ */
 public class TomatoCropProduct implements Buyable
 {
     private static final int PURCHASE_PRICE = 500;
@@ -20,12 +23,23 @@ public class TomatoCropProduct implements Buyable
     private static final int ADJACENT_RADIUS = 1;
     private final Random random = new Random();
 
+    /**
+     * A getter that returns the cost of the purchase
+     * @return the cost of buying a tomato crop
+     */
     @Override
     public int getBuyCost()
     {
         return PURCHASE_PRICE;
     }
 
+    /**
+     * Carries out the logic of the tomato crop product purchase after it has been bought
+     * @param buyer
+     * @param merchant
+     * @param merchantLocation
+     * @return a string describing the result of the purchase (successful, refund or free tomatos)
+     */
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)
     {
@@ -56,6 +70,11 @@ public class TomatoCropProduct implements Buyable
 
     }
 
+    /**
+     * Scans all nearby locations around a certain point to find all plantable locations
+     * @param merchantLocation
+     * @return a list of plantable locations
+     */
     private List<Location> getPlantableLocations(Location merchantLocation)
     {
         List<Location> plantableLocations = new ArrayList<>();
@@ -76,6 +95,10 @@ public class TomatoCropProduct implements Buyable
 
     }
 
+    /**
+     * Returns a string representation of the product
+     * @return a string representing the name of the tomato crop product
+     */
     @Override
     public String toString()
     {

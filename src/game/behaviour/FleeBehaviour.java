@@ -14,10 +14,20 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
 
+/**
+ * Behaviour that allows an actor to runaway from another actor, moving 2 tiles
+ * in one turn in the complete opposite direction of the other actor
+ */
 public class FleeBehaviour implements Behaviour<Actor, Action>
 {
     private static final int SEARCH_RANGE = 5;
 
+    /**
+     * Computes the fleeing action depending on the position of the other actor
+     * @param entity The entity performing the flee behaviour
+     * @param location The location of the current entity
+     * @return an action to move away from the threat or null if no threat has been detected
+     */
     @Override
     public Action operate(Actor entity, Location location)
     {
@@ -85,6 +95,12 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         return null;
     }
 
+    /**
+     * Finds the nearest possible threat within the search range using a breadth first search (BFS)
+     * @param start
+     * @param actor
+     * @return the location of the nearest threat or null if no threat has been detected
+     */
     private Location findNearestThreat(Location start, Actor actor)
     {
         Queue<Location> queue = new ArrayDeque<>();
@@ -122,6 +138,13 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         return null;
     }
 
+    /**
+     * Retrieves the relative location offset from the base location on the map
+     * @param base
+     * @param deltaX
+     * @param deltaY
+     * @return the target location or null if the location is out of bounds
+     */
     private Location getRelativeLocation(Location base, int deltaX, int deltaY)
     {
         try
@@ -133,6 +156,12 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         }
     }
 
+    /**
+     * Converts the coordinate direction into readable string name
+     * @param dx
+     * @param dy
+     * @return
+     */
     private String getDirectionString(int dx, int dy)
     {
         int directionKey = (Integer.compare(dx,0) +1) * 3 + (Integer.compare(dy,0) + 1);
