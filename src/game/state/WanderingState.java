@@ -4,11 +4,12 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.TerrainAbility;
 import game.actor.Zombie;
 import game.behaviour.WanderBehaviour;
-import game.terrain.CorruptedDirt;
-import game.terrain.Dirt;
+import game.blueprint.Corruptible;
 
 
 public class WanderingState implements CreatureState {
@@ -43,16 +44,17 @@ public class WanderingState implements CreatureState {
     }
 
     /**
-     * Entry effect: as the zombie starts to wander it corrupts the plain
-     * dirt on every tile next to it. Only Dirt is affected, so tilled soil,
+     * Entry effect: as the zombie starts to wander it corrupts the corruptible
+     * ground (currently only Dirt) on every tile next to it. Tilled soil,
      * crops, ladders and other terrain are left alone.
      */
     @Override
     public void onEnter(Zombie zombie, GameMap map) {
         for (Exit exit : map.locationOf(zombie).getExits()) {
             Location adjacent = exit.getDestination();
-            if (adjacent.getGround() instanceof Dirt) {
-                adjacent.setGround(new CorruptedDirt());
+            Ground ground = adjacent.getGround();
+            if (ground.hasAbility(TerrainAbility.CAN_BE_CORRUPTED)) {
+                ((Corruptible) ground).corrupt(adjacent);
             }
         }
     }

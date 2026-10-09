@@ -20,6 +20,7 @@ public class Dirt extends Ground implements Tillable, Waterable, Corruptible {
     public Dirt() {
         super('.', "Dirt");
         this.enableAbility(TerrainAbility.CAN_BE_PUDDLE);
+        this.enableAbility(TerrainAbility.CAN_BE_CORRUPTED);
     }
 
     /**
