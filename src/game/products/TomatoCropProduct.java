@@ -3,6 +3,7 @@ package game.products;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.GroundAbility;
 import game.actor.FinanceStatistics;
 import game.blueprint.Harvestable;
 import game.blueprint.Buyable;
@@ -28,16 +29,7 @@ public class TomatoCropProduct implements Buyable
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)
     {
-        List<Location> nearbyLocations = merchantLocation.getNearbyLocations(ADJACENT_RADIUS);
-        List<Location> plantableLocations = new ArrayList<>();
-
-        for (Location nearby : nearbyLocations)
-        {
-            if (nearby.getGroundAs(Harvestable.class) == null)
-            {
-                plantableLocations.add(nearby);
-            }
-        }
+        List<Location> plantableLocations = getPlantableLocations(merchantLocation);
 
         if (plantableLocations.isEmpty())
         {
@@ -61,6 +53,26 @@ public class TomatoCropProduct implements Buyable
         {
             return merchant + " plants a Tomato Crop costing you " + PURCHASE_PRICE;
         }
+
+    }
+
+    private List<Location> getPlantableLocations(Location merchantLocation)
+    {
+        List<Location> plantableLocations = new ArrayList<>();
+        List<Location> nearbyLocations = merchantLocation.getNearbyLocations(ADJACENT_RADIUS);
+
+        for (Location nearby : nearbyLocations)
+        {
+            boolean isFertile = nearby.getGround().hasAbility(GroundAbility.FERTILE);
+            boolean hasNoCrop = (nearby.getGroundAs(Harvestable.class) == null);
+
+            if (isFertile && hasNoCrop)
+            {
+                plantableLocations.add(nearby);
+            }
+        }
+
+        return plantableLocations;
 
     }
 
