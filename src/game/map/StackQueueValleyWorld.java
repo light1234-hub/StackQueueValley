@@ -106,7 +106,8 @@ public class StackQueueValleyWorld extends World {
         AlienDevice device = new AlienDevice();
         device.addDestination(inheritedFarmMap.at(5, 3));
         device.addDestination(minesMap.at(5, 3));
-        farmer.getInventory().add(device);
+        // REQ2: the device is found on the farm map, not carried from the start
+        inheritedFarmMap.at(7, 4).addItem(device);
 
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
