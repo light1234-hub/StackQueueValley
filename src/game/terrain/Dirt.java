@@ -5,14 +5,14 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.ability.TerrainAbility;
-import game.ability.GroundAbility;
 import game.farmeraction.TillAction;
 import game.farmeraction.WaterAction;
+import game.blueprint.Corruptible;
 import game.blueprint.Tillable;
 import game.blueprint.Waterable;
 
 
-public class Dirt extends Ground implements Tillable, Waterable {
+public class Dirt extends Ground implements Tillable, Waterable, Corruptible {
 
     /**
      * A class representing dirt on the ground.
@@ -20,7 +20,7 @@ public class Dirt extends Ground implements Tillable, Waterable {
     public Dirt() {
         super('.', "Dirt");
         this.enableAbility(TerrainAbility.CAN_BE_PUDDLE);
-        this.enableAbility(GroundAbility.FERTILE);
+        this.enableAbility(TerrainAbility.CAN_BE_CORRUPTED);
     }
 
     /**
@@ -59,6 +59,16 @@ public class Dirt extends Ground implements Tillable, Waterable {
     @Override
     public int waterStamina(){
         return 2;
+    }
+
+    /**
+     * Corrupts this dirt by replacing it with corrupted dirt.
+     *
+     * @param location location containing the dirt
+     */
+    @Override
+    public void corrupt(Location location){
+        location.setGround(new CorruptedDirt());
     }
 
     /**

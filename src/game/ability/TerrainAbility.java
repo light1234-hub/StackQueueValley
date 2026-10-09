@@ -1,5 +1,6 @@
 package game.ability;
 
 public enum TerrainAbility {
-    CAN_BE_PUDDLE;
+    CAN_BE_PUDDLE,
+    CAN_BE_CORRUPTED
 }
