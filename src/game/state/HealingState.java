@@ -41,6 +41,13 @@ public class HealingState implements CreatureState{
      */
     @Override
     public  CreatureState nextState(Zombie zombie, GameMap map){
+        // An active poison prevents healing, even if it began while already in this state.
+        if (ZombieSensor.isPoisoned(zombie)) {
+            return ZombieSensor.hasTargetNearby(zombie, map, TARGET_SCAN_RANGE)
+                    ? zombie.getAttackingState()
+                    : zombie.getWanderingState();
+        }
+
         boolean recovered = ZombieSensor.healthPercent(zombie) >= ZombieSensor.RECOVERED_PERCENT;
         boolean target = ZombieSensor.hasTargetNearby(zombie,map,TARGET_SCAN_RANGE);
         boolean food = ZombieSensor.hasFoodNearby(zombie,map,FOOD_SCAN_RANGE);

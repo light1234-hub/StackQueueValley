@@ -10,10 +10,6 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.actor.ZombieTarget;
 import game.behaviour.WanderBehaviour;
-import game.effect.BurnEffect;
-import game.effect.ChargeEffect;
-import game.effect.FireEffect;
-import game.effect.PoisonEffect;
 import game.farmeraction.CreatureAttackAction;
 
 import java.util.ArrayDeque;
@@ -38,12 +34,12 @@ public class AttackingState implements CreatureState {
      */
     @Override
     public CreatureState nextState(Zombie zombie, GameMap map) {
-        if (healthBelow(zombie, 70) && !isBurning(zombie) && hasSafeEscapeTile(zombie, map)) {
+        if (ZombieSensor.canFlee(zombie, map)) {
             return zombie.getFleeingState();
         }
         boolean hasTargetToAttack = hasAdjacentTarget(zombie, map);
         boolean hasValidTarget = firstStepToTarget(zombie, map) != null;
-        if (healthBelow(zombie, 50) && !isPoisoned(zombie)
+        if (healthBelow(zombie, 50) && !ZombieSensor.isPoisoned(zombie)
                 && (!hasTargetToAttack || !hasValidTarget)) {
             return zombie.getHealingState();
         }
@@ -72,21 +68,18 @@ public class AttackingState implements CreatureState {
         return action == null ? new DoNothingAction() : action;
     }
 
-    /** No one-time effect is needed when entering the attacking state. */
+    /**
+     * Temporarily increases the Zombie's attack damage and hit chance. The
+     * Zombie restores its base values at the beginning of its next turn.
+     */
     @Override
-    public void onEnter(Zombie zombie, GameMap map) { }
+    public void onEnter(Zombie zombie, GameMap map) {
+        zombie.boostAttackForCurrentTurn();
+    }
 
     private boolean healthBelow(Zombie zombie, int percentage) {
         return zombie.getStatistic(ActorStatistics.HEALTH) * 100
                 < zombie.getMaximumStatistic(ActorStatistics.HEALTH) * percentage;
-    }
-
-    private boolean isBurning(Zombie zombie) {
-        return zombie.statusesOf(BurnEffect.class).stream().anyMatch(BurnEffect::isStatusActive);
-    }
-
-    private boolean isPoisoned(Zombie zombie) {
-        return zombie.statusesOf(PoisonEffect.class).stream().anyMatch(PoisonEffect::isStatusActive);
     }
 
     private boolean isTarget(Location location) {
@@ -126,17 +119,4 @@ public class AttackingState implements CreatureState {
         return null;
     }
 
-    /** Checks for at least one free adjacent tile without active fire or charge. */
-    private boolean hasSafeEscapeTile(Zombie zombie, GameMap map) {
-        for (Exit exit : map.locationOf(zombie).getExits()) {
-            Location destination = exit.getDestination();
-            if (destination.containsAnActor() || !destination.canActorEnter(zombie)) continue;
-            boolean onFire = destination.getGround().statusesOf(FireEffect.class)
-                    .stream().anyMatch(FireEffect::isStatusActive);
-            boolean charged = destination.getGround().statusesOf(ChargeEffect.class)
-                    .stream().anyMatch(ChargeEffect::isStatusActive);
-            if (!onFire && !charged) return true;
-        }
-        return false;
-    }
 }

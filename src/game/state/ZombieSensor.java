@@ -8,6 +8,10 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.actor.ZombieTarget;
 import game.blueprint.Consumable;
+import game.effect.BurnEffect;
+import game.effect.ChargeEffect;
+import game.effect.FireEffect;
+import game.effect.PoisonEffect;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -38,6 +42,49 @@ public final class ZombieSensor {
             return 0;
         }
         return zombie.getStatistic(ActorStatistics.HEALTH) * 100 / max;
+    }
+
+    /**
+     * Checks whether the Zombie meets the fleeing requirements: low health,
+     * not burning, and at least one unoccupied enterable adjacent tile without
+     * active fire or charge.
+     *
+     * @param zombie the Zombie being checked
+     * @param map current game map
+     * @return true when the Zombie can safely enter its fleeing state
+     */
+    public static boolean canFlee(Zombie zombie, GameMap map) {
+        if (healthPercent(zombie) >= ATTACK_MIN_PERCENT || isBurning(zombie)) {
+            return false;
+        }
+        for (Exit exit : map.locationOf(zombie).getExits()) {
+            Location destination = exit.getDestination();
+            if (destination.containsAnActor() || !destination.canActorEnter(zombie)) {
+                continue;
+            }
+            boolean onFire = destination.getGround().statusesOf(FireEffect.class)
+                    .stream().anyMatch(FireEffect::isStatusActive);
+            boolean charged = destination.getGround().statusesOf(ChargeEffect.class)
+                    .stream().anyMatch(ChargeEffect::isStatusActive);
+            if (!onFire && !charged) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isBurning(Zombie zombie) {
+        return zombie.statusesOf(BurnEffect.class).stream().anyMatch(BurnEffect::isStatusActive);
+    }
+
+    /**
+     * Checks whether the Zombie currently has an active poison effect.
+     *
+     * @param zombie the Zombie being checked
+     * @return true if the Zombie is poisoned
+     */
+    public static boolean isPoisoned(Zombie zombie) {
+        return zombie.statusesOf(PoisonEffect.class).stream().anyMatch(PoisonEffect::isStatusActive);
     }
 
     /**

@@ -22,12 +22,14 @@ public class WanderingState implements CreatureState {
         int health = ZombieSensor.healthPercent(zombie);
 
         // severely injured: healing takes priority over fleeing
-        if (health < ZombieSensor.HEAL_BELOW_PERCENT && ZombieSensor.hasFoodNearby(zombie, map, SCAN_RANGE)) {
+        if (health < ZombieSensor.HEAL_BELOW_PERCENT
+                && !ZombieSensor.isPoisoned(zombie)
+                && ZombieSensor.hasFoodNearby(zombie, map, SCAN_RANGE)) {
             return zombie.getHealingState();
         }
 
         if (ZombieSensor.hasTargetNearby(zombie, map, SCAN_RANGE)) {
-            if (health < ZombieSensor.ATTACK_MIN_PERCENT) {
+            if (health < ZombieSensor.ATTACK_MIN_PERCENT && ZombieSensor.canFlee(zombie, map)) {
                 return zombie.getFleeingState();
             }
             return zombie.getAttackingState();

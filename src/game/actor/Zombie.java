@@ -16,6 +16,12 @@ public class Zombie extends HostileCreature {
     private static final int MAX_HP = 100;
     private static final int ATTACK_DAMAGE = 20;
     private static final int HIT_CHANCE = 60;
+    private static final double ATTACK_DAMAGE_BOOST = 1.10;
+    private static final double HIT_CHANCE_BOOST = 1.15;
+
+    /** Current combat values; restored to their base values at the next turn. */
+    private int currentDamage = ATTACK_DAMAGE;
+    private int currentHitChance = HIT_CHANCE;
 
     private final CreatureState wanderingState = new WanderingState();
     private final CreatureState attackingState = new AttackingState();
@@ -23,6 +29,7 @@ public class Zombie extends HostileCreature {
     private final CreatureState healingState = new HealingState();
 
     private CreatureState currentState;
+    private boolean stateEntered;
 
 
     public Zombie() {
@@ -53,18 +60,36 @@ public class Zombie extends HostileCreature {
 
     @Override
     public int damage() {
-        return ATTACK_DAMAGE;
+        return currentDamage;
     }
 
 
     @Override
     public int hitChance() {
-        return HIT_CHANCE;
+        return currentHitChance;
+    }
+
+    /**
+     * Applies the temporary combat increase when entering the attacking state.
+     * The values are reset at the beginning of the Zombie's next turn.
+     */
+    public void boostAttackForCurrentTurn() {
+        currentDamage = (int) Math.round(ATTACK_DAMAGE * ATTACK_DAMAGE_BOOST);
+        currentHitChance = (int) Math.round(HIT_CHANCE * HIT_CHANCE_BOOST);
+    }
+
+    /** Restores the Zombie's normal combat values. */
+    private void resetAttackStats() {
+        currentDamage = ATTACK_DAMAGE;
+        currentHitChance = HIT_CHANCE;
     }
 
 
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        // An attacking-state entry bonus lasts for this turn only.
+        resetAttackStats();
+
         if (!isConscious()) {
             unconscious(map);
             return new DoNothingAction();
@@ -81,6 +106,11 @@ public class Zombie extends HostileCreature {
 
             currentState = next;
             currentState.onEnter(this, map);
+            stateEntered = true;
+        } else if (!stateEntered) {
+            // Run the entry effect for the initial state once as well.
+            currentState.onEnter(this, map);
+            stateEntered = true;
         }
 
         System.out.println(
