@@ -9,10 +9,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.ability.ToolAbility;
 import game.blueprint.Breakable;
 
-/**
- * Action that breaks a rock, copper node or geode using a pickaxe and
- * stamina. Mirrors the structure of HarvestAction/TillAction/WaterAction.
- */
+
 public class BreakAction extends Action {
     private final Breakable target;
     private final Location targetLocation;
