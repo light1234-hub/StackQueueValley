@@ -38,13 +38,13 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
 
         if (twoStepLocation != null && midStepLocation != null
             && !twoStepLocation.containsAnActor() && twoStepLocation.canActorEnter(entity)
-            && !midStepLocation.containsAnActor())
+            && !midStepLocation.containsAnActor() && midStepLocation.canActorEnter(entity))
         {
             return new TwoStepMoveAction(twoStepLocation,getDirectionString(fleeDx,fleeDy));
         }
 
         if (midStepLocation != null && !midStepLocation.containsAnActor()
-                && midStepLocation.canActorEnter(entity) && midStepLocation.containsAnActor())
+                && midStepLocation.canActorEnter(entity))
         {
             for (Exit exit: location.getExits())
             {
@@ -96,7 +96,7 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         {
             Location current = queue.poll();
 
-            if (current.equals(start) && current.containsAnActor() && ZombieSensor.isTarget(current.getActor()))
+            if (!current.equals(start) && current.containsAnActor() && ZombieSensor.isTarget(current.getActor()))
             {
                 return current;
             }
