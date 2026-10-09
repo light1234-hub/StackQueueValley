@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.state.ZombieSensor;
 import game.zombieaction.TwoStepMoveAction;
 import game.actor.ZombieTarget;
 
@@ -43,7 +44,7 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         }
 
         if (midStepLocation != null && !midStepLocation.containsAnActor()
-                && midStepLocation.canActorEnter(entity))
+                && midStepLocation.canActorEnter(entity) && midStepLocation.containsAnActor())
         {
             for (Exit exit: location.getExits())
             {
@@ -95,7 +96,7 @@ public class FleeBehaviour implements Behaviour<Actor, Action>
         {
             Location current = queue.poll();
 
-            if (current.containsAnActor() && current.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))
+            if (current.equals(start) && current.containsAnActor() && ZombieSensor.isTarget(current.getActor()))
             {
                 return current;
             }
