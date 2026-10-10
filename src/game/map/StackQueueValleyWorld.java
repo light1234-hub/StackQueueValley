@@ -6,7 +6,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actor.*;
-import game.item.AlienDevice;
+import game.item.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
 
@@ -58,6 +58,17 @@ public class StackQueueValleyWorld extends World {
         // the ASCII strings above, so the original farm layout stays untouched.
         inheritedFarmMap.at(0, 5).setGround(new Ladder());
         inheritedFarmMap.at(9, 6).setGround(new TeleportationCircle());
+
+        // REQ5: Zombie on the farm
+        inheritedFarmMap.addActor(new Zombie(), inheritedFarmMap.at(2, 4));
+
+
+        inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
+        inheritedFarmMap.at(0, 4).addItem(new MelonItem());
+        inheritedFarmMap.at(1, 3).addItem(new StrawberryItem(false));
+        inheritedFarmMap.at(3, 3).addItem(new CauliflowerItem());
+        inheritedFarmMap.at(4, 4).addItem(new StrawberryItem(false));
+        inheritedFarmMap.at(3, 5).addItem(new ParsnipItem());
 
         // --- Mines map (new for REQ2) ---
         List<String> mines = Arrays.asList(
@@ -113,8 +124,6 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
 
-        // REQ5: the zombie is a hostile creature, so it lives in the mines with the others
-        minesMap.addActor(new Zombie(), minesMap.at(2, 4));
     }
 
     /**
