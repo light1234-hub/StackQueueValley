@@ -4,11 +4,11 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
-import game.actor.ZombieTarget;
 import game.behaviour.WanderBehaviour;
 import game.effect.ChargeEffect;
 import game.effect.FireEffect;
@@ -40,9 +40,10 @@ public class AttackingState implements CreatureState {
         if (ZombieSensor.canFlee(zombie, map)) {
             return zombie.getFleeingState();
         }
-        boolean hasTargetToAttack = hasAdjacentTarget(zombie, map);
+        boolean hasTargetToAttack = ZombieSensor.adjacentTargetExit(zombie, map) != null;
         boolean hasValidTarget = firstStepToTarget(zombie, map) != null;
-        if (healthBelow(zombie, 50) && !ZombieSensor.isPoisoned(zombie)
+        if (ZombieSensor.healthPercent(zombie) < ZombieSensor.HEAL_BELOW_PERCENT
+                && !ZombieSensor.isPoisoned(zombie)
                 && (!hasTargetToAttack || !hasValidTarget)) {
             return zombie.getHealingState();
         }
@@ -50,23 +51,27 @@ public class AttackingState implements CreatureState {
     }
 
     /** Attacks an adjacent target, pursues a reachable target, or wanders if none is reachable. */
-    @Override
     public Action getAction(Zombie zombie, GameMap map) {
         Location here = map.locationOf(zombie);
-        for (Exit exit : here.getExits()) {
-            Location next = exit.getDestination();
-            if (isTarget(next)) {
-                Actor target = next.getActor();
-                return new CreatureAttackAction(target, exit.getName(), zombie.damage(), zombie.hitChance());
-            }
+
+        Exit attackExit = ZombieSensor.adjacentTargetExit(zombie, map);
+        if (attackExit != null) {
+            Actor target = attackExit.getDestination().getActor();
+            return new CreatureAttackAction(
+                    target,
+                    attackExit.getName(),
+                    zombie.damage(),
+                    zombie.hitChance()
+            );
         }
 
-        Exit step = firstStepToTarget(zombie, map);
-        if (step != null) {
-            Location destination = step.getDestination();
-            return destination.getMoveAction(zombie, step.getName(), step.getHotKey());
+        // Otherwise, move one step toward the nearest reachable target.
+        Exit targetStep = firstStepToTarget(zombie, map);
+        if (targetStep != null) {
+            return new MoveActorAction(targetStep.getDestination(), targetStep.getName());
         }
 
+        // If no target is reachable, wander.
         Action action = wander.operate(zombie, here);
         return action == null ? new DoNothingAction() : action;
     }
@@ -102,22 +107,6 @@ public class AttackingState implements CreatureState {
         }
     }
 
-    private boolean healthBelow(Zombie zombie, int percentage) {
-        return zombie.getStatistic(ActorStatistics.HEALTH) * 100
-                < zombie.getMaximumStatistic(ActorStatistics.HEALTH) * percentage;
-    }
-
-    private boolean isTarget(Location location) {
-        return location.containsAnActor()
-                && location.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET);
-    }
-
-    private boolean hasAdjacentTarget(Zombie zombie, GameMap map) {
-        for (Exit exit : map.locationOf(zombie).getExits()) {
-            if (isTarget(exit.getDestination())) return true;
-        }
-        return false;
-    }
 
     /** Finds a shortest first move through free, enterable tiles to a valid target. */
     private Exit firstStepToTarget(Zombie zombie, GameMap map) {
@@ -133,7 +122,10 @@ public class AttackingState implements CreatureState {
             for (Exit exit : current.getExits()) {
                 Location next = exit.getDestination();
                 if (visited.contains(next)) continue;
-                if (isTarget(next)) return current == start ? exit : firstSteps.get(current);
+                if (next.containsAnActor()
+                        && ZombieSensor.isTarget(next.getActor())) {
+                    return current == start ? exit : firstSteps.get(current);
+                }
                 if (next.containsAnActor() || !next.canActorEnter(zombie)) continue;
 
                 visited.add(next);
