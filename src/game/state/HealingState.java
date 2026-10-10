@@ -77,12 +77,13 @@ public class HealingState implements CreatureState{
     }
 
     /**
-     * Performs the one-time effect when the Zombie enters the healing state
-     * When the zombie enters HealingState, it checks all adjacent tiles and pulls
-     * any consumable items onto its own tiles
-     * if there is no food it spawns food on the
-     * @param zombie zombie the Zombie entering the state
-     * @param map map the current game map
+     * Performs the one-time effect when the Zombie enters HealingState.
+     * Uses BFS to search reachable locations within two steps and moves
+     * any consumable items found onto the Zombie's current tile.
+     * If no food is collected, two ParsnipItems are generated on its tile.
+     *
+     * @param zombie the Zombie entering the healing state
+     * @param map the current game map
      */
     @Override
     public void onEnter(Zombie zombie,GameMap map){
