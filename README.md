@@ -87,7 +87,7 @@ The Zombie can switch between wandering, attacking, fleeing, and healing. This s
 3. If a target is nearby and the Zombie has enough health, it enters `AttackingState`.
 4. Otherwise, it wanders using `WanderBehaviour`. It does nothing if it cannot move.
 
-`ZombieSensor` centralizes checks for health, nearby targets, and nearby food, along with the health thresholds. This lets each state use the same rules rather than repeating them.
+`ZombieSensor` centralizes chxecks for health, nearby targets, and nearby food, along with the health thresholds. This lets each state use the same rules rather than repeating them.
 
 #### Corrupting dirt
 
