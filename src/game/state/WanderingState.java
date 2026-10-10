@@ -56,7 +56,7 @@ public class WanderingState implements CreatureState {
             Location adjacent = exit.getDestination();
             Ground ground = adjacent.getGround();
             if (ground.hasAbility(TerrainAbility.CAN_BE_CORRUPTED)) {
-                ((Corruptible) ground).corrupt(adjacent);
+                ground.asCapability(Corruptible.class).ifPresent(corruptible -> corruptible.corrupt(adjacent));
             }
         }
     }
