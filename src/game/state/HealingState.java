@@ -86,50 +86,28 @@ public class HealingState implements CreatureState{
      * @param map the current game map
      */
     @Override
-    public void onEnter(Zombie zombie,GameMap map){
+    public void onEnter(Zombie zombie,GameMap map) {
         Location zombieLoc = map.locationOf(zombie);
-
         int foodMove = 0;
 
-        Queue<Location> queue = new ArrayDeque<>();
-        Map<Location,Integer> distance = new HashMap<>();
+        List<Location> reachableLocations = ZombieSensor.reachableLocationWithin(zombie, map, FOOD_SCAN_RANGE);
 
-        queue.add(zombieLoc);
-        distance.put(zombieLoc,0);
-
-        while(!queue.isEmpty()){
-            Location current = queue.poll();
-            int steps = distance.get(current);
-
-            if(steps >= FOOD_SCAN_RANGE){
+        for (Location location : reachableLocations) {
+            if (location.equals(zombieLoc)) {
                 continue;
             }
-            for (Exit exit: current.getExits()){
-                Location next = exit.getDestination();
 
-                if(distance.containsKey(next) || !next.canActorEnter(zombie)){
-                    continue;
+            List<Consumable> foods = new ArrayList<>(location.getItemsAs(Consumable.class));
 
-                }
-                distance.put(next, steps +1);
-                queue.add(next);
-
-                List<Consumable> foods = new ArrayList<>(next.getItemsAs(Consumable.class));
-
-                for(Consumable food : foods){
-                    next.removeItem(food.getItem());
-                    zombieLoc.addItem(food.getItem());
-                    foodMove++;
-                }
-
+            for (Consumable food : foods) {
+                location.removeItem(food.getItem());
+                zombieLoc.addItem(food.getItem());
+                foodMove++;
             }
         }
-        if(foodMove == 0){
+        if (foodMove == 0) {
             zombieLoc.addItem(new ParsnipItem());
             zombieLoc.addItem(new ParsnipItem());
-
         }
-
     }
-
 }
