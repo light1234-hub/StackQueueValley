@@ -51,6 +51,7 @@ public class AttackingState implements CreatureState {
     }
 
     /** Attacks an adjacent target, pursues a reachable target, or wanders if none is reachable. */
+    @Override
     public Action getAction(Zombie zombie, GameMap map) {
         Location here = map.locationOf(zombie);
 
