@@ -119,7 +119,7 @@ public final class ZombieSensor {
      */
     public static boolean hasTargetNearby(Zombie zombie, GameMap map, int range) {
         return locationsWithin(zombie, map, range,
-                location -> location.containsAnActor() && isTarget(location.getActor()), false);
+                location -> location.containsAnActor() && isTarget(location.getActor()));
     }
 
     /**
@@ -147,11 +147,10 @@ public final class ZombieSensor {
      * @param map                  current game map
      * @param range                maximum search distance
      * @param condition            condition used to identify a matching location
-     * @param matchMustBeEnterable whether the matching tile must be reachable
      * @return true if a matching location is found
      */
     private static boolean locationsWithin(Zombie zombie, GameMap map, int range,
-                                           Predicate<Location> condition, boolean matchMustBeEnterable) {
+                                           Predicate<Location> condition) {
 
         Location start = map.locationOf(zombie);
 
@@ -183,7 +182,7 @@ public final class ZombieSensor {
 
                 boolean enterable = destination.canActorEnter(zombie);
 
-                if (condition.test(destination) && (!matchMustBeEnterable || enterable)) {
+                if (condition.test(destination)) {
                     return true;
                 }
                 if (enterable) {
