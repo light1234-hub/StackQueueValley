@@ -13,12 +13,7 @@ import game.effect.ChargeEffect;
 import game.effect.FireEffect;
 import game.effect.PoisonEffect;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
 
 
@@ -50,7 +45,7 @@ public final class ZombieSensor {
      * active fire or charge.
      *
      * @param zombie the Zombie being checked
-     * @param map current game map
+     * @param map    current game map
      * @return true when the Zombie can safely enter its fleeing state
      */
     public static boolean canFlee(Zombie zombie, GameMap map) {
@@ -101,7 +96,7 @@ public final class ZombieSensor {
      * Finds an adjacent exit leading to a Zombie target.
      *
      * @param zombie the Zombie performing the search
-     * @param map current game map
+     * @param map    current game map
      * @return exit leading to a target, or null if none exists
      */
     public static Exit adjacentTargetExit(Zombie zombie, GameMap map) {
@@ -118,46 +113,50 @@ public final class ZombieSensor {
      * Checks whether a Zombie target exists within the given range.
      *
      * @param zombie the Zombie performing the search
-     * @param map current game map
-     * @param range maximum search distance
+     * @param map    current game map
+     * @param range  maximum search distance
      * @return true if a target is found
      */
-    public static boolean hasTargetNearby(Zombie zombie, GameMap map,int range) {
+    public static boolean hasTargetNearby(Zombie zombie, GameMap map, int range) {
         return locationsWithin(zombie, map, range,
-                location -> location.containsAnActor() && isTarget(location.getActor()),false);
+                location -> location.containsAnActor() && isTarget(location.getActor()), false);
     }
 
     /**
      * Checks whether reachable consumable food exists within the given range.
      *
      * @param zombie the Zombie performing the search
-     * @param map current game map
-     * @param range maximum search distance
+     * @param map    current game map
+     * @param range  maximum search distance
      * @return true if reachable food is found
      */
-    public static boolean hasFoodNearby(Zombie zombie, GameMap map,int range) {
-        return locationsWithin(zombie, map, range,
-                location -> !location.getItemsAs(Consumable.class).isEmpty(),true);
+    public static boolean hasFoodNearby(Zombie zombie, GameMap map, int range) {
+
+        for (Location location: reachableLocationWithin(zombie,map,range)){
+            if(!location.getItemsAs(Consumable.class).isEmpty()){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Searches locations within a given range for a condition.
      *
-     * @param zombie the Zombie performing the search
-     * @param map current game map
-     * @param range maximum search distance
-     * @param condition condition used to identify a matching location
+     * @param zombie               the Zombie performing the search
+     * @param map                  current game map
+     * @param range                maximum search distance
+     * @param condition            condition used to identify a matching location
      * @param matchMustBeEnterable whether the matching tile must be reachable
      * @return true if a matching location is found
      */
     private static boolean locationsWithin(Zombie zombie, GameMap map, int range,
-                                                  Predicate<Location> condition,boolean matchMustBeEnterable) {
+                                           Predicate<Location> condition, boolean matchMustBeEnterable) {
 
         Location start = map.locationOf(zombie);
 
         Queue<Location> queue = new ArrayDeque<>();
         Map<Location, Integer> distance = new HashMap<>();
-
 
 
         queue.add(start);
@@ -179,8 +178,8 @@ public final class ZombieSensor {
                     continue;
                 }
 
-                int newDistance =  currentDistance + 1;
-                distance.put(destination,newDistance);
+                int newDistance = currentDistance + 1;
+                distance.put(destination, newDistance);
 
                 boolean enterable = destination.canActorEnter(zombie);
 
@@ -193,5 +192,90 @@ public final class ZombieSensor {
             }
         }
         return false;
+    }
+
+    /**
+     * Finds the nearest ZombieTarget within the specified search range
+     * using Breadth-First Search (BFS).
+     *
+     * @param start     the location where the BFS begins
+     * @param scanRange the maximum distance from the starting location
+     * @return the location of the nearest ZombieTarget, or null if none is found
+     */
+    public static Location findNearestTarget(Location start, int scanRange) {
+        Queue<Location> queue = new ArrayDeque<>();
+        Set<Location> visited = new HashSet<>();
+
+        queue.add(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            Location current = queue.poll();
+
+            if (!current.equals(start)
+                    && current.containsAnActor()
+                    && isTarget(current.getActor())) {
+                return current;
+            }
+            int distance = Math.max(Math.abs(current.x() - start.x()), Math.abs(current.y() - start.y()));
+
+            if (distance >= scanRange) {
+                continue;
+            }
+
+            for (Exit exit : current.getExits()) {
+                Location next = exit.getDestination();
+
+                if (visited.add(next)) {
+                    queue.add(next);
+                }
+            }
+
+        }
+        return null;
+    }
+
+    /**
+     * Finds all locations reachable by the Zombie within the specified
+     * number of BFS steps.
+     * <p>
+     * The search only traverses locations the Zombie can enter.
+     * The starting location is included in the returned list.
+     *
+     * @param zombie the Zombie performing the search
+     * @param map    the current game map
+     * @param range  the maximum number of BFS steps
+     * @return a list of reachable locations within the specified range
+     */
+    public static List<Location> reachableLocationWithin(Zombie zombie, GameMap map, int range) {
+        List<Location> locations = new ArrayList<>();
+        Queue<Location> queue = new ArrayDeque<>();
+        Map<Location, Integer> distance = new HashMap<>();
+
+        Location start = map.locationOf(zombie);
+        queue.add(start);
+        distance.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Location current = queue.poll();
+            int steps = distance.get(current);
+
+            locations.add(current);
+
+            if (steps >= range) {
+                continue;
+            }
+            for (Exit exit : current.getExits()) {
+                Location next = exit.getDestination();
+
+                if (distance.containsKey(next)
+                        || !next.canActorEnter(zombie)) {
+                    continue;
+                }
+                distance.put(next, steps + 1);
+                queue.add(next);
+            }
+        }
+        return locations;
     }
 }
