@@ -118,8 +118,8 @@ public class FleeingState implements CreatureState
                     int pushDx = Integer.compare(current.x(), zombieLoc.x());
                     int pushDy = Integer.compare(current.y(), zombieLoc.y());
 
-                    Location midDestination = getRelativeLocation(map,current,pushDx,pushDy);
-                    Location doubleDestination = getRelativeLocation(map, current, pushDx * 2, pushDy * 2);
+                    Location midDestination = ZombieSensor.getRelativeLocation(current,pushDx,pushDy);
+                    Location doubleDestination = ZombieSensor.getRelativeLocation(current, pushDx * 2, pushDy * 2);
                     Location pushDestination = null;
 
                     if (midDestination != null && !midDestination.containsAnActor() && midDestination.canActorEnter(victim)
@@ -162,7 +162,7 @@ public class FleeingState implements CreatureState
         // We temporarily utilize FleeBehaviour's threat finding mechanism or replicate it here
         // For simplicity, we scan for threat using the internal helper logic or reuse direction calculations
         // Assuming a threat search is accessible:
-        Location threatLocation = findNearestThreat(location,zombie);
+        Location threatLocation = ZombieSensor.findNearestTarget(location,SCAN_RANGE);
         if (threatLocation == null)
         {
             return null;
@@ -174,8 +174,8 @@ public class FleeingState implements CreatureState
         int fleeDx = Integer.compare(0, dx);
         int fleeDy = Integer.compare(0, dy);
 
-        Location twoStepLocation = getRelativeLocation(location.map(), location, fleeDx * 2, fleeDy * 2);
-        Location midStepLocation = getRelativeLocation(location.map(), location, fleeDx, fleeDy);
+        Location twoStepLocation = ZombieSensor.getRelativeLocation(location, fleeDx * 2, fleeDy * 2);
+        Location midStepLocation = ZombieSensor.getRelativeLocation(location, fleeDx, fleeDy);
 
         if (twoStepLocation != null && midStepLocation != null
                 && !twoStepLocation.containsAnActor() && twoStepLocation.canActorEnter(zombie)
@@ -185,26 +185,6 @@ public class FleeingState implements CreatureState
         }
 
         return null;
-    }
-
-
-    /**
-     * Retrieves a relative offset location from the base location on the game map
-     * @param map
-     * @param base
-     * @param deltaX
-     * @param deltaY
-     * @return
-     */
-    private Location getRelativeLocation(GameMap map, Location base, int deltaX, int deltaY)
-    {
-        try
-        {
-            return map.at(base.x() + deltaX, base.y() + deltaY);
-        } catch (Exception e)
-        {
-            return null;
-        }
     }
 
     /**
@@ -229,49 +209,6 @@ public class FleeingState implements CreatureState
             case 8 -> "South-East";
             default ->  "away";
         };
-    }
-
-    /**
-     * Finds the nearest target within the scan radius using breadth first search (BFS)
-     * @param start
-     * @param actor
-     * @return
-     */
-    private Location findNearestThreat(Location start, Actor actor)
-    {
-        Queue<Location> queue = new ArrayDeque<>();
-        HashSet<Location> visited = new HashSet<>();
-        queue.add(start);
-        visited.add(start);
-
-        while (!queue.isEmpty())
-        {
-            Location current = queue.poll();
-
-            if (!current.equals(start) && current.containsAnActor() && ZombieSensor.isTarget(current.getActor()))
-            {
-                return current;
-            }
-
-            int distance = Math.max(Math.abs(current.x() - start.x()), Math.abs(current.y() - start.y()));
-
-            if (distance >= SCAN_RANGE)
-            {
-                continue;
-            }
-
-            for (Exit exit : current.getExits())
-            {
-                Location destination = exit.getDestination();
-                if (!visited.contains((destination)))
-                {
-                    visited.add(destination);
-                    queue.add(destination);
-                }
-            }
-        }
-
-        return null;
     }
 
 }

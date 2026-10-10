@@ -277,4 +277,23 @@ public final class ZombieSensor {
         }
         return locations;
     }
+
+    /**
+     * Retrieves the relative location offset from the base location on the map
+     * @param base
+     * @param deltaX
+     * @param deltaY
+     * @return the target location or null if the location is out of bounds
+     */
+    public static Location getRelativeLocation(Location base, int deltaX, int deltaY)
+    {
+        try
+        {
+            return base.map().at(base.x() + deltaX, base.y() + deltaY);
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
+
 }
