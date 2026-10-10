@@ -77,58 +77,37 @@ public class HealingState implements CreatureState{
     }
 
     /**
-     * Performs the one-time effect when the Zombie enters the healing state
-     * When the zombie enters HealingState, it checks all adjacent tiles and pulls
-     * any consumable items onto its own tiles
-     * if there is no food it spawns food on the
-     * @param zombie zombie the Zombie entering the state
-     * @param map map the current game map
+     * Performs the one-time effect when the Zombie enters HealingState.
+     * Uses BFS to search reachable locations within two steps and moves
+     * any consumable items found onto the Zombie's current tile.
+     * If no food is collected, two ParsnipItems are generated on its tile.
+     *
+     * @param zombie the Zombie entering the healing state
+     * @param map the current game map
      */
     @Override
-    public void onEnter(Zombie zombie,GameMap map){
+    public void onEnter(Zombie zombie,GameMap map) {
         Location zombieLoc = map.locationOf(zombie);
-
         int foodMove = 0;
 
-        Queue<Location> queue = new ArrayDeque<>();
-        Map<Location,Integer> distance = new HashMap<>();
+        List<Location> reachableLocations = ZombieSensor.reachableLocationWithin(zombie, map, FOOD_SCAN_RANGE);
 
-        queue.add(zombieLoc);
-        distance.put(zombieLoc,0);
-
-        while(!queue.isEmpty()){
-            Location current = queue.poll();
-            int steps = distance.get(current);
-
-            if(steps >= FOOD_SCAN_RANGE){
+        for (Location location : reachableLocations) {
+            if (location.equals(zombieLoc)) {
                 continue;
             }
-            for (Exit exit: current.getExits()){
-                Location next = exit.getDestination();
 
-                if(distance.containsKey(next) || !next.canActorEnter(zombie)){
-                    continue;
+            List<Consumable> foods = new ArrayList<>(location.getItemsAs(Consumable.class));
 
-                }
-                distance.put(next, steps +1);
-                queue.add(next);
-
-                List<Consumable> foods = new ArrayList<>(next.getItemsAs(Consumable.class));
-
-                for(Consumable food : foods){
-                    next.removeItem(food.getItem());
-                    zombieLoc.addItem(food.getItem());
-                    foodMove++;
-                }
-
+            for (Consumable food : foods) {
+                location.removeItem(food.getItem());
+                zombieLoc.addItem(food.getItem());
+                foodMove++;
             }
         }
-        if(foodMove == 0){
+        if (foodMove == 0) {
             zombieLoc.addItem(new ParsnipItem());
             zombieLoc.addItem(new ParsnipItem());
-
         }
-
     }
-
 }
