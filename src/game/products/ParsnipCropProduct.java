@@ -3,15 +3,13 @@ package game.products;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.ability.GroundAbility;
 import game.actor.FinanceStatistics;
-import game.blueprint.Harvestable;
 import game.blueprint.Buyable;
+import game.products.PlantingLocations;
 import game.item.ParsnipItem;
 import game.terrain.ParsnipCrop;
 
 import java.util.Random;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,30 +31,6 @@ public class ParsnipCropProduct implements Buyable
     public int getBuyCost()
     {
         return PURCHASE_PRICE;
-    }
-
-    /**
-     * Scans all nearby locations around a certain point to find all plantable locations
-     * @param location
-     * @return a list of plantable locations
-     */
-    private List<Location> plantableLocations(Location location)
-    {
-        List<Location> plantableLocations = new ArrayList<>();
-        List<Location> nearbyLocations = location.getNearbyLocations(ADJACENT_RADIUS);
-
-        for (Location nearby : nearbyLocations)
-        {
-            boolean isFertile = nearby.getGround().hasAbility(GroundAbility.FERTILE);
-            boolean hasNoCrop = (nearby.getGroundAs(Harvestable.class) == null);
-
-            if (isFertile && hasNoCrop)
-            {
-                plantableLocations.add(nearby);
-            }
-        }
-
-        return plantableLocations;
     }
 
     /**
@@ -92,7 +66,7 @@ public class ParsnipCropProduct implements Buyable
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)
     {
-        List<Location> plantableLocations = plantableLocations(merchantLocation);
+        List<Location> plantableLocations = PlantingLocations.findPlantableLocations(merchantLocation);
 
         if (plantableLocations.isEmpty())
         {
