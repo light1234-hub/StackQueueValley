@@ -14,13 +14,23 @@ import game.item.TomatoItem;
 /**
  * A tomato crop that can be harvested for tomato items.
  */
-public class TomatoCrop extends Ground implements Harvestable {
+public class TomatoCrop extends Plant implements Harvestable {
 
     /**
      * Creates a tomato crop.
      */
     public TomatoCrop() {
-        super('T',"Tomato crop");
+        super('T',"Tomato Crop");
+    }
+
+    @Override
+    protected String takeTurn(Location location, int age) {
+        if (due(age, 7)) return produce(location, "Tomato", TomatoItem::new);
+        if (due(age, 20) && chance(0.10)) {
+            Location child = spread(location, new TomatoCrop(), age, 1);
+            if (child != null) return spreadMessage("Tomato Crop", child);
+        }
+        return null;
     }
 
     @Override

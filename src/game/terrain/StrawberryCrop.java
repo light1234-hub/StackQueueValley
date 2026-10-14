@@ -15,14 +15,20 @@ import java.util.List;
 import java.util.Random;
 
 
-public class StrawberryCrop extends Ground implements Harvestable, Waterable {
+public class StrawberryCrop extends Plant implements Harvestable, Waterable {
     private int timeWatered = 0;
     private Random random = new Random();
     /**
      * Creates a strawberry crop.
      */
     public StrawberryCrop() {
-        super('S',"Strawberry crop");
+        super('S',"Strawberry Crop");
+    }
+
+    @Override
+    protected String takeTurn(Location location, int age) {
+        if (due(age, 5)) return produce(location, "Strawberry", StrawberryItem::new);
+        return null;
     }
 
     /**

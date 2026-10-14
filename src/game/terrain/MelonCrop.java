@@ -16,7 +16,7 @@ import game.item.StrawberryItem;
 
 import java.util.List;
 
-public class MelonCrop extends Ground implements Harvestable, Waterable {
+public class MelonCrop extends Plant implements Harvestable, Waterable {
 
     private int timeWatered = 0;
 
@@ -25,6 +25,12 @@ public class MelonCrop extends Ground implements Harvestable, Waterable {
      */
     public MelonCrop(){
         super('Q',"Melon Crop");
+    }
+
+    @Override
+    protected String takeTurn(Location location, int age) {
+        Location child = spread(location, new MelonSprout(), age, 20);
+        return child == null ? null : spreadMessage("Melon Sprout", child);
     }
 
     /**

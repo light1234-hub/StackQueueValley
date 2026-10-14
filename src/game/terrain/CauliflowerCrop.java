@@ -16,15 +16,18 @@ import game.item.StrawberryItem;
 import java.util.List;
 import java.util.Random;
 
-public class CauliflowerCrop extends Ground implements Harvestable, Waterable {
+public class CauliflowerCrop extends Plant implements Harvestable, Waterable {
 
     private int timeWatered = 0;
     /**
      * Creates a Cauliflower crop.
      */
     public CauliflowerCrop() {
-        super('Y',"Cauliflower crop");
+        super('Y',"Cauliflower Crop");
     }
+
+    @Override
+    protected String takeTurn(Location location, int age) { return null; }
 
     /**
      * Checks whether the cauliflower has been watered at least five times.
