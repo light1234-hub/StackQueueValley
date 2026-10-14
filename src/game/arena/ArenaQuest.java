@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Farmer;
+import game.tavern.TavernWall;
 import game.terrain.Dirt;
 
 import java.util.ArrayList;
@@ -172,7 +173,7 @@ public final class ArenaQuest {
                     continue;
                 }
                 boolean wall = x == 0|| y == 0 || x == map.getXRange().max() || y == map.getYRange().max();
-                tile.setGround(wall ? TavernWall() : new Dirt());
+                tile.setGround(wall ? new TavernWall() : new Dirt());
             }
         }
     }
