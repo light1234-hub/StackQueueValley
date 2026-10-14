@@ -107,6 +107,7 @@ public class Farmer extends Actor {
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
         display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
         display.println("Inventory: " + this.getInventory().getItems());
+        display.println(("Coins: " + this.getStatistic(FinanceStatistics.COINS)));
         display.println("Level: " + getLevel() + " | Earned XP: " + getTotalExperience() + " | Available XP: " + getAvailableExperience());
         // return/print the console menu
         Menu menu = new Menu(actions);
