@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.TavernAbility;
 import game.progression.ExperienceTracker;
 import game.tool.Hoe;
 import game.tool.WateringCan;
@@ -71,6 +72,8 @@ public class Farmer extends Actor {
         this.getInventory().add(new WateringCan());
 
         this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
+        this.enableAbility(TavernAbility.CAN_USE_TAVERN);
+
 
     }
 
