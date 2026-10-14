@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.progression.ExperienceTracker;
 import game.tool.Hoe;
 import game.tool.WateringCan;
 import game.farmeraction.CoatingActionProvider;
@@ -19,6 +20,40 @@ import game.farmeraction.CoatingActionProvider;
  */
 public class Farmer extends Actor {
     private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
+    private final ExperienceTracker experience = new ExperienceTracker();
+
+    /**
+     * Gives this the farmer quest experience
+     * @param amount amount of experience gain
+     */
+    public void gainExp(int amount){
+        experience.award(amount);
+    }
+
+    /**
+     * Allow to spend experience without knowing the quest
+     * @param amount amount of exp to spend
+     */
+    public void spendExp(int amount){
+        experience.spend(amount);
+    }
+
+    /**
+     * Getter method for levels and exps
+     */
+
+    public int getLevel(){
+        return experience.level();
+    }
+
+    public int getTotalExperience(){
+        return experience.totalEarned();
+    }
+
+    public int getAvailableExperience(){
+        return experience.available();
+    }
+
     /**
      * Creates a farmer with starting stamina and farming tools.
      *
@@ -69,7 +104,7 @@ public class Farmer extends Actor {
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
         display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
         display.println("Inventory: " + this.getInventory().getItems());
-
+        display.println("Level: " + getLevel() + " | Earned XP: " + getTotalExperience() + " | Available XP: " + getAvailableExperience());
         // return/print the console menu
         Menu menu = new Menu(actions);
         return menu.showMenu(this, display);
