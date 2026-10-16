@@ -1,4 +1,4 @@
-package game.cooking;
+package game.recipe;
 
 import edu.monash.fit2099.engine.items.Inventory;
 import game.blueprint.Ingredient;

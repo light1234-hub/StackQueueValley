@@ -1,4 +1,4 @@
-package game.cooking;
+package game.recipe;
 
 import game.ability.IngredientAbility;
 

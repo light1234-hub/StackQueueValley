@@ -13,7 +13,7 @@ import game.blueprint.Ingredient;
 import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
-import game.cooking.AdjacentLocations;
+import game.recipe.AdjacentLocations;
 import game.terrain.ParsnipCrop;
 import game.terrain.PlantableGround;
 
