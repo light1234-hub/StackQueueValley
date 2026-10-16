@@ -5,16 +5,26 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.IngredientAbility;
 import game.blueprint.AnimalFood;
+import game.blueprint.Ingredient;
 import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
+import game.cooking.AdjacentLocations;
+import game.terrain.ParsnipCrop;
+import game.terrain.PlantableGround;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * A harvested parsnip that can be consumed, fed to animals, or dried.
  */
-public class ParsnipItem extends Item implements Consumable, AnimalFood, Processable {
+public class ParsnipItem extends Item implements Consumable, AnimalFood, Processable, Ingredient {
     /**
      * Creates a portable parsnip.
      */
@@ -23,6 +33,8 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
         this.makePortable();
 
     }
+
+    private final Random random = new Random();
 
     /**
      * Restores the actor's health and removes the parsnip from the inventory.
@@ -70,5 +82,36 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
         ActionList actions = super.allowableActions(actor, map);
         actions.add(new ConsumeAction(this));
         return actions;
+    }
+
+    @Override
+    public IngredientAbility category()
+    {
+        return IngredientAbility.VEGETABLE;
+    }
+
+    @Override
+    public String useEffect(Actor farmer, Location station)
+    {
+        List<Location> plantableLocations = new ArrayList<>();
+
+        for (Location adjacent : AdjacentLocations.from(station))
+        {
+            if (adjacent.getGroundAs(PlantableGround.class) != null)
+            {
+                plantableLocations.add(adjacent);
+            }
+        }
+
+        if (plantableLocations.isEmpty())
+        {
+            return "The parsnip is used, but there is no Soil in" +
+                    " the area around the cooking station";
+        }
+
+        Location plantedLocation = plantableLocations.get(random.nextInt(plantableLocations.size()));
+        plantedLocation.setGround(new ParsnipCrop());
+
+        return "A Parsnip Crop has been planted next to the Cooking Station";
     }
 }
