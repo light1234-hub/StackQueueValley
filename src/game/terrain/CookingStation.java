@@ -50,7 +50,7 @@ public class CookingStation extends Ground
     {
         ActionList actions = super.allowableActions(actor,location,direction);
 
-        if (direction.isEmpty())
+        if (!direction.isEmpty())
         {
             for (Recipe recipe : recipes)
             {

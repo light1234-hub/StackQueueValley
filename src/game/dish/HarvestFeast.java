@@ -26,8 +26,9 @@ public class HarvestFeast extends DishItem
     @Override
     public String consume(Actor actor)
     {
-        actor.modifyStatistic(ActorStatistics.HEALTH,StatisticOperations.INCREASE,1);
-        actor.modifyStatistic(ActorStatistics.STAMINA,StatisticOperations.INCREASE,1);
+        actor.modifyStatisticMaximum(ActorStatistics.HEALTH,StatisticOperations.INCREASE,1);
+        actor.modifyStatisticMaximum(ActorStatistics.STAMINA,StatisticOperations.INCREASE,1);
+
 
         return actor + " eats a Harvest Feast. Maximum HP and Stamina has been increased by 1";
     }

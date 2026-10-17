@@ -84,12 +84,22 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
         return actions;
     }
 
+    /**
+     * A getter that returns the ingredient category of the Parsnip
+     * @return the ingredient category Vegetable
+     */
     @Override
     public IngredientAbility category()
     {
         return IngredientAbility.VEGETABLE;
     }
 
+    /**
+     * Applies the effect of adding a Parsnip into the dish
+     * @param farmer
+     * @param station
+     * @return a string describing the result of using a Parsnip as an ingredient
+     */
     @Override
     public String useEffect(Actor farmer, Location station)
     {

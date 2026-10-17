@@ -9,6 +9,9 @@ import game.actor.*;
 import game.item.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
+import game.recipe.HarvestFeastRecipe;
+import game.recipe.JamRecipe;
+import game.recipe.OmeletteRecipe;
 
 import java.util.Arrays;
 import java.util.List;
@@ -115,6 +118,7 @@ public class StackQueueValleyWorld extends World {
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
+        inheritedFarmMap.addActor(new Chicken(), inheritedFarmMap.at(6,5));
 
         // REQ2: give the farmer a pickaxe and an alien device with one fixed
         // destination on each map.
@@ -129,6 +133,9 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+
+        // REQ 2 A3: The Cooking Station
+        inheritedFarmMap.at(5,4).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
 
     }
 
