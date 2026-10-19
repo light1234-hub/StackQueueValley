@@ -190,7 +190,7 @@ public class StackQueueValleyWorld extends World {
         QuestExitDoor arenaExit = new QuestExitDoor("The Drunken Tavern", quests);
         arenaMap.at(1, 2).setGround(arenaExit);
         arenaExit.linkTo(tavernMap.at(2, 2));
-        tavernMap.addActor(new ContractBartender(quests), bartenderLocation);
+        tavernMap.addActor(new ContractBartender(quests,farmer), bartenderLocation);
         farmer.getInventory().add(new QuestJournal(quests));
 
     }
