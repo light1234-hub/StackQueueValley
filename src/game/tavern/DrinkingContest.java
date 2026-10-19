@@ -22,7 +22,7 @@ import java.util.Random;
 public class DrinkingContest {
     private static final int ROUNDS = 3;
     private static final int LOST_STAMINA = 4;
-    private static final int COOLDOWN_TURNS = 20;
+    private static final int COOLDOWN_TURNS = 5;
 
     private final QuestManager quests;
     private final Random random;
