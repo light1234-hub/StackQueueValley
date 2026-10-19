@@ -22,6 +22,29 @@ import game.farmeraction.CoatingActionProvider;
 public class Farmer extends Actor {
     private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
     private final ExperienceTracker experience = new ExperienceTracker();
+    private ActionList conversationActions;
+    private GameMap conversationMap;
+
+    /**
+     * Replaces the regular menu with actions for the current conversation.
+     *
+     * @param actions dialogue actions available to the Farmer
+     * @param map map on which the conversation takes place
+     */
+    public void startConversation(ActionList actions, GameMap map) {
+        if (actions == null || map == null) {
+            throw new IllegalArgumentException("Conversation actions and map are required");
+        }
+        this.conversationActions = new ActionList();
+        this.conversationActions.add(actions);
+        this.conversationMap = map;
+    }
+
+    /** Restores the normal action menu after the conversation finishes. */
+    public void endConversation() {
+        this.conversationActions = null;
+        this.conversationMap = null;
+    }
 
     /**
      * Gives this the farmer quest experience
@@ -65,7 +88,7 @@ public class Farmer extends Actor {
 
         //init the the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
-        this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(10000));
+        this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(0));
 
         // give farmer the Item
         this.getInventory().add(new Hoe());
@@ -110,8 +133,14 @@ public class Farmer extends Actor {
         display.println(("Coins: " + this.getStatistic(FinanceStatistics.COINS)));
         display.println("Level: " + getLevel() + " | Earned XP: " + getTotalExperience() + " | Available XP: " + getAvailableExperience());
         // return/print the console menu
-        Menu menu = new Menu(actions);
-        return menu.showMenu(this, display);
+        if (conversationActions != null && conversationMap != map) {
+            endConversation();
+        }
+        ActionList displayedActions = conversationActions != null
+                ? conversationActions
+                : actions;
+
+        return new Menu(displayedActions).showMenu(this, display);
     }
 
 }
