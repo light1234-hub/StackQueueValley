@@ -46,7 +46,7 @@ public abstract class UseEverythingRecipe implements Recipe {
 
         for (Ingredient ingredient : inventory.getItemsAs(Ingredient.class)) {
             if (ingredient.category() == category
-                    && !isAlreadySelected(selected, ingredient)) {
+                    && !IngredientSelection.isAlreadySelected(selected,ingredient)) {
                 selected.add(ingredient);
             }
         }
@@ -58,18 +58,4 @@ public abstract class UseEverythingRecipe implements Recipe {
         return Optional.of(List.copyOf(selected));
     }
 
-    /**
-     * Checks whether an item has already been selected
-     * @param selected
-     * @param candidate
-     * @return true if the item selected is the same,false it is different
-     */
-    private boolean isAlreadySelected(List<Ingredient> selected, Ingredient candidate) {
-        for (Ingredient chosen : selected) {
-            if (chosen.getItem() == candidate.getItem()) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

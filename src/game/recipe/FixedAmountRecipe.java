@@ -41,7 +41,7 @@ public abstract class FixedAmountRecipe implements Recipe
             for (Ingredient ingredient : available)
             {
                 if (ingredient.category() == requirement.getCategory()
-                && !isAlreadySelected(selected,ingredient))
+                && !IngredientSelection.isAlreadySelected(selected,ingredient))
                 {
                     selected.add(ingredient);
                     found++;
@@ -62,22 +62,5 @@ public abstract class FixedAmountRecipe implements Recipe
         return Optional.of(List.copyOf(selected));
     }
 
-    /**
-     * Checks whether an item has already been selected
-     * @param selected
-     * @param candidate
-     * @return true if the item selected is the same,false it is different
-     */
-    private boolean isAlreadySelected(List<Ingredient> selected, Ingredient candidate)
-    {
-        for (Ingredient chosen : selected)
-        {
-            if (chosen.getItem() == candidate.getItem())
-            {
-                return true;
-            }
-        }
 
-        return false;
-    }
 }

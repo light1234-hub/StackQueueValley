@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Exit;
 import game.blueprint.Ingredient;
 import game.recipe.Recipe;
 
@@ -21,6 +22,7 @@ public class CookAction extends Action
 
     /**
      * A constructor that creates an object of the CookAction class
+     *
      * @param recipe
      * @param station
      */
@@ -32,14 +34,20 @@ public class CookAction extends Action
 
     /**
      * Cooks the recipe for the actor
+     *
      * @param actor The actor performing the action.
-     * @param map The map the actor is on.
+     * @param map   The map the actor is on.
      * @return describes the effects of the cooking, whether the dish
      * has been successfully prepared or there aren't enough ingredients to cook
      */
     @Override
     public String execute(Actor actor, GameMap map)
     {
+        if (!isAdjacent(actor, map))
+        {
+            return "You must be beside the Cooking Station in order to cook";
+        }
+
         Optional<List<Ingredient>> selection = recipe.selectIngredients(actor.getInventory());
 
         if (selection.isEmpty())
@@ -52,11 +60,11 @@ public class CookAction extends Action
 
         for (Ingredient ingredient : ingredients)
         {
-            result.append(ingredient.useEffect(actor,station)).append('\n');
+            result.append(ingredient.useEffect(actor, station)).append('\n');
             actor.getInventory().remove(ingredient.getItem());
         }
 
-        result.append(recipe.applyCookEffect(actor,station,ingredients));
+        result.append(recipe.applyCookEffect(actor, station, ingredients));
 
         Item dish = recipe.createDish(ingredients);
         actor.getInventory().add(dish);
@@ -67,6 +75,7 @@ public class CookAction extends Action
 
     /**
      * Returns the description of how this action appears in the menu
+     *
      * @param actor The actor performing the action.
      * @return a string describing the menu option of a cook action
      */
@@ -74,5 +83,32 @@ public class CookAction extends Action
     public String menuDescription(Actor actor)
     {
         return actor + " cooks " + recipe.name();
+    }
+
+    /**
+     * Checks whether an actor is on the same map and
+     * directly adjacent to the cooking station
+     * @param actor
+     * @param map
+     * @return true if the actor is adjacent to the station, false if not adjacent
+     */
+    private boolean isAdjacent(Actor actor, GameMap map)
+    {
+        if (!map.contains(actor))
+        {
+            return false;
+        }
+
+        Location actorLocation = map.locationOf(actor);
+
+        for (Exit exit : actorLocation.getExits())
+        {
+            if (exit.getDestination() == station)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
