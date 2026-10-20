@@ -9,6 +9,7 @@ The Farmer can visit the Drunken Tavern and accept one of three fantasy quest, e
 The Farmer can travel between the inherited farm and the Drunken Tavern using connected doorways. The bartender provides an interactives dialogue system where the Farmer can ask about the quests, choose a quest or participate in a drinking content.
 
 Three Quest are available:
+
 | Quest         | Entry fee     | Coin reward |XP reward|Time limit|
 | ------------- |:-------------:|:-----------:|:-------:|:--------:|
 | The Cursed Forest      | 120     | 280             | 100         | 45 turns         |
@@ -52,9 +53,64 @@ Responsibility: Defines how each cotract prepares the Quest Arena by placing spe
 | Class  | Complex effect |
 | ------------- |:-------------:|
 | CursedForestScenario      | Transform multiple arena tiles into corrupted ground, creates three ritual root objectives and spawn hostile slime     |
-| RescueMissionScenario      | right bar     |
-| AncientRelicScenario      | right baz     |
+| RescueMissionScenario      | Creates a blocked rescue route using Rock terrain, places two survivor-cage objectives and supplies, and spawns a guarding Bat.    |
+| AncientRelicScenario      | Creates hazardous ruins with Geodes, Copper Nodes, Rock and corrupted terrain, places a Copper item, spawns a Cave Ghost, and creates three ordered objectives.     |
 
+**Abstraction 2: QuestConsequence**
+Type: New interface
+
+Responsibility: Defines how a completed or failed contract changes the inherited farm.
+
+| Class  | Complex effect |
+| ------------- |:-------------:|
+| ForestConsequence     | Success: Restore soil and generate a Strawberry. Failure: Converts farm terrain into Corrupted Dirt and spawns a Slime     |
+| RescueConsequence      | Success: Restore Soil, Spawns a Chicken and creates an Egg. Failure:Creates Rock terrain, drops a Stone item and spawns a Slime     |
+| RelicConsequence      | Success: Restores Soil and places Diamond and Copper items. Failure: Creates Geode and Corrupted Dirt terrain and spawns a Cave Ghost     |
+
+## Supporting Class
+**Quest management:**
+* QuestManager - Manages Quest acceptance, objective tracking, time limit, completion, failure and player transportation
+
+* QuestDefinition - Stores quest name, fee, reward, time limit, rules, scenario and consequence
+
+* QuestWorldContext - Provides access to farm terrain, item placement and creature spawning
+
+* QuestOutcomesService - Handle quest reward and applies the correct failure and success
+
+* QuestSetupContext - controll acces to arena preparation
+
+* ArenaQuest - Manges the resuable arena, including placement and reset
+
+**Quest interaction**
+* AcceptContractAction - Allow farmer to accept QUest
+
+* QuestObjectiveGround - represent any interactive objectives inside the arena
+
+* QuestClockGround - Deals the the quest timer
+
+* QuestJournal - Provides ability to farmer to abandon the quest
+
+* QuestAbandonAction - Handles abandoning a contract
+
+**Tavern and drinking contest**
+
+* ContractBartender - Provides the Farmer with available tavern interaction
+
+* BartenderDialogue - Manages dialoge stages and conversation choices
+
+* DrinkingContest - Manages the drinking rounds, scores and the chances of getting blackout, its cooldown and random Quest selection
+
+* DrinkRoundAction - Processes individual drinking rounds
+
+* StartDrinkingContestAction - Starts an eligible drinking contest.
+
+* TavernDoor, QuestExitDoor, and TavernTravelAction - Support transportation between game locations.
+
+* TavernFloor and TavernWall - Represent Tavern terrain
+
+* TavernAbility - Controls eligibility to use Tavern interactions.
+
+* ExperienceTracker - Maintains the Farmer's accumulated and available experience points.
 # This is a Heading h1
 ## This is a Heading h2
 ###### This is a Heading h6
@@ -214,3 +270,26 @@ These are not counted towards the six.
 
 `Item`, `Ground`, `Actor`, `Status`, `Consumable`, `ConsumeAction`, `Puddle`, `Rock`, `CopperNode`, `Geode`, `StoneItem`, `CopperItem`, `DiamondItem`, `StrawberryItem`, `TomatoItem`, `FinanceStatistics`.
 
+## REQ 5: Weather System
+
+We will introduce a synamic weather system that uses real world weather information to nfluce Farmer's environment. Depending on multitude of factors such as wind condition or even precipitation retrived from external API, the farm can experience flooding, heatwave or even strong winds that would modify the farms terrain, affect nearby actors and redistribute resources. Different Environmental responses allow the farm to adpat to changing conditions, crreating new gameplay challenges and interactions.
+
+## The Mechanics
+
+### Weather System
+The game retrieves weather information using the Open-Meteo Forecast API. The API then generate a request that uses Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, precipitation, wind speed, and weather conditions. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
+
+### Weather Events
+**Rainstorm**: Heavy rainful causes selected soil to turn into puddle temporarily and applies a soak status to actors within the affected area
+
+**Heatwaves**: High temperature turn selected soil tiles into dry ground, create a temporary fire hazard and apply burning effects to actors standing on affected tiles.
+
+**Tornado**: Strong winds scatter items across adjacent locations, intorduces fallen tree obstalce and distrupt nearby actors.
+
+### Environmental Response
+
+**Drainage response:** Floodwater is redirected into drainage channels,floodied terrain is restored to Soil and collected water becomes usable
+
+**Wildlife Response:** Chickens and Cows attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
+
+**Resources Response:** Weather-damaged terrain exposes additonal resources, converting suitablr ground into mining nodes and placing collectible materials nearby. 
