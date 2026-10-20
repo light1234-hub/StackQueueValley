@@ -1,3 +1,4 @@
+
 package game.arena;
 
 import edu.monash.fit2099.engine.GameEngineException;
@@ -11,171 +12,154 @@ import game.tavern.TavernWall;
 import game.terrain.Dirt;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * Manages a reusable quest arena that can be configured for different quests.
- * Provides methods for placing terrain, spawning actors and adding items,
- * while tracking temporary objects for cleanup between quests.
+ * Manages the reusable quest arena, including terrain placement,
+ * actor spawning, item placement and cleanup between quests.
  */
-public final class ArenaQuest {
+public class ArenaQuest {
     private final GameMap map;
     private final Farmer farmer;
-    private final List<Actor> spawnedActors = new ArrayList<>();
-    private final List<SpawnedItem> spawnedItems = new ArrayList<>();
 
     /**
-     * Stores an item and its original spawn location for later cleanup.
+     * Creates a quest arena using an existing map and farmer.
      *
-     * @param location the location where the item was placed
-     * @param item the spawned item
+     * @param map the quest arena map
+     * @param farmer the player
      */
-    private record SpawnedItem(Location location, Item item){
-
-    }
-
-    /**
-     * Creates a quest arena using an existing game map and Farmer.
-     *
-     * @param map the game map used as the quest arena
-     * @param farmer the Farmer participating in quests
-     * @throws NullPointerException if map or farmer is null
-     */
-    public ArenaQuest(GameMap map,Farmer farmer){
+    public ArenaQuest(GameMap map, Farmer farmer) {
         this.map = Objects.requireNonNull(map);
         this.farmer = Objects.requireNonNull(farmer);
     }
 
     /**
-     * Returns the game map associated with this arena.
+     * Returns the arena map.
      *
-     * @return the arena's game map
+     * @return the game map
      */
-    public GameMap map(){
+    public GameMap map() {
         return map;
     }
 
     /**
-     * Checks whether the specified coordinates are within the arena.
+     * Checks whether coordinates are inside the arena.
      *
-     * @param x the horizontal coordinate
-     * @param y the vertical coordinate
-     * @return true if both coordinates are within the map, otherwise false
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @return true if the coordinates are valid
      */
-    public boolean inside(int x,int y){
-        return map.getXRange().contains(x) && map.getYRange().contains(y);
+    public boolean inside(int x, int y) {
+        return map.getXRange().contains(x)
+                && map.getYRange().contains(y);
     }
 
     /**
-     * Places a ground object at the specified coordinates.
-     * Placement fails if the location is invalid, the ground is null,
-     * or an actor occupies the location.
+     * Places ground at the specified location.
      *
-     * @param x the horizontal coordinate
-     * @param y the vertical coordinate
-     * @param ground the ground object to place
-     * @return true if the ground was placed successfully, otherwise false
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param ground ground to place
+     * @return true if placement succeeds
      */
-    public boolean placeGround(int x, int y, Ground ground){
-        Location loc = map.at(x,y);
-
-        if(!inside(x,y) || ground == null){
+    public boolean placeGround(int x, int y, Ground ground) {
+        if (!inside(x, y) || ground == null) {
             return false;
         }
 
-        if(loc.containsAnActor()){
-            return false;
-        }
-        loc.setGround(ground);
-        return  true;
-    }
+        Location location = map.at(x, y);
 
-    /**
-     * Spawns an actor at the specified location and tracks it for cleanup.
-     * Placement fails if the location is invalid, occupied, or cannot
-     * be entered by the actor.
-     *
-     * @param x the horizontal coordinate
-     * @param y the vertical coordinate
-     * @param actor the actor to spawn
-     * @return true if the actor was spawned successfully, otherwise false
-     */
-    public boolean spawnActor(int x, int y, Actor actor){
-        Location tile = map.at(x,y);
-
-        if(!inside(x,y) || actor == null){
+        if (location.containsAnActor()) {
             return false;
         }
 
-        if(!tile.canActorEnter(actor) || tile.containsAnActor()){
-            return false;
-        }
-
-        try{
-            map.addActor(actor,tile);
-            spawnedActors.add(actor);
-            return true;
-        } catch (GameEngineException exception){
-            return false;
-        }
-    }
-
-    /**
-     * Places an item at the specified location and records it for cleanup.
-     *
-     * @param x the horizontal coordinate
-     * @param y the vertical coordinate
-     * @param item the item to place
-     * @return true if the item was placed successfully, otherwise false
-     */
-    public boolean placeItem(int x, int y, Item item){
-        Location tile = map.at(x,y);
-        if(!inside(x,y) || item == null){
-            return false;
-        }
-        tile.addItem(item);
-        spawnedItems.add(new SpawnedItem(tile,item));
+        location.setGround(ground);
         return true;
     }
 
     /**
-     * Resets the arena by removing tracked temporary actors and items,
-     * then restoring its default walls and Dirt terrain.
-     * Preserves the permanent exit at (1, 2) and locations occupied
-     * by actors. The Farmer must leave the arena before it can be reset.
+     * Spawns an actor at the specified location.
      *
-     * @throws IllegalStateException if the Farmer is still inside the arena
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param actor actor to spawn
+     * @return true if spawning succeeds
      */
-    public void reset(){
-        if(map.contains(farmer)){
-            throw new IllegalStateException("Cannot reset arena while the Farmer is inside");
+    public boolean spawnActor(int x, int y, Actor actor) {
+        if (!inside(x, y) || actor == null) {
+            return false;
         }
-        for(Actor actor : spawnedActors){
-            if(map.contains(actor)){
-                map.removeActor(actor);
-            }
+
+        Location location = map.at(x, y);
+
+        if (location.containsAnActor() || !location.canActorEnter(actor)) {
+            return false;
         }
-        spawnedActors.clear();
-        for(SpawnedItem entry: spawnedItems){
-            if(entry.location().getItems().contains(entry.item())){
-                entry.location.removeItem(entry.item());
-            }
-        }
-        spawnedActors.clear();
-        for(int y: map.getYRange()){
-            for(int x : map.getXRange()){
-                Location tile = map.at(x,y);
-                if(x == 1 && y == 2){
-                    continue;
-                }
-                if(tile.containsAnActor()){
-                    continue;
-                }
-                boolean wall = x == 0|| y == 0 || x == map.getXRange().max() || y == map.getYRange().max();
-                tile.setGround(wall ? new TavernWall() : new Dirt());
-            }
+
+        try {
+            map.addActor(actor, location);
+            return true;
+        } catch (GameEngineException exception) {
+            return false;
         }
     }
 
+    /**
+     * Places an item at the specified location.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param item item to place
+     * @return true if placement succeeds
+     */
+    public boolean placeItem(int x, int y, Item item) {
+        if (!inside(x, y) || item == null) {
+            return false;
+        }
+
+        Location location = map.at(x, y);
+        location.addItem(item);
+        return true;
+    }
+
+    /**
+     * Removes temporary actors and items, then restores the arena
+     * terrain while preserving the Tavern exit.
+     *
+     * @throws IllegalStateException if the farmer is still in the arena
+     */
+    public void reset() {
+        if (map.contains(farmer)) {
+            throw new IllegalStateException(
+                    "Cannot reset arena while the Farmer is inside"
+            );
+        }
+
+        for (int y : map.getYRange()) {
+            for (int x : map.getXRange()) {
+                Location location = map.at(x, y);
+
+                if (location.containsAnActor()) {
+                    map.removeActor(location.getActor());
+                }
+
+                for (Item item : new ArrayList<>(location.getItems())) {
+                    location.removeItem(item);
+                }
+
+                if (x == 1 && y == 2) {
+                    continue;
+                }
+
+                boolean wall = x == map.getXRange().min()
+                        || y == map.getYRange().min()
+                        || x == map.getXRange().max()
+                        || y == map.getYRange().max();
+
+                location.setGround(
+                        wall ? new TavernWall() : new Dirt()
+                );
+            }
+        }
+    }
 }
