@@ -19,14 +19,15 @@ public class QuestExitDoor extends TavernDoor {
 
 
     @Override
-    public ActionList allowableActions(Actor actor, Location location, String direction) {
+    public ActionList allowableActions(
+            Actor actor,
+            Location location,
+            String direction) {
+
         if (manager.hasActiveQuest()) {
-            ActionList actions = new ActionList();
-            if (!direction.isEmpty() && actor.hasAbility(TavernAbility.CAN_USE_TAVERN)) {
-                actions.add(new QuestAbandonAction(manager));
-            }
-            return actions;
+            return new ActionList();
         }
+
         return super.allowableActions(actor, location, direction);
     }
 }
