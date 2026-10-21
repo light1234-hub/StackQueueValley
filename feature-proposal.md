@@ -111,80 +111,6 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 * TavernAbility - Controls eligibility to use Tavern interactions.
 
 * ExperienceTracker - Maintains the Farmer's accumulated and available experience points.
-# This is a Heading h1
-## This is a Heading h2
-###### This is a Heading h6
-
-## Emphasis
-
-*This text will be italic*  
-_This will also be italic_
-
-**This text will be bold**  
-__This will also be bold__
-
-_You **can** combine them_
-
-## Lists
-
-### Unordered
-
-* Item 1
-* Item 2
-* Item 2a
-* Item 2b
-    * Item 3a
-    * Item 3b
-
-### Ordered
-
-1. Item 1
-2. Item 2
-3. Item 3
-    1. Item 3a
-    2. Item 3b
-
-## Images
-
-![This is an alt text.](/image/Markdown-mark.svg "This is a sample image.")
-
-## Links
-
-You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
-
-## Blockquotes
-
-> Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
->
->> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
-
-## Tables
-
-| Left columns  | Right columns |
-| ------------- |:-------------:|
-| left foo      | right foo     |
-| left bar      | right bar     |
-| left baz      | right baz     |
-
-## Blocks of code
-
-```
-let message = 'Hello world';
-alert(message);
-```
-
-## Mermaid diagrams
-```mermaid
-graph TD
-  A[Start] --> B{Decision}
-  B -->|Yes| C[Finish]
-  B -->|No| D[Alternate]
-```
-
-## Inline code
-
-This web site is using `markedjs/marked`.
-
 
 
 ## REQ 4 - Alchemy Valley
@@ -284,12 +210,40 @@ The game retrieves weather information using the Open-Meteo Forecast API. The AP
 
 **Heatwaves**: High temperature turn selected soil tiles into dry ground, create a temporary fire hazard and apply burning effects to actors standing on affected tiles.
 
-**Tornado**: Strong winds scatter items across adjacent locations, intorduces fallen tree obstalce and distrupt nearby actors.
+**Tornado**: Strong winds scatter items across adjacent locations, introduces fallen tree obstacles and disrupt nearby actors.
 
 ### Environmental Response
 
-**Drainage response:** Floodwater is redirected into drainage channels,floodied terrain is restored to Soil and collected water becomes usable
+**Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to Soil and collected water becomes usable
 
 **Wildlife Response:** Chickens and Cows attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
 
-**Resources Response:** Weather-damaged terrain exposes additonal resources, converting suitablr ground into mining nodes and placing collectible materials nearby. 
+**Resources Response:** Weather-damaged terrain exposes additional resources, converting suitable ground into mining nodes and placing collectible materials nearby. 
+
+## Architecture
+Here we introduce two new interface and 6 brand new concrete classes with 3 concrete implementation for each interface in Req 5
+
+**Abstraction 1: WeatherEvent**
+
+Type: New interface
+
+Responsibility: Defines how a weather condition changes by modifying the terrain of the farm, affecting actors and redistributing resources.
+
+**Concrete implementation:**
+
+| Class         |                                                                               Complex effect                                                                               |
+|---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| RainstormEvent | Converts selected tiles into temporary puddles and applies a soaked status to all actors caught in the storm. Actor can only move 1 step every 3 turns while being soaked. |
+| HeatwaveEvent |            Converts selected tiles into dry ground, creates temporary fire hazards and applies the burning effect to all actors standing on the selected tiles.            |
+| Tornado       |   Scatters items into nearby adjacent locations, creates fallen-tree obstacles and disrupts nearby actors. Fallen trees block 2 tiles and forces actors to move around.    |
+
+**Abstraction 2: WeatherResponse **
+Type: New interface
+
+Responsibility: Defines how the farm, the animals within said farm and its resources respond to weather damages and hazards.
+
+| Class                    |                                                                                                                      Complex effect                                                                                                                      |
+|--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| DrainageResponse         |        Redirects floodwater into drainage channels, changes the temporary puddles back into soil and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map.         |
+| WildlifeResponse         |          Moves Chicken and Cows into towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items. WildlifeResponse can be crafted by the farmer and placed down on the map.          |
+| ResourceRecoveryResponse | Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations. |
