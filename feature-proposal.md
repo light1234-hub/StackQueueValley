@@ -69,7 +69,7 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 
 ## Supporting Class
 **Quest management:**
-* QuestManager - Manages Quest acceptance, objective tracking, time limit, completion, failure and player transportation
+* QuestManager - coordinates contract acceptance, objective progression, deadlines, completion/failure, and return travel.
 
 * QuestDefinition - Stores quest name, fee, reward, time limit, rules, scenario and consequence
 
