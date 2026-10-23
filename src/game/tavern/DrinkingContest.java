@@ -16,8 +16,7 @@ import java.util.Random;
  * One Farmer competes against the bartender. A win grants one weighted-random
  * free contract; a tie, blackout, loss or walk-away grants none.
  *
- * <p>The game has no day counter, so a completed attempt causes a twenty-turn
- * cooldown instead of an invented daily reset.</p>
+ * <p>A completed attempt causes a five-turn cooldown before another wager may start.</p>
  */
 public class DrinkingContest {
     private static final int ROUNDS = 3;
