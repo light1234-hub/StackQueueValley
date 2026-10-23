@@ -61,11 +61,11 @@ Type: New interface
 
 Responsibility: Defines how a completed or failed contract changes the inherited farm.
 
-| Class  | Complex effect |
-| ------------- |:-------------:|
-| ForestConsequence     | Success: Restore soil and generate a Strawberry. Failure: Converts farm terrain into Corrupted Dirt and spawns a Slime     |
-| RescueConsequence      | Success: Restore Soil, Spawns a Chicken and creates an Egg. Failure:Creates Rock terrain, drops a Stone item and spawns a Slime     |
-| RelicConsequence      | Success: Restores Soil and places Diamond and Copper items. Failure: Creates Geode and Corrupted Dirt terrain and spawns a Cave Ghost     |
+| Class  |                                                                                                             Complex effect                                                                                                              |
+| ------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| ForestConsequence     |                                                         Success: Creates a magical grove that gradually purifies corrupted terrain within a radius and allows new vegetation to grow on restored land. Failure: Creates a corruption source that expands across adjacent Soil over time, infects crops and applies a harmful status to actors entering contaminated areas.                                                        |
+| RescueConsequence      |                                                     Success: Spawns rescued survivors with AI behaviour. They collect dropped resources, navigate back to a supply camp and gradually repair damaged farmland. Failure:Introduces hostile scavengers that patrol the farm, steal dropped resources and construct traps that restrict movement.                                                     |
+| RelicConsequence      |   Success: Generates connected magical crystal veins that trigger a chain reaction when mined, transforming multiple terrain tiles and producing resources. Failure: Creates unstable terrain that collapses after a countdown, affecting nearby actors, scattering items and generating obstacles   |
 
 ## Supporting Class
 **Quest management:**
