@@ -25,7 +25,7 @@ public class QuestManager {
     private final ArenaQuest arena;
     private final Location tavernArrival;
     private final Location bartenderLocation;
-    private final QuestWorldContext persistentWorld;
+    private final QuestOutcomeService outcomeService;
     private final List<QuestDefinition> contracts;
     private final List<QuestObjectiveGround> objectives = new ArrayList<>();
     private QuestDefinition active;
@@ -44,15 +44,11 @@ public class QuestManager {
      */
     public QuestManager(Farmer farmer, ArenaQuest arena, Location tavernArrival,
                         Location bartenderLocation, GameMap farm, List<QuestDefinition> contracts) {
-        if (farmer == null || arena == null || tavernArrival == null ||
-                bartenderLocation == null || farm == null || contracts == null || contracts.isEmpty()) {
-            throw new IllegalArgumentException("Quest service requires its world and contracts");
-        }
         this.farmer = farmer;
         this.arena = arena;
         this.tavernArrival = tavernArrival;
         this.bartenderLocation = bartenderLocation;
-        this.persistentWorld = new QuestWorldContext(farm);
+        this.outcomeService = new QuestOutcomeService(farmer, new QuestWorldContext(farm));
         this.contracts = List.copyOf(contracts);
     }
 
@@ -74,12 +70,24 @@ public class QuestManager {
     /** @return total number of objectives in the active quest */
     public int totalObjectives() { return objectives.size(); }
 
-    /** Checks the actor identity, ability and current map. */
+    /**
+     * Checks whether the supplied actor is the Farmer in the active quest arena.
+     *
+     * @param actor actor whose participation is being checked
+     * @param map current map
+     * @return true if this Farmer has an active quest on the supplied arena map
+     */
     public boolean isActiveFor(Actor actor, GameMap map) {
         return active != null && actor == farmer && map == arena.map() && arena.map().contains(farmer);
     }
 
-    /** Checks that the given objective still belongs to the current contract. */
+    /**
+     * Checks whether an objective is still part of the active contract and remains in place.
+     *
+     * @param actor actor requesting the interaction
+     * @param objective objective being accessed
+     * @return true if the Farmer can interact with the active objective
+     */
     public boolean canInteract(Actor actor, QuestObjectiveGround objective) {
         return active != null && actor == farmer && objectives.contains(objective)
                 && objective.location().getGround() == objective;
@@ -124,7 +132,16 @@ public class QuestManager {
         return beginContract(actor, map, contract, true);
     }
 
-    /** Shared validation and setup for both paid and wagered contracts. */
+    /**
+     * Validates and prepares either a paid contract or a free wager prize.
+     * The entry fee is charged only after the scenario has prepared successfully.
+     *
+     * @param actor actor accepting the contract
+     * @param map current Tavern map
+     * @param contract selected offered contract
+     * @param freeEntry whether payment is waived
+     * @return message describing acceptance or rejection
+     */
     private String beginContract(Actor actor, GameMap map, QuestDefinition contract,
                                  boolean freeEntry) {
         if (!canInteractAtBar(actor, map)) {
@@ -145,7 +162,9 @@ public class QuestManager {
             completed = 0;
             turnsRemaining = contract.turnLimit();
             objectives.clear();
-            contract.scenario().prepare(arena, this);
+            QuestSetupContext setup = new QuestSetupContext(arena,
+                    (location, name) -> addObjective(location.x(), location.y(), name));
+            contract.scenario().prepare(setup);
             if (objectives.isEmpty()) throw new IllegalStateException("Quest has no objectives");
             if (!entrance.canActorEnter(actor) || entrance.containsAnActor()) {
                 throw new IllegalStateException("Quest entrance changed during setup");
@@ -172,6 +191,11 @@ public class QuestManager {
     /**
      * Adds a named objective at the requested coordinates while preparing a quest.
      * A failed placement rejects the entire contract before payment.
+     *
+     * @param x horizontal arena coordinate
+     * @param y vertical arena coordinate
+     * @param name text identifying the objective
+     * @throws IllegalStateException if no contract is being prepared or placement fails
      */
     public void addObjective(int x, int y, String name) {
         if (active == null || !arena.inside(x, y)) {
@@ -183,7 +207,14 @@ public class QuestManager {
         objectives.add(objective);
     }
 
-    /** Makes a terrain change required for the scenario, rejecting failed setups. */
+    /**
+     * Makes a terrain change required for the scenario, rejecting failed setups.
+     *
+     * @param x horizontal arena coordinate
+     * @param y vertical arena coordinate
+     * @param ground ground to place
+     * @throws IllegalStateException if the tile cannot be changed
+     */
     public void requireGround(int x, int y, Ground ground) {
         if (!arena.placeGround(x, y, ground)) {
             throw new IllegalStateException("Cannot prepare arena tile " + x + "," + y);
@@ -191,8 +222,14 @@ public class QuestManager {
     }
 
     /**
-     * Activates one nearby mission objective and finishes the quest when all
-     * goals are complete. Relic objectives must be visited in their listed order.
+     * Activates a nearby objective and finishes the quest when all goals are complete.
+     * Ordered contracts require the objectives to be visited in their listed order.
+     * The final objective is retained if the Tavern has no safe return tile.
+     *
+     * @param actor actor attempting to activate the objective
+     * @param map current map
+     * @param objective objective being activated
+     * @return message describing progress, rejection, or the quest outcome
      */
     public String activate(Actor actor, GameMap map, QuestObjectiveGround objective) {
         if (!isActiveFor(actor, map) || !canInteract(actor, objective)) {
@@ -206,6 +243,10 @@ public class QuestManager {
             return "The relic sigils must be activated in sequence: " + (completed + 1)
                     + " comes next.";
         }
+        if (completed + 1 == objectives.size() && safeReturnLocation() == null) {
+            return "Cannot complete the final objective yet because every Tavern return tile is blocked. "
+                    + "The final objective remains available; clear a safe tile and try again.";
+        }
         target.setGround(new Soil());
         completed++;
         if (completed == objectives.size()) {
@@ -217,7 +258,7 @@ public class QuestManager {
 
     /**
      * Advances the mission deadline once per game-world turn.
-     * Only time spent actively inside the arena counts.
+     * Only time spent actively inside the arena counts. Expiry invokes the failure path.
      */
     public void tick() {
         if (active == null || !arena.map().contains(farmer)) return;
@@ -227,60 +268,100 @@ public class QuestManager {
         }
     }
 
-    /** Returns the Farmer to the Tavern, applying failure effects. */
+    /**
+     * Abandons the active quest and applies its failure consequence.
+     *
+     * @param actor actor requesting abandonment
+     * @param map current map
+     * @return message describing the result
+     */
     public String abandon(Actor actor, GameMap map) {
         if (!isActiveFor(actor, map)) return "There is no active quest to abandon.";
         return "Contract abandoned. " + finish(false);
     }
 
-    /** Applies permanent consequences and transfers the Farmer out of the arena. */
+    /**
+     * Returns the Farmer to a safe Tavern tile, applies the quest outcome, and resets the arena.
+     *
+     * @param successful whether the Farmer completed every objective in time
+     * @return message describing the completed or failed quest, or a blocked return
+     */
     private String finish(boolean successful) {
         QuestDefinition finished = active;
-        // Fallback to an adjacent Tavern tile if another actor occupied the usual arrival.
+        // Try the normal arrival first, then neighbouring and other Tavern tiles.
         Location returnTile = safeReturnLocation();
         if (returnTile == null) {
             return "Cannot return to Tavern: arrival is blocked. Your contract remains active.";
         }
         arena.map().moveActor(farmer, returnTile);
-        String worldChanges;
-        if (successful) {
-            farmer.gainExp(finished.experienceReward());
-            farmer.modifyStatistic(FinanceStatistics.COINS, StatisticOperations.INCREASE,
-                    finished.coinReward());
-            worldChanges = finished.consequence().onSuccess(persistentWorld);
-        } else {
-            worldChanges = finished.consequence().onFailure(persistentWorld);
-        }
+        String outcome = outcomeService.apply(finished, successful);
         active = null;
         completed = 0;
         turnsRemaining = 0;
         objectives.clear();
         arena.reset();
-        String reward = successful ? " Earned " + finished.experienceReward() +
-                " XP and " + finished.coinReward() + " coins." : " No XP or coins awarded.";
-        return finished.title() + (successful ? " succeeded." : " failed.") + reward
-                + " " + worldChanges + " Returned to the Tavern.";
+        return finished.title() + (successful ? " succeeded." : " failed.")
+                + outcome + " Returned to the Tavern.";
     }
 
-    /** Finds a safe return tile without moving a Tavern occupant. */
+    /**
+     * Finds a safe return tile without moving another Tavern occupant.
+     * The usual arrival and neighbouring tiles are preferred; the full Tavern is
+     * searched as a fallback so quests can complete even if the entrance is blocked.
+     *
+     * @return a free enterable Tavern tile, or null if none exists
+     */
     private Location safeReturnLocation() {
-        if (!tavernArrival.containsAnActor() && tavernArrival.canActorEnter(farmer)) {
+        if (isSafeTavernTile(tavernArrival)) {
             return tavernArrival;
         }
         for (Exit exit : tavernArrival.getExits()) {
             Location tile = exit.getDestination();
-            if (!tile.containsAnActor() && tile.canActorEnter(farmer)) return tile;
+            if (isSafeTavernTile(tile)) {
+                return tile;
+            }
+        }
+        GameMap tavern = tavernArrival.map();
+        for (int y : tavern.getYRange()) {
+            for (int x : tavern.getXRange()) {
+                Location tile = tavern.at(x, y);
+                if (isSafeTavernTile(tile)) {
+                    return tile;
+                }
+            }
         }
         return null;
     }
 
-    /** Checks that the actor is one tile away from the bartender. */
+    /**
+     * Checks whether a Tavern tile is a valid return destination for the Farmer.
+     *
+     * @param tile candidate Tavern tile
+     * @return true if it is empty and enterable by the Farmer
+     */
+    private boolean isSafeTavernTile(Location tile) {
+        return tile != null && !tile.containsAnActor() && tile.canActorEnter(farmer);
+    }
+
+    /**
+     * Checks whether an actor is adjacent to the bartender on the supplied map.
+     *
+     * @param map map where the interaction occurs
+     * @param actor actor interacting with the bartender
+     * @return true if the actor is adjacent on the bartender's map
+     */
     private boolean nearBartender(GameMap map, Actor actor) {
         if (bartenderLocation.map() != map) return false;
         return adjacent(map.locationOf(actor), bartenderLocation);
     }
 
-    /** Uses the engine's eight-direction movement adjacency. */
+    /**
+     * Uses eight-direction adjacency for locations on the same map.
+     *
+     * @param left first location
+     * @param right second location
+     * @return true when the locations are distinct neighbours on the same map
+     */
     private static boolean adjacent(Location left, Location right) {
         return left.map() == right.map() &&
                 Math.max(Math.abs(left.x() - right.x()), Math.abs(left.y() - right.y())) == 1;
