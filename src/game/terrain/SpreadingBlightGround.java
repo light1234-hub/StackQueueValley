@@ -27,7 +27,6 @@ public class SpreadingBlightGround extends Ground {
     public SpreadingBlightGround() {
         super('B', "Spreading Blight");
         enableAbility(GroundAbility.GROVE_PURIFIABLE);
-        enableAbility(GroundAbility.BLIGHT_INFECTABLE);
         enableAbility(GroundAbility.COLLAPSE_REPLACEABLE);
         enableAbility(GroundAbility.SURVIVOR_REPAIRABLE);
     }
