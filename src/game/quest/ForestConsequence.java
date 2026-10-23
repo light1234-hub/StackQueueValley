@@ -1,27 +1,45 @@
 package game.quest;
 
-import game.actor.Slime;
-import game.item.StrawberryItem;
-import game.terrain.CorruptedDirt;
-import game.terrain.Soil;
+import game.terrain.LivingGroveGround;
+import game.terrain.SpreadingBlightGround;
 
-/** Spreads or reverses woodland corruption across the inherited farm. */
+/**
+ * Applies the long-term ecological consequences of the Cursed Forest contract.
+ * Success establishes a restorative grove; failure introduces spreading blight.
+ */
 public class ForestConsequence implements QuestConsequence {
-    /** Purifies two farm plots and produces a new harvest on the farm. */
+
+    /**
+     * Creates a Living Grove that purifies corrupted terrain and supports plant growth.
+     *
+     * @param world context for modifying the persistent farm
+     * @return a description of the resulting world change
+     */
     @Override
     public String onSuccess(QuestWorldContext world) {
-        world.changeGround(0, 3, new Soil());
-        world.changeGround(1, 5, new Soil());
-        world.placeItem(0, 3, new StrawberryItem(false));
-        return "Cleansed soil and a strawberry appeared on the farm.";
+        boolean placed = world.placeGroundNearby(
+                0, 3, LivingGroveGround::new) != null;
+        return placed
+                ? "A Living Grove takes root. It gradually purifies nearby blight and grows vegetation."
+                : "The grove could not take root because the nearby farm plots were unavailable.";
     }
 
-    /** Infects farm soil and releases a hostile creature into the overworld. */
+    /**
+     * Creates up to two blight sources that spread and poison actors over time.
+     *
+     * @param world context for modifying the persistent farm
+     * @return a description of the resulting world change
+     */
     @Override
     public String onFailure(QuestWorldContext world) {
-        world.changeGround(0, 3, new CorruptedDirt());
-        world.changeGround(1, 5, new CorruptedDirt());
-        world.spawnNearby(7, 5, new Slime());
-        return "Corruption reached the farm and a slime was unleashed.";
+        boolean first = world.placeGroundNearby(
+                0, 3, SpreadingBlightGround::new) != null;
+        boolean second = world.placeGroundNearby(
+                1, 5, SpreadingBlightGround::new) != null;
+        int placed = (first ? 1 : 0) + (second ? 1 : 0);
+        return placed > 0
+                ? "Spreading Blight has reached the farm in " + placed
+                + " location(s). It infects nearby terrain and poisons actors standing on it."
+                : "The blight could not take hold because the nearby farm plots were unavailable.";
     }
 }

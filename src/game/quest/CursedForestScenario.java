@@ -1,7 +1,6 @@
 package game.quest;
 
 import game.actor.Slime;
-import game.arena.ArenaQuest;
 import game.terrain.CorruptedDirt;
 import game.terrain.Soil;
 
@@ -10,17 +9,21 @@ import game.terrain.Soil;
  * The player must purify each root before the forest infects the farm.
  */
 public class CursedForestScenario implements QuestScenario {
-    /** Dynamically configures terrain, an enemy, and three objectives. */
+    /**
+     * Creates corrupted terrain, a forest guardian, and three objectives.
+     *
+     * @param setup controlled arena setup operations
+     */
     @Override
-    public void prepare(ArenaQuest arena, QuestManager manager) {
+    public void prepare(QuestSetupContext setup) {
         for (int x = 5; x <= 9; x++) {
-            manager.requireGround(x, 3, new CorruptedDirt());
+            setup.requireGround(x, 3, new CorruptedDirt());
         }
-        manager.requireGround(10, 3, new Soil());
-        manager.addObjective(7, 2, "Purify the first cursed root");
-        manager.addObjective(10, 4, "Purify the second cursed root");
-        manager.addObjective(11, 6, "Purify the final cursed root");
-        if (!arena.spawnActor(12, 5, new Slime())) {
+        setup.requireGround(10, 3, new Soil());
+        setup.addObjective(7, 2, "Purify the first cursed root");
+        setup.addObjective(10, 4, "Purify the second cursed root");
+        setup.addObjective(11, 6, "Purify the final cursed root");
+        if (!setup.spawnActor(12, 5, new Slime())) {
             throw new IllegalStateException("Could not place forest guardian");
         }
     }

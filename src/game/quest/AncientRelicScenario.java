@@ -1,7 +1,6 @@
 package game.quest;
 
 import game.actor.CaveGhost;
-import game.arena.ArenaQuest;
 import game.item.CopperItem;
 import game.terrain.CopperNode;
 import game.terrain.CorruptedDirt;
@@ -9,28 +8,30 @@ import game.terrain.Geode;
 import game.terrain.Rock;
 
 /**
- * Builds a hazardous relic chamber with ore, ghosts and three ordered sigils.
- * Activating the runes out of order is rejected by the quest manager.
+ * Builds a hazardous relic chamber with ore, ghosts, and three ordered sigils.
+ * The quest manager rejects sigils activated out of sequence.
  */
-public final class AncientRelicScenario implements QuestScenario {
+public class AncientRelicScenario implements QuestScenario {
     /**
-     * Creates mining obstacles, poison tiles, ordered sigils and an enemy.
+     * Creates mining obstacles, corrupted tiles, ordered sigils, and a guardian.
+     *
+     * @param setup controlled arena setup operations
      */
     @Override
-    public void prepare(ArenaQuest arena, QuestManager manager) {
-        manager.requireGround(7, 2, new Geode());
-        manager.requireGround(8, 5, new CopperNode());
-        manager.requireGround(8, 4, new Rock());
+    public void prepare(QuestSetupContext setup) {
+        setup.requireGround(7, 2, new Geode());
+        setup.requireGround(8, 5, new CopperNode());
+        setup.requireGround(8, 4, new Rock());
         for (int x = 9; x <= 11; x++) {
-            manager.requireGround(x, 3, new CorruptedDirt());
+            setup.requireGround(x, 3, new CorruptedDirt());
         }
-        manager.addObjective(5, 5, "Activate the first relic sigil");
-        manager.addObjective(9, 2, "Activate the second relic sigil");
-        manager.addObjective(12, 5, "Activate the final relic sigil");
-        if (!arena.placeItem(11, 6, new CopperItem())) {
+        setup.addObjective(5, 5, "Activate the first relic sigil");
+        setup.addObjective(9, 2, "Activate the second relic sigil");
+        setup.addObjective(12, 5, "Activate the final relic sigil");
+        if (!setup.placeItem(11, 6, new CopperItem())) {
             throw new IllegalStateException("Could not place the relic offering");
         }
-        if (!arena.spawnActor(12, 2, new CaveGhost())) {
+        if (!setup.spawnActor(12, 2, new CaveGhost())) {
             throw new IllegalStateException("Could not place relic guardian");
         }
     }
