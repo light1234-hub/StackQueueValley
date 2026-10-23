@@ -1,17 +1,14 @@
 package game.quest;
 
-import game.arena.ArenaQuest;
-
 /**
- * Defines how a contract changes the reusable arena and creates objectives.
- * Each implementation must set up at least one interactable objective.
+ * Defines how a contract prepares the reusable quest arena.
+ * Implementations specify their terrain, encounters, resources, and objectives.
  */
 public interface QuestScenario {
     /**
-     * Populates the arena with terrain, encounters and interactable goals.
+     * Populates the arena with terrain, encounters, and interactable objectives.
      *
-     * @param arena the cleared arena
-     * @param manager the quest manager receiving objective registrations
+     * @param setup controlled operations for preparing the active arena
      */
-    void prepare(ArenaQuest arena, QuestManager manager);
+    void prepare(QuestSetupContext setup);
 }
