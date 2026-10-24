@@ -1,3 +1,4 @@
+
 package game.terrain;
 
 import edu.monash.fit2099.engine.positions.Ground;
@@ -33,6 +34,7 @@ public class LivingGroveGround extends Ground {
     @Override
     public void tick(Location location) {
         turns++;
+
         if (turns % EFFECT_INTERVAL != 0) {
             return;
         }
@@ -41,89 +43,83 @@ public class LivingGroveGround extends Ground {
             return;
         }
 
-        if (purifyNearbyCorruption(location)) {
+        if (restoreNearbyGround(location, GroundAbility.GROVE_PURIFIABLE)) {
             return;
         }
 
-        enrichNearbyGround(location);
+        restoreNearbyGround(location, GroundAbility.GROVE_ENRICHABLE);
     }
 
     /**
-     * Grows a seedling on a clear soil plot purified during an earlier turn.
+     * Grows a seedling on a clear soil plot restored during an earlier turn.
      *
      * @return whether a seedling was planted
      */
     private boolean growPreviouslyRestoredPlot() {
         Iterator<Location> iterator = restoredPlots.iterator();
+
         while (iterator.hasNext()) {
             Location plot = iterator.next();
+
             if (plot.getGround().hasAbility(GroundAbility.GROVE_SEEDING_PLOT)
                     && !plot.containsAnActor()) {
                 plot.setGround(new StrawberrySeedling());
                 iterator.remove();
                 return true;
             }
+
             if (!plot.getGround().hasAbility(GroundAbility.GROVE_SEEDING_PLOT)) {
                 iterator.remove();
             }
         }
+
         return false;
     }
 
     /**
-     * Purifies one unoccupied corrupted tile within the grove's radius.
+     * Restores one unoccupied nearby tile with the specified ability.
      *
      * @param location location occupied by this grove
-     * @return whether corrupted ground was restored
+     * @param ability ability required for restoration
+     * @return whether a tile was restored
      */
-    private boolean purifyNearbyCorruption(Location location) {
+    private boolean restoreNearbyGround(Location location, GroundAbility ability) {
         for (Location target : nearbyLocations(location)) {
             if (!target.containsAnActor()
-                    && target.getGround().hasAbility(GroundAbility.GROVE_PURIFIABLE)) {
+                    && target.getGround().hasAbility(ability)) {
                 target.setGround(new Soil());
                 restoredPlots.add(target);
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Enriches one nearby unoccupied dirt or soil tile if no corruption is available.
-     *
-     * @param location location occupied by this grove
-     * @return whether a tile was enriched
-     */
-    private boolean enrichNearbyGround(Location location) {
-        for (Location target : nearbyLocations(location)) {
-            if (!target.containsAnActor()
-                    && target.getGround().hasAbility(GroundAbility.GROVE_ENRICHABLE)) {
-                target.setGround(new Soil());
-                restoredPlots.add(target);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns locations in the grove's Manhattan-distance radius, excluding the grove itself.
+     * Returns locations in the grove's Manhattan-distance radius,
+     * excluding the grove itself.
      *
      * @param location location occupied by this grove
      * @return nearby locations ordered by row then column
      */
     private List<Location> nearbyLocations(Location location) {
         List<Location> result = new ArrayList<>();
+
         for (int y = Math.max(location.map().getYRange().min(), location.y() - RADIUS);
              y <= Math.min(location.map().getYRange().max(), location.y() + RADIUS); y++) {
+
             for (int x = Math.max(location.map().getXRange().min(), location.x() - RADIUS);
                  x <= Math.min(location.map().getXRange().max(), location.x() + RADIUS); x++) {
+
                 if (Math.abs(x - location.x()) + Math.abs(y - location.y()) <= RADIUS
                         && (x != location.x() || y != location.y())) {
                     result.add(location.map().at(x, y));
                 }
             }
         }
+
         return result;
     }
 }
+

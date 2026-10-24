@@ -4,6 +4,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.quest.QuestManager;
 
+import java.util.stream.Collectors;
+
 /**
  * Tracks a single branching conversation with the Tavern bartender.
  * Dialogue changes only which menu actions are shown; it does not charge
@@ -22,6 +24,7 @@ public class BartenderDialogue {
     }
 
     private final QuestManager quests;
+    private final DrinkingContest contest;
     private Actor speaker;
     private GameMap conversationMap;
     private Stage stage = Stage.CLOSED;
@@ -29,14 +32,16 @@ public class BartenderDialogue {
     /**
      * Creates a dialogue controller for the bartender's quest service.
      *
-     * @param quests the quest manager that validates who can speak at the bar
-     * @throws IllegalArgumentException if quests is null
+     * @param quests manager that validates Tavern interactions and supplies contracts
+     * @param contest controller that determines when the wager is available
+     * @throws IllegalArgumentException if either dependency is null
      */
-    public BartenderDialogue(QuestManager quests) {
-        if (quests == null) {
-            throw new IllegalArgumentException("Quest manager cannot be null");
+    public BartenderDialogue(QuestManager quests, DrinkingContest contest) {
+        if (quests == null || contest == null) {
+            throw new IllegalArgumentException("Quest manager and drinking contest are required");
         }
         this.quests = quests;
+        this.contest = contest;
     }
 
     /**
@@ -84,12 +89,17 @@ public class BartenderDialogue {
             case ASK_CONTRACTS -> {
                 if (stage != Stage.GREETING) return "Go back to the main conversation first.";
                 stage = Stage.CONTRACTS;
-                return "Bartender: The Cursed Forest is crawling with rot. The Lost Survivors "
-                        + "need a brave soul. And the Ancient Relic? That one's trouble. "
+                String offers = quests.contracts().stream()
+                        .map(contract -> contract.title() + " (" + contract.entryFee() + " coins)")
+                        .collect(Collectors.joining("; "));
+                return "Bartender: I've got these contracts: " + offers + ". "
                         + "Choose carefully: the fee is paid up front, and failure has consequences.";
             }
             case ASK_WAGER -> {
                 if (stage != Stage.GREETING) return "Go back to the main conversation first.";
+                if (!contest.canChallenge(actor, map)) {
+                    return "Bartender: The wager isn't available right now.";
+                }
                 stage = Stage.WAGER;
                 return "Bartender: Short on coin? Outdrink me in three rounds and I'll send you "
                         + "on a RANDOM contract for free. Sip for one cup, or chug for two with "

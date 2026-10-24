@@ -37,8 +37,6 @@ public class DrinkRoundAction extends Action {
      */
     @Override
     public String menuDescription(Actor actor) {
-        return choice == DrinkChoice.SIP
-                ? "Drink: Sip (+1 cup, safe)"
-                : "Drink: Chug (+2 cups, 20% blackout risk)";
+        return choice.menuText();
     }
 }

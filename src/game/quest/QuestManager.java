@@ -12,7 +12,6 @@ import game.actor.FinanceStatistics;
 import game.arena.ArenaQuest;
 import game.terrain.Soil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,10 +26,7 @@ public class QuestManager {
     private final Location bartenderLocation;
     private final QuestOutcomeService outcomeService;
     private final List<QuestDefinition> contracts;
-    private final List<QuestObjectiveGround> objectives = new ArrayList<>();
-    private QuestDefinition active;
-    private int completed;
-    private int turnsRemaining;
+    private QuestSession session;
 
     /**
      * Creates one quest service for the Farmer and a single reusable arena.
@@ -56,19 +52,19 @@ public class QuestManager {
     public List<QuestDefinition> contracts() { return contracts; }
 
     /** @return true when the Farmer has an unfinished contract */
-    public boolean hasActiveQuest() { return active != null; }
+    public boolean hasActiveQuest() { return session != null; }
 
     /** @return title of the active quest, or a suitable fallback */
-    public String activeTitle() { return active == null ? "No active contract" : active.title(); }
+    public String activeTitle() { return session == null ? "No active contract" : session.definition().title(); }
 
     /** @return time remaining on the active contract */
-    public int turnsRemaining() { return turnsRemaining; }
+    public int turnsRemaining() { return session == null ? 0 : session.turnsRemaining(); }
 
     /** @return number of finished objectives in the active quest */
-    public int completedObjectives() { return completed; }
+    public int completedObjectives() { return session == null ? 0 : session.completedObjectives(); }
 
     /** @return total number of objectives in the active quest */
-    public int totalObjectives() { return objectives.size(); }
+    public int totalObjectives() { return session == null ? 0 : session.totalObjectives(); }
 
     /**
      * Checks whether the supplied actor is the Farmer in the active quest arena.
@@ -78,7 +74,7 @@ public class QuestManager {
      * @return true if this Farmer has an active quest on the supplied arena map
      */
     public boolean isActiveFor(Actor actor, GameMap map) {
-        return active != null && actor == farmer && map == arena.map() && arena.map().contains(farmer);
+        return session != null && actor == farmer && map == arena.map() && arena.map().contains(farmer);
     }
 
     /**
@@ -89,7 +85,7 @@ public class QuestManager {
      * @return true if the Farmer can interact with the active objective
      */
     public boolean canInteract(Actor actor, QuestObjectiveGround objective) {
-        return active != null && actor == farmer && objectives.contains(objective)
+        return session != null && actor == farmer && session.contains(objective)
                 && objective.location().getGround() == objective;
     }
 
@@ -147,7 +143,7 @@ public class QuestManager {
         if (!canInteractAtBar(actor, map)) {
             return "You must stand beside the bartender to accept a contract.";
         }
-        if (active != null) return "Finish your current contract before taking another.";
+        if (session != null) return "Finish your current contract before taking another.";
         if (!contracts.contains(contract)) return "The bartender does not offer that contract.";
         if (!freeEntry && actor.getStatistic(FinanceStatistics.COINS) < contract.entryFee()) {
             return "Not enough coins for " + contract.title() + " (fee " + contract.entryFee() + ").";
@@ -158,21 +154,17 @@ public class QuestManager {
         }
         try {
             arena.reset();
-            active = contract;
-            completed = 0;
-            turnsRemaining = contract.turnLimit();
-            objectives.clear();
+            session = new QuestSession(contract);
             QuestSetupContext setup = new QuestSetupContext(arena,
                     (location, name) -> addObjective(location.x(), location.y(), name));
             contract.scenario().prepare(setup);
-            if (objectives.isEmpty()) throw new IllegalStateException("Quest has no objectives");
+            if (session.totalObjectives() == 0) throw new IllegalStateException("Quest has no objectives");
             if (!entrance.canActorEnter(actor) || entrance.containsAnActor()) {
                 throw new IllegalStateException("Quest entrance changed during setup");
             }
             requireGround(13, 1, new QuestClockGround(this));
         } catch (RuntimeException failure) {
-            active = null;
-            objectives.clear();
+            session = null;
             arena.reset();
             return "Cannot prepare contract: " + failure.getMessage();
         }
@@ -184,7 +176,7 @@ public class QuestManager {
         String entry = freeEntry ? " won a free wager entry to "
                 : " paid " + contract.entryFee() + " coins for ";
         return actor + entry + contract.title()
-                + ". Objectives: " + objectives.size() + ". Time limit: "
+                + ". Objectives: " + session.totalObjectives() + ". Time limit: "
                 + contract.turnLimit() + " turns. Use the Quest Journal to abandon.";
     }
 
@@ -198,13 +190,13 @@ public class QuestManager {
      * @throws IllegalStateException if no contract is being prepared or placement fails
      */
     public void addObjective(int x, int y, String name) {
-        if (active == null || !arena.inside(x, y)) {
+        if (session == null || !arena.inside(x, y)) {
             throw new IllegalStateException("Objective cannot be created here");
         }
         Location location = arena.map().at(x, y);
         QuestObjectiveGround objective = new QuestObjectiveGround(this, location, name);
         requireGround(x, y, objective);
-        objectives.add(objective);
+        session.addObjective(objective);
     }
 
     /**
@@ -238,22 +230,21 @@ public class QuestManager {
         Location current = map.locationOf(actor);
         Location target = objective.location();
         if (!adjacent(current, target)) return "Move beside the objective to activate it.";
-        int index = objectives.indexOf(objective);
-        if (active.orderedObjectives() && index != completed) {
-            return "The relic sigils must be activated in sequence: " + (completed + 1)
+        if (!session.isNextObjective(objective)) {
+            return "The relic sigils must be activated in sequence: " + (session.completedObjectives() + 1)
                     + " comes next.";
         }
-        if (completed + 1 == objectives.size() && safeReturnLocation() == null) {
+        if (session.isFinalObjective() && safeReturnLocation() == null) {
             return "Cannot complete the final objective yet because every Tavern return tile is blocked. "
                     + "The final objective remains available; clear a safe tile and try again.";
         }
         target.setGround(new Soil());
-        completed++;
-        if (completed == objectives.size()) {
+        session.completeObjective();
+        if (session.isComplete()) {
             return "All objectives completed! " + finish(true);
         }
-        return "Objective completed (" + completed + "/" + objectives.size() + "). "
-                + turnsRemaining + " turns remaining.";
+        return "Objective completed (" + session.completedObjectives() + "/" + session.totalObjectives() + "). "
+                + session.turnsRemaining() + " turns remaining.";
     }
 
     /**
@@ -261,9 +252,9 @@ public class QuestManager {
      * Only time spent actively inside the arena counts. Expiry invokes the failure path.
      */
     public void tick() {
-        if (active == null || !arena.map().contains(farmer)) return;
-        turnsRemaining--;
-        if (turnsRemaining <= 0) {
+        if (session == null || !arena.map().contains(farmer)) return;
+        session.tick();
+        if (session.hasExpired()) {
             System.out.println("Bartender: Time's up! " + finish(false));
         }
     }
@@ -287,7 +278,7 @@ public class QuestManager {
      * @return message describing the completed or failed quest, or a blocked return
      */
     private String finish(boolean successful) {
-        QuestDefinition finished = active;
+        QuestDefinition finished = session.definition();
         // Try the normal arrival first, then neighbouring and other Tavern tiles.
         Location returnTile = safeReturnLocation();
         if (returnTile == null) {
@@ -295,10 +286,7 @@ public class QuestManager {
         }
         arena.map().moveActor(farmer, returnTile);
         String outcome = outcomeService.apply(finished, successful);
-        active = null;
-        completed = 0;
-        turnsRemaining = 0;
-        objectives.clear();
+        session = null;
         arena.reset();
         return finished.title() + (successful ? " succeeded." : " failed.")
                 + outcome + " Returned to the Tavern.";

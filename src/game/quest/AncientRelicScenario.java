@@ -28,12 +28,8 @@ public class AncientRelicScenario implements QuestScenario {
         setup.addObjective(5, 5, "Activate the first relic sigil");
         setup.addObjective(9, 2, "Activate the second relic sigil");
         setup.addObjective(12, 5, "Activate the final relic sigil");
-        if (!setup.placeItem(11, 6, new CopperItem())) {
-            throw new IllegalStateException("Could not place the relic offering");
-        }
-        if (!setup.spawnActor(12, 2, new CaveGhost())) {
-            throw new IllegalStateException("Could not place relic guardian");
-        }
+        setup.requireItem(11, 6, new CopperItem());
+        setup.requireActor(12, 2, new CaveGhost());
     }
 }
 

@@ -84,4 +84,33 @@ public class QuestSetupContext {
     public boolean placeItem(int x, int y, Item item) {
         return arena.placeItem(x, y, item);
     }
+    /**
+     * Places a required actor or rejects the whole quest setup.
+     * Scenario classes do not need to repeat placement failure handling.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param actor actor that must be spawned
+     * @throws IllegalStateException when the actor cannot be placed
+     */
+    public void requireActor(int x, int y, Actor actor) {
+        if (!spawnActor(x, y, actor)) {
+            throw new IllegalStateException("Cannot spawn required actor at " + x + "," + y);
+        }
+    }
+
+    /**
+     * Places a required item or rejects the whole quest setup.
+     *
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param item item that must be present
+     * @throws IllegalStateException when the item cannot be placed
+     */
+    public void requireItem(int x, int y, Item item) {
+        if (!placeItem(x, y, item)) {
+            throw new IllegalStateException("Cannot place required item at " + x + "," + y);
+        }
+    }
+
 }

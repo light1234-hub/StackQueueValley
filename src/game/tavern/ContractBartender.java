@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
+import game.actor.NonPlayerCharacter;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.ability.TavernAbility;
@@ -16,7 +17,7 @@ import game.quest.QuestManager;
  * Stationary bartender offering conversation, paid contracts, and a drinking
  * wager. Dialogue, quests, and contest rules are delegated to separate classes.
  */
-public class ContractBartender extends Actor {
+public class ContractBartender extends NonPlayerCharacter {
     private final QuestManager manager;
     private final DrinkingContest contest;
     private final BartenderDialogue dialogue;
@@ -43,7 +44,7 @@ public class ContractBartender extends Actor {
         this.manager = manager;
         this.farmer = farmer;
         this.contest = new DrinkingContest(manager);
-        this.dialogue = new BartenderDialogue(manager);
+        this.dialogue = new BartenderDialogue(manager, contest);
     }
 
     /**

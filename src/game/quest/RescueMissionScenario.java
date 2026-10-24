@@ -23,11 +23,7 @@ public class RescueMissionScenario implements QuestScenario {
         setup.requireGround(9, 5, new Soil());
         setup.addObjective(5, 2, "Unlock the first survivor cage");
         setup.addObjective(11, 5, "Unlock the second survivor cage");
-        if (!setup.placeItem(9, 4, new ParsnipItem())) {
-            throw new IllegalStateException("Could not place rescue supplies");
-        }
-        if (!setup.spawnActor(11, 2, new Bat())) {
-            throw new IllegalStateException("Could not place rescue guardian");
-        }
+        setup.requireItem(9, 4, new ParsnipItem());
+        setup.requireActor(11, 2, new Bat());
     }
 }

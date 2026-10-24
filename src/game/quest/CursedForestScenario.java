@@ -23,8 +23,6 @@ public class CursedForestScenario implements QuestScenario {
         setup.addObjective(7, 2, "Purify the first cursed root");
         setup.addObjective(10, 4, "Purify the second cursed root");
         setup.addObjective(11, 6, "Purify the final cursed root");
-        if (!setup.spawnActor(12, 5, new Slime())) {
-            throw new IllegalStateException("Could not place forest guardian");
-        }
+        setup.requireActor(12, 5, new Slime());
     }
 }
