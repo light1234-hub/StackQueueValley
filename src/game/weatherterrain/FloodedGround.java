@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.terrain.Soil;
 import game.weatherblueprint.Drainable;
+import game.weatherblueprint.WeatherHazard;
 
 import java.util.Locale;
 
@@ -13,7 +14,7 @@ import java.util.Locale;
  * when drained, the terrain becomes Mudground, which eventually restores to the original state
  *
  */
-public class FloodedGround extends Ground implements Drainable {
+public class FloodedGround extends Ground implements Drainable, WeatherHazard {
 
     private static final int EVAPORATED_RATE = 6;
     private int turnsRemaining;
@@ -73,5 +74,15 @@ public class FloodedGround extends Ground implements Drainable {
      */
     public int turnsRemaining(){
         return turnsRemaining;
+    }
+
+    /**
+     * Indicates the flooded terrain is dangerous
+     * @return true while the terrain is flooded
+     */
+
+    @Override
+    public boolean isDangerous(){
+        return true;
     }
 }
