@@ -22,7 +22,7 @@ public class ResourceRecoveryResponse implements WeatherResponse{
             if(target.containsAnActor()){
                 continue;
             }
-            WeatherRecoverable recoverable = target.getActorAs(WeatherRecoverable.class);
+            WeatherRecoverable recoverable = target.getGroundAs(WeatherRecoverable.class);
 
             if(recoverable != null && recoverable.recover(target)){
                 return;
