@@ -1,4 +1,4 @@
-package game.weather;
+package game.weatherapi;
 
 /**
  * A class that represents a failure while requesting

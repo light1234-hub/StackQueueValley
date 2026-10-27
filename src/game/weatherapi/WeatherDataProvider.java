@@ -1,4 +1,6 @@
-package game.weather;
+package game.weatherapi;
+
+import game.weather.WeatherSnapshot;
 
 /**
  * Retrieves the weather details for a specified geographical location
