@@ -3,7 +3,7 @@ package game.actor;
 import edu.monash.fit2099.engine.positions.Location;
 import game.item.StrawberryItem;
 
-/** Mine creature with a fast attack that drops a fresh strawberry when struck.eeeeeee*/
+/** Mine creature with a fast attack that drops a fresh strawberry when struck.*/
 public class Bat extends HostileCreature {
     /** Creates a bat with 50 health points. */
     public Bat() { super("Bat", 'b', 50); }
