@@ -1,6 +1,7 @@
 package game.weather;
 
 import edu.monash.fit2099.engine.positions.Location;
+import game.behaviour.NearbyLocationFinderBehaviour;
 import game.weatherblueprint.Drainable;
 
 /**
@@ -16,30 +17,14 @@ public class DrainageResponse implements WeatherResponse{
      */
     @Override
     public void respond(Location location){
-        int minX = Math.max(location.map().getXRange().min(), location.x() - RADIUS);
-        int maxX = Math.max(location.map().getXRange().max(), location.x() + RADIUS);
+        for(Location target : NearbyLocationFinderBehaviour.find(location,RADIUS)){
+            if(target.containsAnActor()){
+                continue;
+            }
+            Drainable drainable = target.getGroundAs(Drainable.class);
 
-        int minY = Math.max(location.map().getYRange().min(), location.y() - RADIUS);
-        int maxY = Math.max(location.map().getYRange().max(), location.y() + RADIUS);
-
-        for( int y = minY; y<= maxY; y++){
-            for(int x = minX; x<= maxX; x++){
-                int distance = Math.abs(location.x() - x)+Math.abs(location.y() - y);
-
-                if(distance == 0 || distance > RADIUS){
-                    continue;
-                }
-                Location target = location.map().at(x,y);
-
-                if(target.containsAnActor()){
-                    continue;
-                }
-
-                Drainable drainable = target.getGroundAs(Drainable.class);
-
-                if(drainable != null && drainable.drain(target)){
-                    return;
-                }
+            if(drainable != null && drainable.drain(target)){
+                return;
             }
         }
     }
