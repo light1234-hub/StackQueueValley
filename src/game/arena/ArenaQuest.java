@@ -8,7 +8,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Farmer;
-import game.tavern.TavernWall;
+import game.terrain.QuestArenaWall;
 import game.terrain.Dirt;
 
 import java.util.ArrayList;
@@ -124,7 +124,7 @@ public class ArenaQuest {
 
     /**
      * Removes temporary actors and items, then restores the arena
-     * terrain while preserving the Tavern exit.
+     * terrain and its walls between contracts.
      *
      * @throws IllegalStateException if the farmer is still in the arena
      */
@@ -147,17 +147,13 @@ public class ArenaQuest {
                     location.removeItem(item);
                 }
 
-                if (x == 1 && y == 2) {
-                    continue;
-                }
-
                 boolean wall = x == map.getXRange().min()
                         || y == map.getYRange().min()
                         || x == map.getXRange().max()
                         || y == map.getYRange().max();
 
                 location.setGround(
-                        wall ? new TavernWall() : new Dirt()
+                        wall ? new QuestArenaWall() : new Dirt()
                 );
             }
         }

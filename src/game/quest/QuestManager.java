@@ -6,7 +6,6 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.ability.TavernAbility;
 import game.actor.Farmer;
 import game.actor.FinanceStatistics;
 import game.arena.ArenaQuest;
@@ -15,15 +14,15 @@ import game.terrain.Soil;
 import java.util.List;
 
 /**
- * Coordinates paid quest acceptance, objective progress, deadlines, rewards,
- * failure consequences and safe return to the Tavern.
+ * Coordinates quest acceptance, objective progress, deadlines, rewards,
+ * failure consequences and safe return to the inherited farm.
  * The manager depends on QuestScenario and QuestConsequence abstractions.
  */
 public class QuestManager {
     private final Farmer farmer;
     private final ArenaQuest arena;
-    private final Location tavernArrival;
-    private final Location bartenderLocation;
+    private final Location farmReturn;
+    private final Location boardLocation;
     private final QuestOutcomeService outcomeService;
     private final List<QuestDefinition> contracts;
     private QuestSession session;
@@ -33,17 +32,17 @@ public class QuestManager {
      *
      * @param farmer the player who can sign contracts
      * @param arena reusable arena to configure for each contract
-     * @param tavernArrival safe return location
-     * @param bartenderLocation interaction position of the bartender
+     * @param farmReturn safe return location on the inherited farm
+     * @param boardLocation the position of the farm quest board
      * @param farm persistent overworld changed by quest outcomes
      * @param contracts immutable list of offered contracts
      */
-    public QuestManager(Farmer farmer, ArenaQuest arena, Location tavernArrival,
-                        Location bartenderLocation, GameMap farm, List<QuestDefinition> contracts) {
+    public QuestManager(Farmer farmer, ArenaQuest arena, Location farmReturn,
+                        Location boardLocation, GameMap farm, List<QuestDefinition> contracts) {
         this.farmer = farmer;
         this.arena = arena;
-        this.tavernArrival = tavernArrival;
-        this.bartenderLocation = bartenderLocation;
+        this.farmReturn = farmReturn;
+        this.boardLocation = boardLocation;
         this.outcomeService = new QuestOutcomeService(farmer, new QuestWorldContext(farm));
         this.contracts = List.copyOf(contracts);
     }
@@ -90,23 +89,19 @@ public class QuestManager {
     }
 
     /**
-     * Checks that this actor is the Farmer, has Tavern permission and is next to
-     * the bartender on the correct map. Stale menu actions must also pass this.
-     *
-     * @param actor the actor attempting to interact
-     * @param map the map where the interaction is attempted
-     * @return true only for the authorised adjacent Farmer
+     * Allows only the participating Farmer to interact beside the quest board
+     * on the inherited farm. Also revalidates old menu actions when executed.
      */
-    public boolean canInteractAtBar(Actor actor, GameMap map) {
-        return actor == farmer && actor.hasAbility(TavernAbility.CAN_USE_TAVERN)
-                && map != null && map.contains(actor) && nearBartender(map, actor);
+    public boolean canInteractAtBoard(Actor actor, GameMap map) {
+        return actor == farmer && map != null && boardLocation.map() == map
+                && map.contains(actor) && adjacent(map.locationOf(actor), boardLocation);
     }
 
     /**
      * Attempts to buy a contract, charging only after arena preparation succeeds.
      *
      * @param actor the actor signing the contract
-     * @param map the current Tavern map
+     * @param map the current farm map
      * @param contract the desired contract
      * @return a message reporting acceptance or rejection
      */
@@ -115,36 +110,35 @@ public class QuestManager {
     }
 
     /**
-     * Starts a contract without charging an entry fee. Only the drinking contest
-     * should call this method after winning the wager; all normal validations
-     * (location, ownership, available arena) still apply.
+     * Starts the selected contract without an entry fee after a won dice wager.
+     * All normal location, ownership, and arena validations still apply.
      *
      * @param actor the winner of the wager
-     * @param map the current Tavern map
+     * @param map the current farm map
      * @param contract the randomly assigned contract
      * @return a message reporting acceptance or rejection
      */
-    public String acceptWagerPrize(Actor actor, GameMap map, QuestDefinition contract) {
+    public String acceptDicePrize(Actor actor, GameMap map, QuestDefinition contract) {
         return beginContract(actor, map, contract, true);
     }
 
     /**
-     * Validates and prepares either a paid contract or a free wager prize.
+     * Validates and prepares either a paid contract or a free dice prize.
      * The entry fee is charged only after the scenario has prepared successfully.
      *
      * @param actor actor accepting the contract
-     * @param map current Tavern map
+     * @param map current farm map
      * @param contract selected offered contract
      * @param freeEntry whether payment is waived
      * @return message describing acceptance or rejection
      */
     private String beginContract(Actor actor, GameMap map, QuestDefinition contract,
                                  boolean freeEntry) {
-        if (!canInteractAtBar(actor, map)) {
-            return "You must stand beside the bartender to accept a contract.";
+        if (!canInteractAtBoard(actor, map)) {
+            return "You must stand beside the quest board to accept a contract.";
         }
         if (session != null) return "Finish your current contract before taking another.";
-        if (!contracts.contains(contract)) return "The bartender does not offer that contract.";
+        if (!contracts.contains(contract)) return "The quest board does not offer that contract.";
         if (!freeEntry && actor.getStatistic(FinanceStatistics.COINS) < contract.entryFee()) {
             return "Not enough coins for " + contract.title() + " (fee " + contract.entryFee() + ").";
         }
@@ -173,7 +167,7 @@ public class QuestManager {
                     contract.entryFee());
         }
         map.moveActor(actor, entrance);
-        String entry = freeEntry ? " won a free wager entry to "
+        String entry = freeEntry ? " won free dice-challenge entry to "
                 : " paid " + contract.entryFee() + " coins for ";
         return actor + entry + contract.title()
                 + ". Objectives: " + session.totalObjectives() + ". Time limit: "
@@ -216,7 +210,7 @@ public class QuestManager {
     /**
      * Activates a nearby objective and finishes the quest when all goals are complete.
      * Ordered contracts require the objectives to be visited in their listed order.
-     * The final objective is retained if the Tavern has no safe return tile.
+     * The final objective is retained if the farm has no safe return tile.
      *
      * @param actor actor attempting to activate the objective
      * @param map current map
@@ -235,7 +229,7 @@ public class QuestManager {
                     + " comes next.";
         }
         if (session.isFinalObjective() && safeReturnLocation() == null) {
-            return "Cannot complete the final objective yet because every Tavern return tile is blocked. "
+            return "Cannot complete the final objective yet because every farm return tile is blocked. "
                     + "The final objective remains available; clear a safe tile and try again.";
         }
         target.setGround(new Soil());
@@ -255,7 +249,7 @@ public class QuestManager {
         if (session == null || !arena.map().contains(farmer)) return;
         session.tick();
         if (session.hasExpired()) {
-            System.out.println("Bartender: Time's up! " + finish(false));
+            System.out.println("Quest board: Time's up! " + finish(false));
         }
     }
 
@@ -272,48 +266,48 @@ public class QuestManager {
     }
 
     /**
-     * Returns the Farmer to a safe Tavern tile, applies the quest outcome, and resets the arena.
+     * Returns the Farmer to a safe farm tile, applies the quest outcome, and resets the arena.
      *
      * @param successful whether the Farmer completed every objective in time
      * @return message describing the completed or failed quest, or a blocked return
      */
     private String finish(boolean successful) {
         QuestDefinition finished = session.definition();
-        // Try the normal arrival first, then neighbouring and other Tavern tiles.
+        // Try the normal return location, then neighbouring and other farm tiles.
         Location returnTile = safeReturnLocation();
         if (returnTile == null) {
-            return "Cannot return to Tavern: arrival is blocked. Your contract remains active.";
+            return "Cannot return to farm: arrival is blocked. Your contract remains active.";
         }
         arena.map().moveActor(farmer, returnTile);
         String outcome = outcomeService.apply(finished, successful);
         session = null;
         arena.reset();
         return finished.title() + (successful ? " succeeded." : " failed.")
-                + outcome + " Returned to the Tavern.";
+                + outcome + " Returned to the farm.";
     }
 
     /**
-     * Finds a safe return tile without moving another Tavern occupant.
-     * The usual arrival and neighbouring tiles are preferred; the full Tavern is
+     * Finds a safe return tile without moving another farm occupant.
+     * The usual arrival and neighbouring tiles are preferred; the full farm is
      * searched as a fallback so quests can complete even if the entrance is blocked.
      *
-     * @return a free enterable Tavern tile, or null if none exists
+     * @return a free enterable farm tile, or null if none exists
      */
     private Location safeReturnLocation() {
-        if (isSafeTavernTile(tavernArrival)) {
-            return tavernArrival;
+        if (isSafeFarmTile(farmReturn)) {
+            return farmReturn;
         }
-        for (Exit exit : tavernArrival.getExits()) {
+        for (Exit exit : farmReturn.getExits()) {
             Location tile = exit.getDestination();
-            if (isSafeTavernTile(tile)) {
+            if (isSafeFarmTile(tile)) {
                 return tile;
             }
         }
-        GameMap tavern = tavernArrival.map();
-        for (int y : tavern.getYRange()) {
-            for (int x : tavern.getXRange()) {
-                Location tile = tavern.at(x, y);
-                if (isSafeTavernTile(tile)) {
+        GameMap farm = farmReturn.map();
+        for (int y : farm.getYRange()) {
+            for (int x : farm.getXRange()) {
+                Location tile = farm.at(x, y);
+                if (isSafeFarmTile(tile)) {
                     return tile;
                 }
             }
@@ -322,25 +316,13 @@ public class QuestManager {
     }
 
     /**
-     * Checks whether a Tavern tile is a valid return destination for the Farmer.
+     * Checks whether a farm tile is a valid return destination for the Farmer.
      *
-     * @param tile candidate Tavern tile
+     * @param tile candidate farm tile
      * @return true if it is empty and enterable by the Farmer
      */
-    private boolean isSafeTavernTile(Location tile) {
+    private boolean isSafeFarmTile(Location tile) {
         return tile != null && !tile.containsAnActor() && tile.canActorEnter(farmer);
-    }
-
-    /**
-     * Checks whether an actor is adjacent to the bartender on the supplied map.
-     *
-     * @param map map where the interaction occurs
-     * @param actor actor interacting with the bartender
-     * @return true if the actor is adjacent on the bartender's map
-     */
-    private boolean nearBartender(GameMap map, Actor actor) {
-        if (bartenderLocation.map() != map) return false;
-        return adjacent(map.locationOf(actor), bartenderLocation);
     }
 
     /**

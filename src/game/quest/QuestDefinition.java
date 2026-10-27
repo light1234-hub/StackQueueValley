@@ -3,7 +3,7 @@ package game.quest;
 /**
  * Immutable contract configuration; both effects depend on abstractions.
  *
- * @param title the name shown by the bartender
+ * @param title the name shown on the quest board
  * @param entryFee coins paid when accepting the contract
  * @param coinReward coins earned only on success
  * @param experienceReward experience earned only on success

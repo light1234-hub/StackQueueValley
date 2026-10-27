@@ -37,6 +37,6 @@ public class QuestAbandonAction extends Action {
      */
     @Override
     public String menuDescription(Actor actor) {
-        return "Abandon contract (failure consequences, return to Tavern)";
+        return "Abandon contract (failure consequences, return to farm)";
     }
 }

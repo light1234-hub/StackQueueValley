@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * Owns progress for one active contract: registered objectives, completion order,
- * and the remaining deadline. The Tavern and arena lifecycle are managed elsewhere.
+ * and the remaining deadline. Farm travel and arena lifecycle are managed elsewhere.
  */
 final class QuestSession {
     private final QuestDefinition definition;

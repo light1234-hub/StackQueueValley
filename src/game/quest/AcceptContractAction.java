@@ -4,12 +4,12 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 
-/** Menu action to purchase and enter one selected Tavern contract. */
+/** Menu action to purchase and enter one selected quest-board contract. */
 public class AcceptContractAction extends Action {
     private final QuestManager manager;
     private final QuestDefinition contract;
 
-    /** @param manager the Tavern contract service
+    /** @param manager the quest board service
      *  @param contract the offered quest */
     public AcceptContractAction(QuestManager manager, QuestDefinition contract) {
         this.manager = manager;
