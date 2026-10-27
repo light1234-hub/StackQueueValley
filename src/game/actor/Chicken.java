@@ -13,6 +13,7 @@ import game.farmeraction.FeedAction;
 import game.blueprint.AnimalFood;
 import game.blueprint.Feedable;
 import game.item.Egg;
+import game.weatherblueprint.WeatherShelterable;
 
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Random;
 /**
  * A chicken that wanders around the farm and produces an egg when fed.
  */
-public class Chicken extends Actor implements Feedable {
+public class Chicken extends Actor implements Feedable, WeatherShelterable {
     private Random random = new Random();
     private WanderBehaviour wanderBehaviour;
     /**
@@ -83,6 +84,16 @@ public class Chicken extends Actor implements Feedable {
     }
 
     /**
+     *  Produces an Egg when it relocates to a safer place
+     * @param destination the animal's new location
+     */
+
+    @Override
+    public void onRelocated(Location destination){
+        destination.addItem(new Egg());
+    }
+
+    /**
      * Adds feeding actions for animal food in the actor's inventory.
      *
      * @param actor actor interacting with the chicken
@@ -99,5 +110,6 @@ public class Chicken extends Actor implements Feedable {
         }
         return actions;
     }
+
 
 }
