@@ -2,7 +2,6 @@ package game.weatherblueprint;
 
 import edu.monash.fit2099.engine.positions.Location;
 
-import java.lang.classfile.constantpool.LoadableConstantEntry;
 
 /**
  * Represents terrain that can be drained
