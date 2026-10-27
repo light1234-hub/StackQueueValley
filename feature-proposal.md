@@ -173,9 +173,11 @@ Drinking reuses the existing `Consumable` and `ConsumeAction`.
 
 ### Cauldron Effects While Brewing
 
-* **Tidal Cauldron:** When its brew finishes, it floods all ground within radius 2 into Puddles, a terrain change that also pulls ground items into the cauldron's tile.
-* **Ward Cauldron:** On every turn of the brew, it damages every hostile creature within radius 3, an area-of-effect over time.
-* **Quarry Cauldron:** On every turn of the brew, it has a chance to spawn an ore node (Copper Node or Geode) on a random empty tile within radius 5, dynamic spawning over time.
+Each cauldron is linked to one potion and changes the world every turn of the brew.
+
+* **Orchard Cauldron (brews Gale Draught, 3 turns):** Each turn it plants one `ArcaneSapling` on a random empty tile on the map. A sapling grows over 3 turns into an `ArcaneTree`, even after the potion is collected. A tree cannot be walked through and drops a random Strawberry or Tomato on its tile every 2 turns. A hostile creature that steps onto a sapling tramples it and it is removed.
+* **Taming Cauldron (brews Aegis Elixir, 4 turns):** Each turn it places one `Lure` item on a random empty tile on the map. Every hostile creature drops its current behaviour and walks toward a random lure. When a creature reaches a lure, the lure is used up and the creature permanently gets a `TAMED` status: it stops attacking the farmer and instead attacks any untamed hostile creature it meets. Unused lures disappear when the potion is collected.
+* **Quarry Cauldron (brews Prospector's Elixir, 5 turns):** When the brew starts it spawns a `StoneGolem` actor. Each turn the golem walks to a random Rock on the map and shatters it, removing the Rock and adding Stone items to the cauldron's output. The golem crumbles when the potion is collected.
 
 ## The Architecture
 
