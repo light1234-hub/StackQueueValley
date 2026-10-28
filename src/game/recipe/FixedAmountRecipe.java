@@ -1,6 +1,7 @@
 package game.recipe;
 
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.items.Item;
 import game.blueprint.Ingredient;
 
 import java.util.ArrayList;
@@ -9,7 +10,9 @@ import java.util.Optional;
 
 
 /**
- * A class that represents a recipe where a fixed number of ingredients is required
+ * Represents cooking recipes requiring fixed quantities
+ * of ingredients.
+ * Uses the shared RecipeMaterials selection logic.
  */
 public abstract class FixedAmountRecipe implements Recipe
 {
@@ -30,36 +33,26 @@ public abstract class FixedAmountRecipe implements Recipe
     @Override
     public Optional<List<Ingredient>> selectIngredients(Inventory inventory)
     {
-        List<Ingredient> available = inventory.getItemsAs(Ingredient.class);
-        List<Ingredient> selected = new ArrayList<>();
+        List<ItemRequirement> rules = new ArrayList<>();
 
 
-        for (IngredientRequirement requirement : requirements())
+        for (IngredientRequirement required : requirements())
         {
-            int found = 0;
-
-            for (Ingredient ingredient : available)
-            {
-                if (ingredient.category() == requirement.getCategory()
-                && !IngredientSelection.isAlreadySelected(selected,ingredient))
-                {
-                    selected.add(ingredient);
-                    found++;
-
-                    if (found == requirement.getCount())
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if (found < requirement.getCount())
-            {
-                return Optional.empty();
-            }
+            rules.add(new ItemRequirement
+                    (item -> item.asCapability(Ingredient.class)
+                            .map(ingredient -> ingredient.category() == required.getCategory())
+                            .orElse(false),
+                            required.getCount(),
+                            required.getCategory().name()));
         }
 
-        return Optional.of(List.copyOf(selected));
+        return RecipeMaterials.select(inventory,rules).map(items -> {
+            List<Ingredient> ingredients = new ArrayList<>();
+            for (Item item : items){
+                ingredients.add(item.asCapability(Ingredient.class).orElseThrow());
+            }
+            return List.copyOf(ingredients);
+        });
     }
 
 
