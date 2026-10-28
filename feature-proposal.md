@@ -128,3 +128,88 @@ graph TD
 ## Inline code
 
 This web site is using `markedjs/marked`.
+
+## REQ 4 - Alchemy Valley
+
+## The Pitch
+
+Alchemy Valley is a new map, reached through a paid Wishing Well, where the farmer brews potions in three cauldrons. Brewing is not instant: the farmer loads ingredients (and must have enough XP), and the cauldron brews over several turns, changing the world around it while it works. When the potion is collected and drunk, it triggers a powerful effect such as knockback, damage reflection, or terrain-breaking item magnetism.
+
+## The Mechanics
+
+### Travel and the Wizard
+
+A `WishingWell` on the farm map lets the farmer perform a `WishAction`. It costs 100 coins and teleports the farmer to Alchemy Valley. A second well in Alchemy Valley returns the farmer to the farm.
+
+A Wizard NPC in Alchemy Valley tells the farmer each potion's ingredients, XP requirement and brewing time, and how much XP the farmer is still missing.
+
+### Multi-turn Brewing
+
+1. The farmer uses a `LoadAction` on a cauldron while holding the correct ingredients and enough XP. The ingredients are consumed and the brew timer starts.
+2. Each turn the cauldron ticks down its timer and applies its own in-brew effect.
+3. When the timer ends, the cauldron is marked READY. The farmer uses a `CollectAction` to take the potion. A cauldron cannot be loaded again until its potion has been collected.
+
+XP is a threshold that is checked and not spent. It is earned through the quest and XP feature built by a teammate for REQ3. This feature only reads the XP value.
+
+### Recipes
+
+Three potions are available:
+
+| Potion              | Ingredients                      | XP Required | Brew Time |
+|---------------------|----------------------------------|:-----------:|:---------:|
+| Gale Draught        | 3 Strawberry, 1 Tomato, 1 Copper |     50      |  3 turns  |
+| Aegis Elixir        | 3 Stone, 2 Strawberry, 1 Diamond |     100     |  4 turns  |
+| Prospector's Elixir | 2 Copper, 2 Tomato, 1 Stone      |     150     |  5 turns  |
+
+### Potion Effects
+
+Drinking reuses the existing `Consumable` and `ConsumeAction`.
+
+* **Gale Draught:** AoE, radius 3. Every actor in range is pushed up to 3 tiles directly away from the farmer. Anything blocked by an obstacle stops early. Hostile creatures hit this way are stunned for 2 turns.
+* **Aegis Elixir:** Applies a reflect Status for 10 turns. While active, the farmer takes no damage, and every attacker takes the damage that was blocked.
+* **Prospector's Elixir:** AoE, radius 4. Every item on the ground in range is pulled into the farmer's inventory, and every Rock in range is shattered and replaced with Stone items on the ground, which changes the terrain.
+
+### Cauldron Effects While Brewing
+
+Each cauldron is linked to one potion and changes the world every turn of the brew.
+
+* **Orchard Cauldron (brews Gale Draught, 3 turns):** Each turn it plants one `ArcaneSapling` on a random empty tile on the map. A sapling grows over 3 turns into an `ArcaneTree`, even after the potion is collected. A tree cannot be walked through and drops a random Strawberry or Tomato on its tile every 2 turns. A hostile creature that steps onto a sapling tramples it and it is removed.
+* **Taming Cauldron (brews Aegis Elixir, 4 turns):** Each turn it places one `Lure` item on a random empty tile on the map. Every hostile creature drops its current behaviour and walks toward a random lure. When a creature reaches a lure, the lure is used up and the creature permanently gets a `TAMED` status: it stops attacking the farmer and instead attacks any untamed hostile creature it meets. Unused lures disappear when the potion is collected.
+* **Quarry Cauldron (brews Prospector's Elixir, 5 turns):** When the brew starts it spawns a `StoneGolem` actor. Each turn the golem walks to a random Rock on the map and shatters it, removing the Rock and adding Stone items to the cauldron's output. The golem crumbles when the potion is collected.
+
+## The Architecture
+
+### New Abstractions
+
+| Abstraction      | Type           | Extends  |
+|------------------|----------------|----------|
+| `Potion`         | Abstract class | `Item`   |
+| `BrewingStation` | Abstract class | `Ground` |
+
+`Potion` holds the ingredient list, XP requirement, and a `drink` method that each potion implements. `BrewingStation` holds the brew timer, the READY state, the load and collect logic, and an abstract hook for the in-brew effect that each cauldron implements.
+
+### Concrete Classes
+
+| #   | Class              | Implements / Extends | Status |
+|-----|--------------------|----------------------|--------|
+| 1   | `GaleDraught`      | `Potion`             | New    |
+| 2   | `AegisElixir`      | `Potion`             | New    |
+| 3   | `ProspectorElixir` | `Potion`             | New    |
+| 4   | `TidalCauldron`    | `BrewingStation`     | New    |
+| 5   | `WardCauldron`     | `BrewingStation`     | New    |
+| 6   | `QuarryCauldron`   | `BrewingStation`     | New    |
+
+All six concrete classes are entirely new. No classes from Assignments 1 to 3 are retrofitted.
+
+### Supporting Classes
+
+These are not counted towards the six.
+
+* `WishingWell` (extends `Ground`) and `WishAction`: the travel mechanism.
+* `Wizard` (extends `Actor`): the recipe guide NPC.
+* `LoadAction` and `CollectAction`: the farmer's actions at a cauldron.
+* `AlchemyValleyWorld` (map): the new map containing the three cauldrons, the wizard, and the return well.
+
+### Existing Classes Used (Unmodified)
+
+`Item`, `Ground`, `Actor`, `Status`, `Consumable`, `ConsumeAction`, `Puddle`, `Rock`, `CopperNode`, `Geode`, `StoneItem`, `CopperItem`, `DiamondItem`, `StrawberryItem`, `TomatoItem`, `FinanceStatistics`.
