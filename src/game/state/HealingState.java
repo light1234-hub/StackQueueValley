@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Zombie;
 import game.behaviour.SeekFoodBehaviour;
 import game.blueprint.Consumable;
+import game.item.CauliflowerItem;
 import game.item.ParsnipItem;
 
 import java.util.*;
@@ -106,8 +107,8 @@ public class HealingState implements CreatureState{
             }
         }
         if (foodMove == 0) {
-            zombieLoc.addItem(new ParsnipItem());
-            zombieLoc.addItem(new ParsnipItem());
+            zombieLoc.addItem(new CauliflowerItem());
+            zombieLoc.addItem(new CauliflowerItem());
         }
     }
 }

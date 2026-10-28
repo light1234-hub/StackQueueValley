@@ -37,16 +37,17 @@ public class AttackingState implements CreatureState {
      */
     @Override
     public CreatureState nextState(Zombie zombie, GameMap map) {
+
+        int hpPercent = ZombieSensor.healthPercent(zombie);
+
+        if (hpPercent < ZombieSensor.HEAL_BELOW_PERCENT && !ZombieSensor.isPoisoned(zombie)) {
+            return zombie.getHealingState();
+        }
+
         if (ZombieSensor.canFlee(zombie, map)) {
             return zombie.getFleeingState();
         }
-        boolean hasTargetToAttack = ZombieSensor.adjacentTargetExit(zombie, map) != null;
-        boolean hasValidTarget = firstStepToTarget(zombie, map) != null;
-        if (ZombieSensor.healthPercent(zombie) < ZombieSensor.HEAL_BELOW_PERCENT
-                && !ZombieSensor.isPoisoned(zombie)
-                && (!hasTargetToAttack || !hasValidTarget)) {
-            return zombie.getHealingState();
-        }
+
         return this;
     }
 

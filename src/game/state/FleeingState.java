@@ -44,8 +44,7 @@ public class FleeingState implements CreatureState
         boolean hasThreatInScanRange = ZombieSensor.hasTargetNearby(zombie,map,SCAN_RANGE);
 
         if (hpPercent < ZombieSensor.HEAL_BELOW_PERCENT
-                && !ZombieSensor.isPoisoned(zombie)
-                && (!hasAdjThreat || hasFoodNearby))
+                && !ZombieSensor.isPoisoned(zombie))
         {
             return zombie.getHealingState();
         }

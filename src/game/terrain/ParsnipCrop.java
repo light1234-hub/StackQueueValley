@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * A parsnip crop that can be harvested for a parsnip item.
  */
-public class ParsnipCrop extends Ground implements Harvestable, Waterable {
+public class ParsnipCrop extends Plant implements Harvestable, Waterable {
     private Random random = new Random();
     private int timeWatered = 0;
 
@@ -28,7 +28,13 @@ public class ParsnipCrop extends Ground implements Harvestable, Waterable {
      * Creates a parsnip crop.
      */
     public ParsnipCrop() {
-        super('P',"Parsnip crop");
+        super('P',"Parsnip Crop");
+    }
+
+    @Override
+    protected String takeTurn(Location location, int age) {
+        if (due(age, 15)) return produce(location, "Parsnip", ParsnipItem::new);
+        return null;
     }
 
     /**
