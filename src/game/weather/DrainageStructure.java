@@ -1,19 +1,13 @@
+
 package game.weather;
 
-import edu.monash.fit2099.engine.positions.Ground;
-import edu.monash.fit2099.engine.positions.Location;
+/**
+ * Automatically drains nearby flooded terrain.
+ */
+public class DrainageStructure extends WeatherResponseStructure {
 
-public class DrainageStructure extends Ground {
-
-    private final WeatherResponse response;
-
-    public DrainageStructure(){
-        super('D',"Drainage Structure");
-        this.response = new DrainageResponse();
-    }
-
-    @Override
-    public void tick(Location location){
-        response.respond(location);
+    public DrainageStructure() {
+        super('D', "Drainage Structure", new DrainageResponse());
     }
 }
+
