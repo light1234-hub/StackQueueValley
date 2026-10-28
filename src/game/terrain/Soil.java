@@ -19,5 +19,6 @@ public class Soil extends Ground implements PlantableGround {
         super(',', "Soil");
         this.enableAbility(TerrainAbility.CAN_BE_PUDDLE);
         this.enableAbility(GroundAbility.FERTILE);
+        this.enableAbility(TerrainAbility.WEATHER_STRUCTURE_PLACEABLE);
     }
 }
