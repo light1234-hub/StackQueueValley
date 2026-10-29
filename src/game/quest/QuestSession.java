@@ -13,6 +13,7 @@ final class QuestSession {
     private final List<QuestObjectiveGround> objectives = new ArrayList<>();
     private int completedObjectives;
     private int turnsRemaining;
+    private boolean firstArenaTick = true;
 
     /** Creates a fresh session with the contract's configured turn limit. */
     QuestSession(QuestDefinition definition) {
@@ -68,7 +69,13 @@ final class QuestSession {
 
     /** Consumes one active arena turn; the coordinator controls when time advances. */
     void tick() {
-        if (turnsRemaining > 0) turnsRemaining--;
+        if(firstArenaTick){
+            firstArenaTick = false;
+            return;
+        }
+        if (turnsRemaining > 0){
+            turnsRemaining--;
+        }
     }
 
     /** Whether no arena turns remain. */

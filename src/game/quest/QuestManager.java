@@ -26,6 +26,7 @@ public class QuestManager {
     private final QuestOutcomeService outcomeService;
     private final List<QuestDefinition> contracts;
     private QuestSession session;
+    private boolean awaitingReturn;
 
     /**
      * Creates one quest service for the Farmer and a single reusable arena.
@@ -142,7 +143,7 @@ public class QuestManager {
         if (!freeEntry && actor.getStatistic(FinanceStatistics.COINS) < contract.entryFee()) {
             return "Not enough coins for " + contract.title() + " (fee " + contract.entryFee() + ").";
         }
-        Location entrance = arena.map().at(3, 3);
+        Location entrance = arena.entrance();
         if (entrance.containsAnActor() || !entrance.canActorEnter(actor)) {
             return "The Quest Arena entrance is blocked.";
         }
@@ -156,7 +157,7 @@ public class QuestManager {
             if (!entrance.canActorEnter(actor) || entrance.containsAnActor()) {
                 throw new IllegalStateException("Quest entrance changed during setup");
             }
-            requireGround(13, 1, new QuestClockGround(this));
+            arena.placeClock(new QuestClockGround(this));
         } catch (RuntimeException failure) {
             session = null;
             arena.reset();
@@ -246,7 +247,15 @@ public class QuestManager {
      * Only time spent actively inside the arena counts. Expiry invokes the failure path.
      */
     public void tick() {
-        if (session == null || !arena.map().contains(farmer)) return;
+        if (session == null || !arena.map().contains(farmer)) {
+            return;
+        }
+        if (awaitingReturn) {
+            if (safeReturnLocation() != null) {
+                System.out.println("Quest board: " + finish(false));
+            }
+            return;
+        }
         session.tick();
         if (session.hasExpired()) {
             System.out.println("Quest board: Time's up! " + finish(false));
@@ -276,7 +285,9 @@ public class QuestManager {
         // Try the normal return location, then neighbouring and other farm tiles.
         Location returnTile = safeReturnLocation();
         if (returnTile == null) {
-            return "Cannot return to farm: arrival is blocked. Your contract remains active.";
+            awaitingReturn = true;
+            return "All farm return tiles are blocked. The contract has ended; "
+                    + "return will be retried automatically when a tile becomes free.";
         }
         arena.map().moveActor(farmer, returnTile);
         String outcome = outcomeService.apply(finished, successful);

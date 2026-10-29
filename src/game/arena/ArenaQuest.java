@@ -19,6 +19,10 @@ import java.util.Objects;
  * actor spawning, item placement and cleanup between quests.
  */
 public class ArenaQuest {
+    private static final int ENTRANCE_X = 3;
+    private static final int ENTRANCE_Y = 3;
+    private static final int CLOCK_X = 13;
+    private static final int CLOCK_Y = 1;
     private final GameMap map;
     private final Farmer farmer;
 
@@ -40,6 +44,21 @@ public class ArenaQuest {
      */
     public GameMap map() {
         return map;
+    }
+
+    /** @return the entrance to the reusable arena. */
+    public Location entrance() {
+        return map.at(ENTRANCE_X, ENTRANCE_Y);
+    }
+
+    /**
+     * Installs the hidden clock at the arena's designated clock tile.
+     *
+     * @param clock the clock ground
+     * @return true if the clock could be installed
+     */
+    public boolean placeClock(Ground clock) {
+        return placeGround(CLOCK_X, CLOCK_Y, clock);
     }
 
     /**
