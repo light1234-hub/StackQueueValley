@@ -18,7 +18,7 @@ public class CraftWeatherStructureAction extends Action {
     @Override
     public String execute(Actor actor, GameMap map){
         if(!plan.consumeMaterials(actor)){
-            return "Not enough materials to craft" + plan.displayName() + "; requires " + plan.recipeDescription();
+            return "Not enough materials to craft " + plan.displayName() + "; requires " + plan.recipeDescription();
         }
 
         actor.getInventory().add(new WeatherStructureKit(plan));
