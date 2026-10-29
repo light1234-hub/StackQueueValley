@@ -29,7 +29,7 @@ public class MelonCrop extends Plant implements Harvestable, Waterable {
 
     @Override
     protected String takeTurn(Location location, int age) {
-        Location child = spread(location, new MelonSprout(), age, 20);
+        Location child = spread(location, PlantGrowth.sprout(PlantGrowth.Species.MELON), age, 20);
         return child == null ? null : spreadMessage("Melon Sprout", child);
     }
 
@@ -130,3 +130,4 @@ public class MelonCrop extends Plant implements Harvestable, Waterable {
     }
 
 }
+

@@ -25,9 +25,12 @@ public class TomatoCrop extends Plant implements Harvestable {
 
     @Override
     protected String takeTurn(Location location, int age) {
-        if (due(age, 7)) return produce(location, "Tomato", TomatoItem::new);
+        if (due(age, 7)) {
+            String result = produce(location, "Tomato", TomatoItem::new);
+            if (result != null) return result;
+        }
         if (due(age, 20) && chance(0.10)) {
-            Location child = spread(location, new TomatoCrop(), age, 1);
+            Location child = spread(location, new TomatoCrop(), age, 20);
             if (child != null) return spreadMessage("Tomato Crop", child);
         }
         return null;
