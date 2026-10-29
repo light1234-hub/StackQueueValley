@@ -10,11 +10,8 @@ import java.util.Locale;
  * The mud dries after three world turns and restores
  * the terrain that existed before the rainstorm.
  */
-public class MudGround extends Ground {
-    private static final int DRYING_TURN = 3;
-
-    private final Ground originalGround;
-    private int turnsRemaining;
+public final class MudGround extends DryingWeatherGround
+{
 
     /**
      * Creates mud terrain.
@@ -22,30 +19,12 @@ public class MudGround extends Ground {
      * @param originalGround terrain to restore after drying
      */
     public MudGround(Ground originalGround){
-        super('m',"Mud");
-
-        this.originalGround = originalGround;
-        this.turnsRemaining = DRYING_TURN;
+        super('m',"Mud",originalGround);
     }
-
-    /**
-     * Mud drying time tick
-     * @param location location occupied by this mud
-     */
 
     @Override
-    public void tick(Location location){
-        turnsRemaining--;
-        if(turnsRemaining <= 0){
-            location.setGround(originalGround);
-        }
+    protected void onDry(Location location)
+    {
+        location.setGround(getOriginalGround());
     }
-
-    /**
-     * Returns the number of turns
-     */
-    public int turnsRemaining(){
-        return turnsRemaining;
-    }
-
 }

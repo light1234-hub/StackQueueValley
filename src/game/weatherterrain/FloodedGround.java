@@ -14,75 +14,28 @@ import java.util.Locale;
  * when drained, the terrain becomes Mudground, which eventually restores to the original state
  *
  */
-public class FloodedGround extends Ground implements Drainable, WeatherHazard {
-
-    private static final int EVAPORATED_RATE = 6;
-    private int turnsRemaining;
-    private final Ground originalGround;
-
-    /**
-     * Created flooded terrain while preserving its original ground
-     * @param originalGround terrain that existed before flooding
-     */
-    public FloodedGround(Ground originalGround){
-        super('=',"Flooded Ground");
-        this.turnsRemaining = EVAPORATED_RATE;
-        this.originalGround = originalGround;
+public final class FloodedGround extends DryingWeatherGround implements Drainable
+{
+    public FloodedGround(Ground originaGround)
+    {
+        super('=', "Flooded Ground",originaGround);
     }
 
-    /**
-     * advanced natural evaporation
-     * @param location The location of the Ground that is flooded
-     */
     @Override
-    public void tick(Location location){
-        turnsRemaining--;
-        if(turnsRemaining <= 0){
-            location.setGround(new Soil());
-        }
+    protected void onDry(Location location)
+    {
+        location.setGround(new Soil());
     }
-    /**
-     * Drains the flooded terrain into mud.
-     * The original ground is passed to MudGround so it
-     * can be restored after the mud dries.
-     *
-     * @param location location occupied by this flooded ground
-     * @return true if drainage succeeds
-     */
+
     @Override
-    public boolean drain(Location location){
-        if(location.getGround() != this ){
+    public boolean drain(Location location)
+    {
+        if (location.getGround() != this)
+        {
             return false;
         }
 
-        if (location.containsAnActor()){
-            return false;
-        }
-        location.setGround(new MudGround(originalGround));
-        return  true;
-    }
-    /**
-     * Refreshes the evaporation countdown after new rainfall.
-     */
-    public void refresh (){
-        turnsRemaining = EVAPORATED_RATE;
-    }
-    /**
-     * Returns the turns remaining before natural evaporation.
-     *
-     * @return remaining turns
-     */
-    public int turnsRemaining(){
-        return turnsRemaining;
-    }
-
-    /**
-     * Indicates the flooded terrain is dangerous
-     * @return true while the terrain is flooded
-     */
-
-    @Override
-    public boolean isDangerous(){
+        location.setGround(new MudGround(getOriginalGround()));
         return true;
     }
 }
