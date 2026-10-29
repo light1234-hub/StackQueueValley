@@ -16,17 +16,25 @@ import game.recipe.OmeletteRecipe;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Configures the valley maps and their starting actors, items, and plant population.
+ */
 public class StackQueueValleyWorld extends World {
 
     /**
-     * Constructor.
+     * Creates the game world using the provided display.
      *
-     * @param display the Display that will display this World.
+     * @param display interface used to render the world
      */
     public StackQueueValleyWorld(Display display) {
         super(display);
     }
 
+    /**
+     * Builds the maps and establishes the starting plant stages required by REQ1.
+     *
+     * @throws Exception if a map or starting world element cannot be initialized
+     */
     public void initialise() throws Exception {
         DefaultGroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('.', Dirt::new);
@@ -143,6 +151,12 @@ public class StackQueueValleyWorld extends World {
      * Places a ladder on each location and links the two so that each leads to the other.
      * Call this after both maps exist.
      */
+    /**
+     * Places and connects a pair of reciprocal ladder locations.
+     *
+     * @param a first location to turn into a ladder
+     * @param b second location to turn into a ladder
+     */
     private void linkLadders(Location a, Location b) {
         a.setGround(new Ladder());
         b.setGround(new Ladder());
@@ -153,6 +167,12 @@ public class StackQueueValleyWorld extends World {
     /**
      * Places a teleportation circle on each location and links the two so that each
      * leads to the other. Call this after both maps exist.
+     */
+    /**
+     * Places and connects a pair of reciprocal teleportation-circle locations.
+     *
+     * @param a first location to turn into a circle
+     * @param b second location to turn into a circle
      */
     private void linkCircles(Location a, Location b) {
         a.setGround(new TeleportationCircle());

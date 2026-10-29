@@ -16,8 +16,10 @@ import game.item.StrawberryItem;
 import java.util.List;
 import java.util.Random;
 
+/** A mature cauliflower crop with watering-dependent harvest readiness. */
 public class CauliflowerCrop extends Plant implements Harvestable, Waterable {
 
+    /** Number of times this crop has been watered, used to determine harvest readiness. */
     private int timeWatered = 0;
     /**
      * Creates a Cauliflower crop.
@@ -26,6 +28,11 @@ public class CauliflowerCrop extends Plant implements Harvestable, Waterable {
         super('Y',"Cauliflower Crop");
     }
 
+    /** Mature cauliflower has no autonomous growth, spread, or produce action.
+     * @param location location occupied by this crop
+     * @param age current crop age in turns
+     * @return {@code null} because this crop acts only through farmer interactions
+     */
     @Override
     protected String takeTurn(Location location, int age) { return null; }
 

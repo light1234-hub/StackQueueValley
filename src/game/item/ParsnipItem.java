@@ -95,10 +95,11 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
     }
 
     /**
-     * Applies the effect of adding a Parsnip into the dish
-     * @param farmer
-     * @param station
-     * @return a string describing the result of using a Parsnip as an ingredient
+     * Uses this parsnip as an ingredient and plants a crop on nearby plantable ground.
+     *
+     * @param farmer actor using the ingredient
+     * @param station cooking station whose adjacent tiles are searched
+     * @return a description of the planting result
      */
     @Override
     public String useEffect(Actor farmer, Location station)

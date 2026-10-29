@@ -5,15 +5,13 @@ import game.ability.TerrainAbility;
 import game.ability.GroundAbility;
 
 /**
- * Tilled ground that can be used as a farm plot.
+ * Tilled ground that accepts planted and self-spreading crops.
+ * Soil also retains its existing terrain and weather capabilities.
  */
 public class Soil extends Ground implements PlantableGround {
 
     /**
-     * A class representing puddle on the ground.
-     */
-    /**
-     * Creates tilled soil.
+     * Creates tilled, plantable soil and enables its existing terrain abilities.
      */
     public Soil() {
         super(',', "Soil");

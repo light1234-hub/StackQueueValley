@@ -12,7 +12,8 @@ import game.item.TomatoItem;
 
 
 /**
- * A tomato crop that can be harvested for tomato items.
+ * Mature tomato crop that produces tomatoes every seven turns and has a 10%
+ * chance to self-replicate every twenty turns. It can also be harvested.
  */
 public class TomatoCrop extends Plant implements Harvestable {
 
@@ -23,6 +24,11 @@ public class TomatoCrop extends Plant implements Harvestable {
         super('T',"Tomato Crop");
     }
 
+    /** Attempts tomato production first, then 10% self-replication every twentieth turn.
+     * @param location location occupied by this crop
+     * @param age current crop age in turns
+     * @return message for the first successful action, or {@code null} if none occurs
+     */
     @Override
     protected String takeTurn(Location location, int age) {
         if (due(age, 7)) {
@@ -36,7 +42,6 @@ public class TomatoCrop extends Plant implements Harvestable {
         return null;
     }
 
-    @Override
     /**
      * Harvests the crop, replacing it with dirt and increasing maximum stamina.
      *
@@ -44,6 +49,7 @@ public class TomatoCrop extends Plant implements Harvestable {
      * @param location crop location
      * @return a description of the harvest result
      */
+    @Override
     public String harvest(Actor actor, Location location){
         location.setGround(new Dirt());
         actor.getInventory().add(new TomatoItem());
@@ -54,17 +60,16 @@ public class TomatoCrop extends Plant implements Harvestable {
         return "Harvested Tomato!!";
     }
 
-    @Override
     /**
      * Returns the stamina required to harvest the crop.
      *
      * @return stamina cost
      */
+    @Override
     public int staminaCost(){
         return 2;
     }
 
-    @Override
     /**
      * Adds the harvest action for this crop.
      *
@@ -73,6 +78,7 @@ public class TomatoCrop extends Plant implements Harvestable {
      * @param direction direction from the actor to the crop
      * @return available actions
      */
+    @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
         actions.add(new HarvestAction(this,location));

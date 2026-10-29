@@ -16,8 +16,10 @@ import game.item.StrawberryItem;
 
 import java.util.List;
 
+/** A mature melon crop that spreads sprouts and supports harvesting and watering. */
 public class MelonCrop extends Plant implements Harvestable, Waterable {
 
+    /** Number of times this crop has been watered, affecting its harvest behavior. */
     private int timeWatered = 0;
 
     /**
@@ -27,6 +29,11 @@ public class MelonCrop extends Plant implements Harvestable, Waterable {
         super('Q',"Melon Crop");
     }
 
+    /** Spreads a melon sprout every twentieth turn when an adjacent plantable tile is available.
+     * @param location location occupied by this crop
+     * @param age current crop age in turns
+     * @return spread message when a sprout is placed, otherwise {@code null}
+     */
     @Override
     protected String takeTurn(Location location, int age) {
         Location child = spread(location, PlantGrowth.sprout(PlantGrowth.Species.MELON), age, 20);

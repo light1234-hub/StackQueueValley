@@ -1,5 +1,8 @@
 package game.terrain;
 
-/** Marker contract for ground that accepts planted or self-spreading crops. */
+/**
+ * Capability marker for ground that can accept crops planted by an actor or
+ * created by a plant's spreading behavior.
+ */
 public interface PlantableGround {
 }
