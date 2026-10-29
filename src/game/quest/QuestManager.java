@@ -85,7 +85,11 @@ public class QuestManager {
      * @return true if the Farmer can interact with the active objective
      */
     public boolean canInteract(Actor actor, QuestObjectiveGround objective) {
-        return session != null && actor == farmer && session.contains(objective)
+        return session != null
+                && !awaitingReturn
+                && !session.hasExpired()
+                && actor == farmer
+                && session.contains(objective)
                 && objective.location().getGround() == objective;
     }
 
@@ -157,7 +161,9 @@ public class QuestManager {
             if (!entrance.canActorEnter(actor) || entrance.containsAnActor()) {
                 throw new IllegalStateException("Quest entrance changed during setup");
             }
-            arena.placeClock(new QuestClockGround(this));
+            if (!arena.placeClock(new QuestClockGround(this))) {
+                throw new IllegalStateException("Cannot prepare arena clock");
+            }
         } catch (RuntimeException failure) {
             session = null;
             arena.reset();
@@ -168,6 +174,7 @@ public class QuestManager {
                     contract.entryFee());
         }
         map.moveActor(actor, entrance);
+        awaitingReturn = false;
         String entry = freeEntry ? " won free dice-challenge entry to "
                 : " paid " + contract.entryFee() + " coins for ";
         return actor + entry + contract.title()
@@ -221,6 +228,9 @@ public class QuestManager {
     public String activate(Actor actor, GameMap map, QuestObjectiveGround objective) {
         if (!isActiveFor(actor, map) || !canInteract(actor, objective)) {
             return "The objective is no longer available.";
+        }
+        if (awaitingReturn || session.hasExpired()) {
+            return "The contract has ended. Waiting to return to the farm.";
         }
         Location current = map.locationOf(actor);
         Location target = objective.location();
@@ -292,6 +302,7 @@ public class QuestManager {
         arena.map().moveActor(farmer, returnTile);
         String outcome = outcomeService.apply(finished, successful);
         session = null;
+        awaitingReturn = false;
         arena.reset();
         return finished.title() + (successful ? " succeeded." : " failed.")
                 + outcome + " Returned to the farm.";
