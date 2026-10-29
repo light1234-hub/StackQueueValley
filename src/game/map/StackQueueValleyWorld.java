@@ -61,7 +61,7 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
         //inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
         inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
-        /**
+
          // REQ2: place the farm-side ladder and teleportation circle. Set with
          // .setGround() the same way crops are, rather than baking them into
          // the ASCII strings above, so the original farm layout stays untouched.
@@ -70,17 +70,15 @@ public class StackQueueValleyWorld extends World {
 
          // REQ5: Zombie on the farm
          //inheritedFarmMap.addActor(new Zombie(), inheritedFarmMap.at(2, 4));
-         */
 
-        /**
+
          inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
          inheritedFarmMap.at(0, 4).addItem(new MelonItem());
          inheritedFarmMap.at(1, 3).addItem(new StrawberryItem(false));
          inheritedFarmMap.at(3, 3).addItem(new CauliflowerItem());
          inheritedFarmMap.at(4, 4).addItem(new StrawberryItem(false));
          inheritedFarmMap.at(3, 5).addItem(new ParsnipItem());
-         */
-        /**
+
          // --- Mines map (new for REQ2) ---
          List<String> mines = Arrays.asList(
          "RRRRRRRRRR",
@@ -115,14 +113,13 @@ public class StackQueueValleyWorld extends World {
          // Circles: (9,6) above, plus these two pairs.
          linkCircles(inheritedFarmMap.at(3, 6), minesMap.at(4, 5));
          linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
-         */
 
         // --- Farmer setup ---
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
 
-        /**
+
          // REQ2: give the farmer a pickaxe and an alien device with one fixed
          // destination on each map.
          farmer.getInventory().add(new Pickaxe());
@@ -136,7 +133,7 @@ public class StackQueueValleyWorld extends World {
          minesMap.addActor(new Bat(), minesMap.at(3, 2));
          minesMap.addActor(new Slime(), minesMap.at(6, 3));
          minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
-         **/
+
         // A3 REQ3: one reusable arena, accessed from a quest board on the farm.
         List<String> arenaRows = Arrays.asList(
                 "###############",
