@@ -38,11 +38,8 @@ public class QuestOutcomeService {
         Objects.requireNonNull(quest, "quest must not be null");
         if (successful) {
             farmer.gainExp(quest.experienceReward());
-            farmer.modifyStatistic(FinanceStatistics.COINS, StatisticOperations.INCREASE,
-                    quest.coinReward());
-            return " Earned " + quest.experienceReward() + " XP and "
-                    + quest.coinReward() + " coins. "
-                    + quest.consequence().onSuccess(world);
+            farmer.modifyStatistic(FinanceStatistics.COINS, StatisticOperations.INCREASE, quest.coinReward());
+            return " Earned " + quest.experienceReward() + " XP and " + quest.coinReward() + " coins. " + quest.consequence().onSuccess(world);
         }
         return " No XP or coins awarded. " + quest.consequence().onFailure(world);
     }

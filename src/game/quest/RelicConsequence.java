@@ -19,20 +19,12 @@ public class RelicConsequence implements QuestConsequence {
      */
     @Override
     public String onSuccess(QuestWorldContext world) {
-        Location first = world.placeGroundNearby(
-                3, 4, ResonantCrystalGround::new);
-        Location second = first == null ? null
-                : world.placeAdjacentGround(first, ResonantCrystalGround::new);
-        Location third = second == null ? null
-                : world.placeAdjacentGround(second, ResonantCrystalGround::new);
-
-        int crystals = (first == null ? 0 : 1)
-                + (second == null ? 0 : 1)
-                + (third == null ? 0 : 1);
+        Location first = world.placeGroundNearby(3, 4, ResonantCrystalGround::new);
+        Location second = first == null ? null : world.placeAdjacentGround(first, ResonantCrystalGround::new);
+        Location third = second == null ? null : world.placeAdjacentGround(second, ResonantCrystalGround::new);
+        int crystals = (first == null ? 0 : 1) + (second == null ? 0 : 1) + (third == null ? 0 : 1);
         return crystals > 0
-                ? "A resonant vein of " + crystals
-                + " crystal(s) appears. Mining one breaks connected crystals, drops resources and may expose a Copper Node."
-                : "The crystal vein could not form because the nearby farm plots were unavailable.";
+                ? "A resonant vein of " + crystals + " crystal appears. Mining one breaks connected crystals, drops resources and may expose a Copper Node." : "The crystal vein could not form because the nearby farm plots were unavailable.";
     }
 
     /**
@@ -49,8 +41,6 @@ public class RelicConsequence implements QuestConsequence {
         boolean third = world.placeGroundNearby(9, 0, UnstableGround::new) != null;
         int unstableTiles = (first ? 1 : 0) + (second ? 1 : 0) + (third ? 1 : 0);
         return unstableTiles > 0
-                ? unstableTiles + " unstable ground tile(s) appeared. They collapse after three turns, "
-                + "displacing nearby actors, scattering items and leaving rubble."
-                : "The collapse could not begin because the nearby farm plots were unavailable.";
+                ? unstableTiles + " unstable ground tile appeared. They collapse after three turns, " + "displacing nearby actors, scattering items and leaving rubble." : "The collapse could not begin because the nearby farm plots were unavailable.";
     }
 }

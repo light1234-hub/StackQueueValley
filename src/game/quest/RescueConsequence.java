@@ -20,20 +20,13 @@ public class RescueConsequence implements QuestConsequence {
      */
     @Override
     public String onSuccess(QuestWorldContext world) {
-        Location firstCamp = world.placeGroundNearby(
-                2, 4, SurvivorCampGround::new);
-        Location secondCamp = world.placeGroundNearby(
-                2, 5, SurvivorCampGround::new);
-
-        boolean firstSurvivor = firstCamp != null && world.spawnNearby(
-                7, 5, new RescuedSurvivor(firstCamp.x(), firstCamp.y()));
-        boolean secondSurvivor = secondCamp != null && world.spawnNearby(
-                7, 4, new RescuedSurvivor(secondCamp.x(), secondCamp.y()));
-
+        Location firstCamp = world.placeGroundNearby(2, 4, SurvivorCampGround::new);
+        Location secondCamp = world.placeGroundNearby(2, 5, SurvivorCampGround::new);
+        boolean firstSurvivor = firstCamp != null && world.spawnNearby(7, 5, new RescuedSurvivor(firstCamp.x(), firstCamp.y()));
+        boolean secondSurvivor = secondCamp != null && world.spawnNearby(7, 4, new RescuedSurvivor(secondCamp.x(), secondCamp.y()));
         int camps = (firstCamp == null ? 0 : 1) + (secondCamp == null ? 0 : 1);
         int survivors = (firstSurvivor ? 1 : 0) + (secondSurvivor ? 1 : 0);
-        return "Established " + camps + " survivor camp(s) and spawned " + survivors
-                + " survivor(s). Survivors gather portable resources and repair damaged ground over time.";
+        return "Established " + camps + " survivor camp and spawned " + survivors + " survivor. Survivors gather portable resources and repair damaged ground over time.";
     }
 
     /**
@@ -48,7 +41,6 @@ public class RescueConsequence implements QuestConsequence {
         boolean second = world.spawnNearby(7, 4, new Scavenger());
         int spawned = (first ? 1 : 0) + (second ? 1 : 0);
         return spawned > 0
-                ? spawned + " scavenger(s) have occupied the farm. They steal resources and build temporary snares."
-                : "No scavengers could enter because the available spawning locations were blocked.";
+                ? spawned + " scavenger have occupied the farm. They steal resources and build temporary snares." : "No scavengers could enter because the available spawning locations were blocked.";
     }
 }

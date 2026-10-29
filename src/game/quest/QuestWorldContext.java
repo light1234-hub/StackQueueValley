@@ -22,9 +22,9 @@ public class QuestWorldContext {
      * Creates a context for the inherited farm.
      *
      * @param farm persistent farm map to modify
-     * @throws NullPointerException if the map is {@code null}
      */
     public QuestWorldContext(GameMap farm) {
+
         this.farm = farm;
     }
 
@@ -133,9 +133,7 @@ public class QuestWorldContext {
                         continue;
                     }
                     Location target = farm.at(xx, yy);
-                    if (!target.containsAnActor()
-                            && target.getGround().hasAbility(
-                            GroundAbility.QUEST_FEATURE_PLACEABLE)) {
+                    if (!target.containsAnActor() && target.getGround().hasAbility(GroundAbility.QUEST_FEATURE_PLACEABLE)) {
                         target.setGround(groundFactory.get());
                         return target;
                     }
@@ -159,9 +157,7 @@ public class QuestWorldContext {
         }
         for (Exit exit : anchor.getExits()) {
             Location target = exit.getDestination();
-            if (!target.containsAnActor()
-                    && target.getGround().hasAbility(
-                    GroundAbility.QUEST_FEATURE_PLACEABLE)) {
+            if (!target.containsAnActor() && target.getGround().hasAbility(GroundAbility.QUEST_FEATURE_PLACEABLE)) {
                 target.setGround(groundFactory.get());
                 return target;
             }
@@ -177,6 +173,7 @@ public class QuestWorldContext {
      * @return {@code true} if both coordinates are in range
      */
     public boolean inside(int x, int y) {
+
         return farm.getXRange().contains(x) && farm.getYRange().contains(y);
     }
 }

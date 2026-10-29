@@ -25,11 +25,9 @@ public class QuestSetupContext {
      * @param objectiveRegistrar callback that registers an objective with the manager
      * @throws NullPointerException if either dependency is null
      */
-    public QuestSetupContext(ArenaQuest arena,
-                             BiConsumer<Location, String> objectiveRegistrar) {
+    public QuestSetupContext(ArenaQuest arena, BiConsumer<Location, String> objectiveRegistrar) {
         this.arena = Objects.requireNonNull(arena, "arena must not be null");
-        this.objectiveRegistrar = Objects.requireNonNull(
-                objectiveRegistrar, "objective registrar must not be null");
+        this.objectiveRegistrar = Objects.requireNonNull(objectiveRegistrar, "objective registrar must not be null");
     }
 
     /**
@@ -70,6 +68,7 @@ public class QuestSetupContext {
      * @return true if the actor was spawned
      */
     public boolean spawnActor(int x, int y, Actor actor) {
+
         return arena.spawnActor(x, y, actor);
     }
 

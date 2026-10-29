@@ -48,23 +48,19 @@ public class QuestManager {
         this.contracts = List.copyOf(contracts);
     }
 
-    /** @return the available contract definitions */
+    /**
+     * Returns the contracts offered by the quest board.
+     *
+     * @return unmodifiable list of offered quest definitions
+     */
     public List<QuestDefinition> contracts() { return contracts; }
 
-    /** @return true when the Farmer has an unfinished contract */
+    /**
+     * Checks whether a contract session exists.
+     *
+     * @return true when a quest session exists
+     */
     public boolean hasActiveQuest() { return session != null; }
-
-    /** @return title of the active quest, or a suitable fallback */
-    public String activeTitle() { return session == null ? "No active contract" : session.definition().title(); }
-
-    /** @return time remaining on the active contract */
-    public int turnsRemaining() { return session == null ? 0 : session.turnsRemaining(); }
-
-    /** @return number of finished objectives in the active quest */
-    public int completedObjectives() { return session == null ? 0 : session.completedObjectives(); }
-
-    /** @return total number of objectives in the active quest */
-    public int totalObjectives() { return session == null ? 0 : session.totalObjectives(); }
 
     /**
      * Checks whether the supplied actor is the Farmer in the active quest arena.
@@ -85,12 +81,7 @@ public class QuestManager {
      * @return true if the Farmer can interact with the active objective
      */
     public boolean canInteract(Actor actor, QuestObjectiveGround objective) {
-        return session != null
-                && !awaitingReturn
-                && !session.hasExpired()
-                && actor == farmer
-                && session.contains(objective)
-                && objective.location().getGround() == objective;
+        return session != null && !awaitingReturn && !session.hasExpired() && actor == farmer && session.contains(objective) && objective.location().getGround() == objective;
     }
 
     /**
@@ -98,8 +89,7 @@ public class QuestManager {
      * on the inherited farm. Also revalidates old menu actions when executed.
      */
     public boolean canInteractAtBoard(Actor actor, GameMap map) {
-        return actor == farmer && map != null && boardLocation.map() == map
-                && map.contains(actor) && adjacent(map.locationOf(actor), boardLocation);
+        return actor == farmer && map != null && boardLocation.map() == map && map.contains(actor) && adjacent(map.locationOf(actor), boardLocation);
     }
 
     /**
@@ -137,13 +127,16 @@ public class QuestManager {
      * @param freeEntry whether payment is waived
      * @return message describing acceptance or rejection
      */
-    private String beginContract(Actor actor, GameMap map, QuestDefinition contract,
-                                 boolean freeEntry) {
+    private String beginContract(Actor actor, GameMap map, QuestDefinition contract, boolean freeEntry) {
         if (!canInteractAtBoard(actor, map)) {
             return "You must stand beside the quest board to accept a contract.";
         }
-        if (session != null) return "Finish your current contract before taking another.";
-        if (!contracts.contains(contract)) return "The quest board does not offer that contract.";
+        if (session != null) {
+            return "Finish your current contract before taking another.";
+        }
+        if (!contracts.contains(contract)) {
+            return "The quest board does not offer that contract.";
+        }
         if (!freeEntry && actor.getStatistic(FinanceStatistics.COINS) < contract.entryFee()) {
             return "Not enough coins for " + contract.title() + " (fee " + contract.entryFee() + ").";
         }
@@ -154,10 +147,11 @@ public class QuestManager {
         try {
             arena.reset();
             session = new QuestSession(contract);
-            QuestSetupContext setup = new QuestSetupContext(arena,
-                    (location, name) -> addObjective(location.x(), location.y(), name));
+            QuestSetupContext setup = new QuestSetupContext(arena, (location, name) -> addObjective(location.x(), location.y(), name));
             contract.scenario().prepare(setup);
-            if (session.totalObjectives() == 0) throw new IllegalStateException("Quest has no objectives");
+            if (session.totalObjectives() == 0) {
+                throw new IllegalStateException("Quest has no objectives");
+            }
             if (!entrance.canActorEnter(actor) || entrance.containsAnActor()) {
                 throw new IllegalStateException("Quest entrance changed during setup");
             }
@@ -175,11 +169,8 @@ public class QuestManager {
         }
         map.moveActor(actor, entrance);
         awaitingReturn = false;
-        String entry = freeEntry ? " won free dice-challenge entry to "
-                : " paid " + contract.entryFee() + " coins for ";
-        return actor + entry + contract.title()
-                + ". Objectives: " + session.totalObjectives() + ". Time limit: "
-                + contract.turnLimit() + " turns. Use the Quest Journal to abandon.";
+        String entry = freeEntry ? " won free dice-challenge entry to " : " paid " + contract.entryFee() + " coins for ";
+        return actor + entry + contract.title() + ". Objectives: " + session.totalObjectives() + ". Time limit: " + contract.turnLimit() + " turns. Use the Quest Journal to abandon.";
     }
 
     /**
@@ -234,22 +225,21 @@ public class QuestManager {
         }
         Location current = map.locationOf(actor);
         Location target = objective.location();
-        if (!adjacent(current, target)) return "Move beside the objective to activate it.";
+        if (!adjacent(current, target)) {
+            return "Move beside the objective to activate it.";
+        }
         if (!session.isNextObjective(objective)) {
-            return "The relic sigils must be activated in sequence: " + (session.completedObjectives() + 1)
-                    + " comes next.";
+            return "The relic sigils must be activated in sequence: " + (session.completedObjectives() + 1) + " comes next.";
         }
         if (session.isFinalObjective() && safeReturnLocation() == null) {
-            return "Cannot complete the final objective yet because every farm return tile is blocked. "
-                    + "The final objective remains available; clear a safe tile and try again.";
+            return "Cannot complete the final objective yet because every farm return tile is blocked. " + "The final objective remains available; clear a safe tile and try again.";
         }
         target.setGround(new Soil());
         session.completeObjective();
         if (session.isComplete()) {
             return "All objectives completed! " + finish(true);
         }
-        return "Objective completed (" + session.completedObjectives() + "/" + session.totalObjectives() + "). "
-                + session.turnsRemaining() + " turns remaining.";
+        return "Objective completed (" + session.completedObjectives() + "/" + session.totalObjectives() + "). " + session.turnsRemaining() + " turns remaining.";
     }
 
     /**
@@ -280,7 +270,10 @@ public class QuestManager {
      * @return message describing the result
      */
     public String abandon(Actor actor, GameMap map) {
-        if (!isActiveFor(actor, map)) return "There is no active quest to abandon.";
+        if (!isActiveFor(actor, map)) {
+            return "There is no active quest to abandon.";
+        }
+
         return "Contract abandoned. " + finish(false);
     }
 

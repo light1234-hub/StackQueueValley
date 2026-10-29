@@ -15,46 +15,88 @@ final class QuestSession {
     private int turnsRemaining;
     private boolean firstArenaTick = true;
 
-    /** Creates a fresh session with the contract's configured turn limit. */
+    /**
+     * Creates progress state for one quest definition with its configured deadline.
+     *
+     * @param definition quest definition associated with this session
+     */
     QuestSession(QuestDefinition definition) {
         this.definition = Objects.requireNonNull(definition, "definition");
         this.turnsRemaining = definition.turnLimit();
     }
 
-    /** Returns the immutable contract configuration for this session. */
+    /**
+     * Returns the contract definition for this session.
+     *
+     * @return quest definition associated with the session
+     */
     QuestDefinition definition() { return definition; }
 
-    /** Returns the remaining number of arena turns. */
+    /**
+     * Returns the remaining quest turns.
+     *
+     * @return number of turns remaining in this session
+     */
     int turnsRemaining() { return turnsRemaining; }
 
-    /** Returns the number of objectives completed so far. */
+    /**
+     * Returns the number of completed objectives.
+     *
+     * @return number of objectives completed so far
+     */
     int completedObjectives() { return completedObjectives; }
 
-    /** Returns the number of registered objectives. */
+    /**
+     * Returns the total number of registered objectives.
+     *
+     * @return number of registered quest objectives
+     */
     int totalObjectives() { return objectives.size(); }
 
-    /** Registers an objective created during arena preparation. */
+    /**
+     * Adds an objective to the active session.
+     *
+     * @param objective objective to add to the session
+     */
     void addObjective(QuestObjectiveGround objective) {
         objectives.add(Objects.requireNonNull(objective, "objective"));
     }
 
-    /** Tests membership without exposing the mutable objective collection. */
+    /**
+     * Checks whether this session contains the given objective.
+     *
+     * @param objective objective whose membership is being checked
+     * @return true if this session contains the objective
+     */
     boolean contains(QuestObjectiveGround objective) {
         return objectives.contains(objective);
     }
 
-    /** Validates ordered objectives while permitting any order for other contracts. */
+    /**
+     * Checks whether the objective is eligible under the contract ordering rules.
+     *
+     * @param objective objective being checked against the completion order
+     * @return true if this objective can be activated next
+     */
     boolean isNextObjective(QuestObjectiveGround objective) {
         int index = objectives.indexOf(objective);
         return index >= 0 && (!definition.orderedObjectives() || index == completedObjectives);
     }
 
-    /** Checks whether the next activation will finish this contract. */
+    /**
+     * Checks whether one more objective would complete the quest.
+     *
+     * @return true if one more activation would complete the quest
+     */
     boolean isFinalObjective() {
         return !objectives.isEmpty() && completedObjectives + 1 == objectives.size();
     }
 
-    /** Records a completed objective after the coordinator validates its location. */
+    /**
+     * Records the completion of one remaining objective.
+     *
+     * @throws IllegalStateException if there are no remaining objectives
+     */
     void completeObjective() {
         if (completedObjectives >= objectives.size()) {
             throw new IllegalStateException("There are no remaining objectives");
@@ -62,12 +104,19 @@ final class QuestSession {
         completedObjectives++;
     }
 
-    /** Whether the session's objectives have all been completed. */
+    /**
+     * Checks whether all registered objectives have been completed.
+     *
+     * @return true if every registered objective has been completed
+     */
     boolean isComplete() {
+
         return !objectives.isEmpty() && completedObjectives == objectives.size();
     }
 
-    /** Consumes one active arena turn; the coordinator controls when time advances. */
+    /**
+     * Advances the quest timer, excluding its initial arena tick.
+     */
     void tick() {
         if(firstArenaTick){
             firstArenaTick = false;
@@ -78,8 +127,13 @@ final class QuestSession {
         }
     }
 
-    /** Whether no arena turns remain. */
+    /**
+     * Checks whether the quest deadline has reached zero.
+     *
+     * @return true if no quest turns remain
+     */
     boolean hasExpired() {
+
         return turnsRemaining == 0;
     }
 }

@@ -43,11 +43,13 @@ public class ArenaQuest {
      * @return the game map
      */
     public GameMap map() {
+
         return map;
     }
 
     /** @return the entrance to the reusable arena. */
     public Location entrance() {
+
         return map.at(ENTRANCE_X, ENTRANCE_Y);
     }
 
@@ -58,6 +60,7 @@ public class ArenaQuest {
      * @return true if the clock could be installed
      */
     public boolean placeClock(Ground clock) {
+
         return placeGround(CLOCK_X, CLOCK_Y, clock);
     }
 
@@ -69,8 +72,7 @@ public class ArenaQuest {
      * @return true if the coordinates are valid
      */
     public boolean inside(int x, int y) {
-        return map.getXRange().contains(x)
-                && map.getYRange().contains(y);
+        return map.getXRange().contains(x) && map.getYRange().contains(y);
     }
 
     /**
@@ -85,13 +87,10 @@ public class ArenaQuest {
         if (!inside(x, y) || ground == null) {
             return false;
         }
-
         Location location = map.at(x, y);
-
         if (location.containsAnActor()) {
             return false;
         }
-
         location.setGround(ground);
         return true;
     }
@@ -108,13 +107,10 @@ public class ArenaQuest {
         if (!inside(x, y) || actor == null) {
             return false;
         }
-
         Location location = map.at(x, y);
-
         if (location.containsAnActor() || !location.canActorEnter(actor)) {
             return false;
         }
-
         try {
             map.addActor(actor, location);
             return true;
@@ -135,7 +131,6 @@ public class ArenaQuest {
         if (!inside(x, y) || item == null) {
             return false;
         }
-
         Location location = map.at(x, y);
         location.addItem(item);
         return true;
@@ -153,27 +148,17 @@ public class ArenaQuest {
                     "Cannot reset arena while the Farmer is inside"
             );
         }
-
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
                 Location location = map.at(x, y);
-
                 if (location.containsAnActor()) {
                     map.removeActor(location.getActor());
                 }
-
                 for (Item item : new ArrayList<>(location.getItems())) {
                     location.removeItem(item);
                 }
-
-                boolean wall = x == map.getXRange().min()
-                        || y == map.getYRange().min()
-                        || x == map.getXRange().max()
-                        || y == map.getYRange().max();
-
-                location.setGround(
-                        wall ? new QuestArenaWall() : new Dirt()
-                );
+                boolean wall = x == map.getXRange().min() || y == map.getYRange().min() || x == map.getXRange().max() || y == map.getYRange().max();
+                location.setGround(wall ? new QuestArenaWall() : new Dirt());
             }
         }
     }

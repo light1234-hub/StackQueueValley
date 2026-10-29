@@ -22,8 +22,7 @@ public class AncientRelicScenario implements QuestScenario {
         setup.requireGround(7, 2, new Geode());
         setup.requireGround(8, 5, new CopperNode());
         setup.requireGround(8, 4, new Rock());
-        for (int x = 9; x <= 11; x++) {
-            setup.requireGround(x, 3, new CorruptedDirt());
+        for (int x = 9; x <= 11; x++) {setup.requireGround(x, 3, new CorruptedDirt());
         }
         setup.addObjective(5, 5, "Activate the first relic sigil");
         setup.addObjective(9, 2, "Activate the second relic sigil");

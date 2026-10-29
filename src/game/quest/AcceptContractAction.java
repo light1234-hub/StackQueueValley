@@ -23,8 +23,6 @@ public class AcceptContractAction extends Action {
     /** Shows the entry price, reward and deadline before purchasing. */
     @Override
     public String menuDescription(Actor actor) {
-        return "Accept " + contract.title() + " (fee " + contract.entryFee() +
-                " coins, reward " + contract.coinReward() + " coins + " +
-                contract.experienceReward() + " XP, " + contract.turnLimit() + " turns)";
+        return "Accept " + contract.title() + " (fee " + contract.entryFee() + " coins, reward " + contract.coinReward() + " coins + " + contract.experienceReward() + " XP, " + contract.turnLimit() + " turns)";
     }
 }

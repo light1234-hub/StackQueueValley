@@ -17,11 +17,8 @@ public class ForestConsequence implements QuestConsequence {
      */
     @Override
     public String onSuccess(QuestWorldContext world) {
-        boolean placed = world.placeGroundNearby(
-                0, 3, LivingGroveGround::new) != null;
-        return placed
-                ? "A Living Grove takes root. It gradually purifies nearby blight and grows vegetation."
-                : "The grove could not take root because the nearby farm plots were unavailable.";
+        boolean placed = world.placeGroundNearby(0, 3, LivingGroveGround::new) != null;
+        return placed ? "A Living Grove takes root. It gradually purifies nearby blight and grows vegetation." : "The grove could not take root because the nearby farm plots were unavailable.";
     }
 
     /**
@@ -32,14 +29,10 @@ public class ForestConsequence implements QuestConsequence {
      */
     @Override
     public String onFailure(QuestWorldContext world) {
-        boolean first = world.placeGroundNearby(
-                0, 3, SpreadingBlightGround::new) != null;
-        boolean second = world.placeGroundNearby(
-                1, 5, SpreadingBlightGround::new) != null;
+        boolean first = world.placeGroundNearby(0, 3, SpreadingBlightGround::new) != null;
+        boolean second = world.placeGroundNearby(1, 5, SpreadingBlightGround::new) != null;
         int placed = (first ? 1 : 0) + (second ? 1 : 0);
         return placed > 0
-                ? "Spreading Blight has reached the farm in " + placed
-                + " location(s). It infects nearby terrain and poisons actors standing on it."
-                : "The blight could not take hold because the nearby farm plots were unavailable.";
+                ? "Spreading Blight has reached the farm in " + placed + " location(s). It infects nearby terrain and poisons actors standing on it." : "The blight could not take hold because the nearby farm plots were unavailable.";
     }
 }
