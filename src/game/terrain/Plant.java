@@ -17,6 +17,9 @@ public abstract class Plant extends Ground {
     /** Number of world turns this plant instance has lived. */
     private int age;
 
+    /** Whether this plant must skip a same-turn tick after spreading into a later map tile. */
+    private boolean skipNextTick;
+
     /** Random source shared by this plant's growth, spread, and production attempts. */
     private final Random random = new Random();
 
@@ -38,6 +41,10 @@ public abstract class Plant extends Ground {
      */
     @Override
     public final void tick(Location location) {
+        if (skipNextTick) {
+            skipNextTick = false;
+            return;
+        }
         age++;
         String result = takeTurn(location, age);
         if (result != null) {
@@ -97,6 +104,8 @@ public abstract class Plant extends Ground {
 
     /**
      * Places a child plant on a random adjacent unoccupied plantable ground when due.
+     * If the child tile has not yet been visited in this map tick, its age remains
+     * zero until the next world turn.
      *
      * @param location location of the parent plant
      * @param child new plant instance to place if a suitable location exists
@@ -117,7 +126,31 @@ public abstract class Plant extends Ground {
         if (soil.isEmpty()) return null;
         Location target = soil.get(random.nextInt(soil.size()));
         target.setGround(child);
+        if (comesAfterInMapTickOrder(target, location)) {
+            child.deferNextTick();
+        }
         return target;
+    }
+
+    /**
+     * Defers the first tick of a newly spread plant when it would otherwise be
+     * ticked again during the turn in which it was created.
+     */
+    private void deferNextTick() {
+        skipNextTick = true;
+    }
+
+    /**
+     * Checks whether one tile is visited after another by {@code GameMap.tick()}.
+     * GameMap processes rows by increasing y, then columns by increasing x.
+     *
+     * @param candidate potential child plant location
+     * @param current location of the plant performing the spread
+     * @return {@code true} if the candidate has not yet been ticked this turn
+     */
+    private static boolean comesAfterInMapTickOrder(Location candidate, Location current) {
+        return candidate.y() > current.y()
+                || (candidate.y() == current.y() && candidate.x() > current.x());
     }
 
     /**

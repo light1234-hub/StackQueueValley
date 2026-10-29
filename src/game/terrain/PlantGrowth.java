@@ -110,7 +110,7 @@ public final class PlantGrowth extends Plant {
         if (species == Species.STRAWBERRY) {
             if (grow(location, age, 10, 0.50, StrawberryCrop::new))
                 return "grows into a Strawberry Crop.";
-            Location child = spread(location, sprout(Species.STRAWBERRY), age, 5);
+            Location child = spread(location, seedling(Species.STRAWBERRY), age, 5);
             return child == null ? null : spreadMessage("Strawberry Seedling", child);
         }
         if (species == Species.CAULIFLOWER) {
