@@ -66,11 +66,11 @@ public final class Req1PlantUnitTests {
         map.at(0, 0).setGround(parent);
         map.at(1, 0).setGround(new Soil());
 
-        map.tick();
+        tickGrounds(map, 2, 1);
         assertEquals(0, childAges.size(),
                 "A plant spread to a later tile must skip the remainder of its creation turn.");
 
-        map.tick();
+        tickGrounds(map, 2, 1);
         assertEquals(List.of(1), childAges,
                 "The newborn's first world-turn tick must advance it from age zero to age one.");
     }
@@ -80,11 +80,11 @@ public final class Req1PlantUnitTests {
         List<Integer> replacementAges = new ArrayList<>();
         map.at(0, 0).setGround(new ReplacingPlant(replacementAges));
 
-        map.tick();
+        tickGrounds(map, 1, 1);
         assertEquals(0, replacementAges.size(),
                 "A replacement created during a tile's tick must not tick again immediately.");
 
-        map.tick();
+        tickGrounds(map, 1, 1);
         assertEquals(List.of(1), replacementAges,
                 "A replacement's first tick on the following turn must see age one.");
     }
@@ -162,6 +162,15 @@ public final class Req1PlantUnitTests {
         }
         assertEquals(expectedName, location.getGround().toString(),
                 expectedName + " must remain in its current stage before its growth interval.");
+    }
+
+    /** Ticks map locations in the same y-then-x order as GameMap.tick(). */
+    private void tickGrounds(GameMap map, int width, int height) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                map.at(x, y).tick();
+            }
+        }
     }
 
     private GameMap newMap(String... rows) throws Exception {
