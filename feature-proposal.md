@@ -195,8 +195,8 @@ Each cauldron is linked to one potion and changes the world every turn of the br
 | 1   | `GaleDraught`      | `Potion`             | New    |
 | 2   | `AegisElixir`      | `Potion`             | New    |
 | 3   | `ProspectorElixir` | `Potion`             | New    |
-| 4   | `TidalCauldron`    | `BrewingStation`     | New    |
-| 5   | `WardCauldron`     | `BrewingStation`     | New    |
+| 4   | `OrchardCauldron`  | `BrewingStation`     | New    |
+| 5   | `TamingCauldron`   | `BrewingStation`     | New    |
 | 6   | `QuarryCauldron`   | `BrewingStation`     | New    |
 
 All six concrete classes are entirely new. No classes from Assignments 1 to 3 are retrofitted.
