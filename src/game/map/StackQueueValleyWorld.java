@@ -12,6 +12,7 @@ import game.tool.Pickaxe;
 import game.recipe.HarvestFeastRecipe;
 import game.recipe.JamRecipe;
 import game.recipe.OmeletteRecipe;
+import game.weather.WeatherCoordinator;
 import game.weatherterrain.WeatherMap;
 
 import java.util.Arrays;
@@ -116,7 +117,8 @@ public class StackQueueValleyWorld extends World {
         linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
 
         // --- Farmer setup ---
-        Farmer farmer = new Farmer("Bob");
+        WeatherCoordinator weatherCoordinator = WeatherCoordinator.createDefault();
+        Farmer farmer = new Farmer("Bob", weatherCoordinator);
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
         inheritedFarmMap.addActor(new Chicken(), inheritedFarmMap.at(6,5));

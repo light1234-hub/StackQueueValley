@@ -23,9 +23,15 @@ public class WeatherConditions
      * @param minWindKmh
      * @param minHumidity
      */
-    public WeatherConditions(WeatherEventAbility eventType, int minContributingTiles, double minRainMmPerHour,
-                             double minTemperatureC, double minWindKmh, double minHumidity)
+    public WeatherConditions(WeatherEventAbility eventType, int minContributingTiles, Double minRainMmPerHour,
+                             Double minTemperatureC, Double minWindKmh, Double minHumidity)
     {
+        if (minContributingTiles < 1) {
+            throw new IllegalArgumentException(
+                    "At least one contributing tile is required."
+            );
+        }
+
         this.eventType = eventType;
         this.minContributingTiles = minContributingTiles;
         this.minRainMmPerHour = minRainMmPerHour;
@@ -43,48 +49,20 @@ public class WeatherConditions
         return eventType;
     }
 
-    /**
-     * Returns the minimum qualifying tile count
-     * @return minimum number of contributing tiles
-     */
     public int getMinContributingTiles()
     {
         return minContributingTiles;
     }
 
-    /**
-     * Returns the precipitation threshold
-     * @return minimum precipitation in millimeters per hour
-     */
-    public double getMinRainMmPerHour()
-    {
-        return minRainMmPerHour;
+    public boolean isContributedBy(TileWeather weather) {
+        return meets(weather.getPrecipitationMmPerHour(), minRainMmPerHour)
+                || meets(weather.getTemperatureC(), minTemperatureC)
+                || meets(weather.getWindSpeedKmh(), minWindKmh)
+                || meets(weather.getRelativeHumidity(), minHumidity);
     }
 
-    /**
-     * Returns the temperature threshold
-     * @return minimum temperature in degree Celsius
-     */
-    public double getMinTemperatureC()
+    private boolean meets(double value, Double threshold)
     {
-        return minTemperatureC;
-    }
-
-    /**
-     * Returns the wind threshold
-     * @return minimum wind speed in kilometers per hour
-     */
-    public double getMinWindKmh()
-    {
-        return minWindKmh;
-    }
-
-    /**
-     * Returns the humidity threshold
-     * @return minimum relative humidity percentage
-     */
-    public double getMinHumidity()
-    {
-        return minHumidity;
+        return threshold != null && value >= threshold;
     }
 }

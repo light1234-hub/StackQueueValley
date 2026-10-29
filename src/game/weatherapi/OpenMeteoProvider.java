@@ -9,11 +9,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OpenMeteoProvider implements WeatherDataProvider
 {
+    private static final Pattern CURRENT_OBJECT = Pattern.compile("\"current\"\\s*:\\s*\\{([^}]*)\\}");
+
     private final HttpClient client;
 
     public OpenMeteoProvider()
@@ -24,7 +27,16 @@ public class OpenMeteoProvider implements WeatherDataProvider
     @Override
     public WeatherSnapshot fetch(double latitude, double longitude) throws WeatherDataException
     {
-        String url = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,rain";
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180)
+        {
+            throw new IllegalArgumentException("Invalid latitude or longitude");
+        }
+
+        String url = String.format(
+                Locale.ROOT,
+                "https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f"
+                        + "&current=temperature_2m,relative_humidity_2m,wind_speed_10m,rain",
+                latitude, longitude);
 
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).timeout(Duration.ofSeconds(10)).GET().build();
 
@@ -37,7 +49,7 @@ public class OpenMeteoProvider implements WeatherDataProvider
                 throw new WeatherDataException("OpenMeteo returned HTTP " + response.statusCode());
             }
 
-            return parseCsv(response.body());
+            return parseCurrentWeather(response.body());
         }
         catch (InterruptedException exception)
         {
@@ -50,57 +62,47 @@ public class OpenMeteoProvider implements WeatherDataProvider
         }
     }
 
-    private WeatherSnapshot parseCsv(String csv) throws WeatherDataException
-    {
-        String[] lines = csv.split("\\R");
-        String[] headers = null;
-        String[] values = null;
+    private WeatherSnapshot parseCurrentWeather(String json)
+            throws WeatherDataException {
+        Matcher objectMatcher = CURRENT_OBJECT.matcher(json);
 
-        for (String line : lines)
-        {
-            String trimmed = line.trim();
-
-            if (trimmed.isEmpty() || trimmed.startsWith("#"))
-            {
-                continue;
-            }
-
-            String[] columns = trimmed.split(",",1);
-
-            if (headers == null)
-            {
-                headers = columns;
-            }
-            else
-            {
-                values = columns;
-                break;
-            }
+        if (!objectMatcher.find()) {
+            throw new WeatherDataException(
+                    "Open Meteo response did not contain current weather."
+            );
         }
 
-        if (headers == null || values == null)
-        {
-            throw new WeatherDataException("CSV response has no weather rows");
+        String currentObject = objectMatcher.group(1);
+
+        try {
+            return new WeatherSnapshot(
+                    readNumber(currentObject, "temperature_2m"),
+                    readNumber(currentObject, "rain"),
+                    readNumber(currentObject, "wind_speed_10m"),
+                    readNumber(currentObject, "relative_humidity_2m"),
+                    Instant.now()
+            );
+        } catch (IllegalArgumentException exception) {
+            throw new WeatherDataException(
+                    "Open Meteo returned incomplete current weather data.",
+                    exception
+            );
+        }
+    }
+
+    private double readNumber(String jsonObject, String property) {
+        Pattern pattern = Pattern.compile(
+                "\"" + Pattern.quote(property) + "\"\\s*:\\s*"
+                        + "(-?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)"
+        );
+        Matcher matcher = pattern.matcher(jsonObject);
+
+        if (!matcher.find()) {
+            throw new IllegalArgumentException(
+                    "Missing numeric property: " + property
+            );
         }
 
-        Map<String, String> data = new HashMap<>();
-        for (int i = 0; i < Math.min(headers.length, values.length); i++)
-        {
-            data.put(headers[i].trim(),values[i].trim());
-        }
-
-        try
-        {
-            return new WeatherSnapshot(Double.parseDouble(data.get("temperature_2m")),
-                                        Double.parseDouble(data.get("precipitation")),
-                                        Double.parseDouble(data.get("wind_speed_10m")),
-                                        Double.parseDouble(data.get("relative_humidity_2m")),
-                                        Instant.now());
-        }
-        catch (RuntimeException exception)
-        {
-            throw new WeatherDataException("CSV response is missing valid weather values", exception);
-        }
-
+        return Double.parseDouble(matcher.group(1));
     }
 }

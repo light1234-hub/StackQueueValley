@@ -13,19 +13,22 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.tool.Hoe;
 import game.tool.WateringCan;
 import game.farmeraction.CoatingActionProvider;
+import game.weather.WeatherCoordinator;
 
 /**
  * The player-controlled farmer who manages the farm and performs actions.
  */
 public class Farmer extends Actor {
     private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
+    private final WeatherCoordinator weatherCoordinator;
     /**
      * Creates a farmer with starting stamina and farming tools.
      *
      * @param name farmer's name
      */
-    public Farmer(String name) {
+    public Farmer(String name, WeatherCoordinator weatherCoordinator) {
         super("Farmer " + name, '@', 100);
+        this.weatherCoordinator = weatherCoordinator;
 
         //init the the Stamina attribute
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
@@ -55,6 +58,8 @@ public class Farmer extends Actor {
             return new DoNothingAction();
         }
 
+        weatherCoordinator.updateOnTurn(map.locationOf(this));
+
         // Handle multi-turn Actions
         if (lastAction.getNextAction() != null)
             return lastAction.getNextAction();
@@ -73,6 +78,7 @@ public class Farmer extends Actor {
         // return/print the console menu
         Menu menu = new Menu(actions);
         return menu.showMenu(this, display);
+
     }
 
 }

@@ -26,6 +26,11 @@ public final class RainstormEvent implements WeatherEvent
     {
         for (Location location : affectedLocations)
         {
+            if (location.getGroundAs(Drainable.class) != null)
+            {
+                continue;
+            }
+
             Ground originalGround = location.getGround();
 
             location.setGround(new FloodedGround(originalGround));
