@@ -21,7 +21,13 @@ public class QuestBoardGround extends Ground {
     private final DiceWager wager;
     private final Farmer farmer;
 
-    /** Constructs the board using shared services for quests and dice rounds. */
+    /**
+     * Creates an impassable Quest Board linked to shared quest and dice services.
+     *
+     * @param quests quest manager that owns the available contracts
+     * @param wager dice challenge whose state is controlled by this action
+     * @param farmer Farmer participating in the quest system
+     */
     public QuestBoardGround(QuestManager quests, DiceWager wager, Farmer farmer) {
         super('+', "Quest Board");
         this.quests = Objects.requireNonNull(quests, "quests");
@@ -29,25 +35,31 @@ public class QuestBoardGround extends Ground {
         this.farmer = Objects.requireNonNull(farmer, "farmer");
     }
 
-    /** Quest board is inspected from a neighbouring farm tile. */
+    /**
+     * Prevents actors from walking onto the Quest Board tile.
+     *
+     * @param actor actor performing the operation
+     * @return {@code false}, because actors cannot occupy this ground
+     */
     @Override
     public boolean canActorEnter(Actor actor) {
         return false;
     }
 
     /**
-     * Builds one reusable action per offered contract, or the rolling choices
-     * if a challenge is underway. The Farmer's temporary menu is restricted
-     * during a wager and restored automatically when it ends.
+     * Offers contract or dice actions when the Farmer stands next to the board.
+     *
+     * @param actor actor performing the operation
+     * @param here location containing this ground
+     * @param direction direction from the actor to this ground
+     * @return actions available to the actor at this location
      */
     @Override
     public ActionList allowableActions(Actor actor, Location here, String direction) {
         ActionList actions = super.allowableActions(actor, here, direction);
-        if (direction.isEmpty() || !quests.canInteractAtBoard(actor, here.map())
-                || quests.hasActiveQuest()) {
+        if (direction.isEmpty() || !quests.canInteractAtBoard(actor, here.map()) || quests.hasActiveQuest()) {
             return actions;
         }
-
         ActionList boardActions = new ActionList();
         if (wager.inProgress()) {
             for (DiceChoice choice : DiceChoice.values()) {
@@ -69,7 +81,11 @@ public class QuestBoardGround extends Ground {
         return actions;
     }
 
-    /** One turn of dice cooldown; resets stale wagers if Farmer is displaced. */
+    /**
+     * Advances the wager timer and closes a stale interaction when needed.
+     *
+     * @param location tile containing the Quest Board
+     */
     @Override
     public void tick(Location location) {
         String message = wager.tick();

@@ -13,19 +13,38 @@ public enum DiceChoice {
     private final int sides;
     private final int bustAtOrBelow;
 
+    /**
+     * Creates a dice choice with its display label, number of sides and bust threshold.
+     *
+     * @param label text displayed for the dice choice
+     * @param sides number of sides on the die
+     * @param bustAtOrBelow highest roll that causes an immediate loss
+     */
     DiceChoice(String label, int sides, int bustAtOrBelow) {
         this.label = label;
         this.sides = sides;
         this.bustAtOrBelow = bustAtOrBelow;
     }
 
-    /** @return number of sides on the selected die, or zero for forfeiture */
+    /**
+     * Returns the number of sides on the chosen die.
+     *
+     * @return number of sides, or zero for forfeiting
+     */
     public int sides() { return sides; }
 
-    /** @return highest face that causes immediate failure */
+    /**
+     * Returns the highest roll that triggers an immediate loss.
+     *
+     * @return largest die value that causes an immediate loss
+     */
     public int bustAtOrBelow() { return bustAtOrBelow; }
 
-    /** @return a human-readable menu choice */
+    /**
+     * Returns the menu description of this dice choice.
+     *
+     * @return description displayed for the selected dice choice
+     */
     public String menuText() {
         return switch (this) {
             case SAFE -> label + " (d6, no bust)";
