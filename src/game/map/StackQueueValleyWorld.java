@@ -12,6 +12,7 @@ import game.tool.Pickaxe;
 import game.recipe.HarvestFeastRecipe;
 import game.recipe.JamRecipe;
 import game.recipe.OmeletteRecipe;
+import game.weatherterrain.WeatherMap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,7 @@ public class StackQueueValleyWorld extends World {
                 ".........."
         );
 
-        GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
+        WeatherMap inheritedFarmMap = new WeatherMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
 
         // REQ1: the farm starts with every plant stage already established.
