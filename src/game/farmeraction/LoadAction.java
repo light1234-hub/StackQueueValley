@@ -6,34 +6,27 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.terrain.BrewingStation;
 
-/**
- * The farmer loads a cauldron with ingredients. All rule checking (XP,
- * ingredients, cauldron state) lives in {@link BrewingStation#load}.
- */
+/** Loads a cauldron with the ingredients of its recipe and starts the brew. */
 public class LoadAction extends Action {
     private final BrewingStation station;
-    private final Location stationLocation;
+    private final Location location;
     private final String direction;
 
-    /**
-     * @param station the cauldron to load
-     * @param stationLocation where the cauldron is
-     * @param direction direction of the cauldron from the actor (for the menu)
-     */
-    public LoadAction(BrewingStation station, Location stationLocation, String direction) {
+    public LoadAction(BrewingStation station, Location location, String direction) {
         this.station = station;
-        this.stationLocation = stationLocation;
+        this.location = location;
         this.direction = direction;
     }
 
     @Override
     public String execute(Actor actor, GameMap map) {
-        return station.load(actor, stationLocation);
+        return station.load(actor, location);
     }
 
     @Override
     public String menuDescription(Actor actor) {
-        return actor + " loads the " + station + " at " + direction
-                + " to brew " + station.getRecipe();
+        return actor + " loads " + station + " with " + station.getRecipe() + " ingredients ("
+                + station.getRecipe().describeIngredients() + ", XP " + station.getRecipe().getXpRequired()
+                + ") " + direction;
     }
 }

@@ -50,8 +50,8 @@ public abstract class BrewingStation extends Ground {
     /** Hook: called right after the farmer loads the cauldron. */
     protected void onBrewStarted(Location location) { }
 
-    /** Hook: called right after the potion is collected (clean-up goes here). */
-    protected void onCollected(Location location) { }
+    /** Hook: called right after the potion is collected (clean-up / extra output goes here). */
+    protected void onCollected(Actor collector, Location location) { }
 
     /** @return a prototype of the potion this cauldron brews (for recipe info) */
     public Potion getRecipe() {
@@ -104,7 +104,7 @@ public abstract class BrewingStation extends Ground {
         for (Map.Entry<Class<? extends Item>, Integer> need : recipe.getIngredients().entrySet()) {
             int found = 0;
             for (Item item : actor.getInventory().getItems()) {
-                if (found < need.getValue() && need.getKey().isInstance(item)) {
+                if (found < need.getValue() && item.getClass() == need.getKey()) {
                     toConsume.add(item);
                     found++;
                 }
@@ -142,7 +142,7 @@ public abstract class BrewingStation extends Ground {
         actor.getInventory().add(potion);
         state = BrewState.IDLE;
         turnsRemaining = 0;
-        onCollected(location);
+        onCollected(actor, location);
         return actor + " collects " + potion + " from the " + this + ".";
     }
 

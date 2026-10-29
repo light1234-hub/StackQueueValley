@@ -6,24 +6,16 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.farmeraction.WishAction;
 
-/**
- * A wishing well linked to a well on another map. The farm well charges 100
- * coins; the return well in Alchemy Valley is created with a cost of 0.
- * Like a door, it is impassable and used from an adjacent tile.
- * <p>
- * Link both wells with {@link #setDestination(Location)} after both maps exist.
- */
+/** Impassable well; the farmer wishes from an adjacent tile to travel to the linked well's side. */
 public class WishingWell extends Ground {
     private final int cost;
     private Location destination;
 
-    /** @param cost coins charged per wish (0 for free) */
     public WishingWell(int cost) {
         super('W', "Wishing Well");
         this.cost = cost;
     }
 
-    /** @param destination the location of the well on the other map */
     public void setDestination(Location destination) {
         this.destination = destination;
     }
