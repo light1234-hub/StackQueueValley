@@ -4,7 +4,9 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.IndestructibleAbility;
 import game.ability.WeatherEventAbility;
 import game.weatherterrain.FallenTreeGround;
 
@@ -29,7 +31,8 @@ public final class TornadoEvent implements WeatherEvent
             scatterItems(location);
             displaceActor(location);
 
-            if(!location.containsAnActor() && location.getGroundAs(FallenTreeGround.class)== null)
+            if(!location.containsAnActor() && location.getGroundAs(FallenTreeGround.class)== null
+                && location.getGround().hasAbility(IndestructibleAbility.PROTECTED))
             {
                 location.setGround(new FallenTreeGround());
             }

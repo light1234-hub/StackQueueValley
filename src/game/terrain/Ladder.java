@@ -4,13 +4,17 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.IndestructibleAbility;
 import game.farmeraction.TravelAction;
 
-public class Ladder extends Ground {
+public class Ladder extends Ground
+{
     private Location destination;
 
-    public Ladder() {
+    public Ladder()
+    {
         super('H', "Ladder");
+        this.enableAbility(IndestructibleAbility.PROTECTED);
     }
 
     /**
