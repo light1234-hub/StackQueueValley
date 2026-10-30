@@ -60,18 +60,11 @@ public class Farmer extends Actor {
      * @return the action selected for the turn
      */
     @Override
-    public Action playTurn(
-            ActionList actions,
-            Action lastAction,
-            GameMap map,
-            Display display) {
+    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
 
-        if (!this.isConscious()) {
-            this.unconscious(map);
-            return new DoNothingAction();
+        if (!this.isConscious()) {this.unconscious(map);return new DoNothingAction();
         }
 
-        // Teammate's REQ5 weather event updates
         weatherCoordinator.updateOnTurn(map.locationOf(this));
 
         // Handle multi-turn actions
