@@ -117,7 +117,7 @@ public class StackQueueValleyWorld extends World {
         linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
 
         // --- Farmer setup ---
-        WeatherCoordinator weatherCoordinator = WeatherCoordinator.createDefault();
+        WeatherCoordinator weatherCoordinator = WeatherCoordinator.createDefault(inheritedFarmMap);
         Farmer farmer = new Farmer("Bob", weatherCoordinator);
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
