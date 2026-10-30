@@ -29,7 +29,7 @@ public final class TornadoEvent implements WeatherEvent
             scatterItems(location);
             displaceActor(location);
 
-            if(!location.containsAnActor())
+            if(!location.containsAnActor() && location.getGroundAs(FallenTreeGround.class)== null)
             {
                 location.setGround(new FallenTreeGround());
             }
