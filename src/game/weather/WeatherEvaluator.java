@@ -32,36 +32,15 @@ public class WeatherEvaluator
     {
         for (WeatherConditions condition : conditions)
         {
-            int contributors = 0;
+            long contributors = tileWeather.values().stream()
+                    .filter(condition::isContributedBy)
+                    .count();
 
-            for (TileWeather weather : tileWeather.values())
-            {
-                if (contributes(weather, condition))
-                {
-                    contributors++;
-                }
-            }
-
-            if (contributors >= condition.getMinContributingTiles())
-            {
+            if (contributors >= condition.getMinContributingTiles()) {
                 return Optional.of(condition.getEventType());
             }
         }
 
         return Optional.empty();
-    }
-
-    /**
-     * Checks whether a tile meets at least one threshold for a weather event conditionAdd
-     * @param weather
-     * @param condition
-     * @return
-     */
-    private boolean contributes(TileWeather weather, WeatherConditions condition)
-    {
-        return weather.getPrecipitationMmPerHour() >= condition.getMinRainMmPerHour() ||
-                weather.getTemperatureC() >= condition.getMinTemperatureC() ||
-                weather.getWindSpeedKmh() >= condition.getMinWindKmh() ||
-                weather.getRelativeHumidity() >= condition.getMinHumidity();
     }
 }
