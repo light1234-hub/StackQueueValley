@@ -1,7 +1,7 @@
 package game.terrain;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.exceptions.GameEngineException;
+import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;

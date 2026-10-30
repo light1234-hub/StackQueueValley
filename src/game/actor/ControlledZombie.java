@@ -28,7 +28,7 @@ public class ControlledZombie extends Zombie implements BehaviourHost {
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         if (isConscious()) {
             for (Behaviour<Actor, Action> control : controls) {
-                Action action = control.getAction(this, map);
+                Action action = control.operate(this, map.locationOf(this));
                 if (action != null) {
                     return action;
                 }

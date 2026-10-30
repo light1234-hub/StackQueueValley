@@ -1,5 +1,6 @@
 package game.actor;
 
+import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actions.MoveActorAction;
@@ -48,7 +49,11 @@ public final class CreatureControl {
         int lost = c.getMaximumStatistic(ActorStatistics.HEALTH) - c.getStatistic(ActorStatistics.HEALTH);
         map.removeActor(c);
         ControlledZombie replacement = new ControlledZombie();
-        map.addActor(replacement, at);
+        try {
+            map.addActor(replacement, at);
+        } catch (GameEngineException e) {
+            throw new IllegalStateException(e);
+        }
         if (lost > 0) {
             replacement.hurt(lost);
         }
@@ -108,7 +113,8 @@ public final class CreatureControl {
 
     static class StunBehaviour implements Behaviour<Actor, Action> {
         @Override
-        public Action getAction(Actor actor, GameMap map) {
+        public Action operate(Actor actor, Location location) {
+            GameMap map = location.map();
             return isStunned(actor) ? new DoNothingAction() : null;
         }
     }
@@ -122,7 +128,8 @@ public final class CreatureControl {
         }
 
         @Override
-        public Action getAction(Actor actor, GameMap map) {
+        public Action operate(Actor actor, Location location) {
+            GameMap map = location.map();
             if (isStunned(actor)) {
                 return new DoNothingAction();
             }
@@ -156,7 +163,8 @@ public final class CreatureControl {
 
     static class TamedBehaviour implements Behaviour<Actor, Action> {
         @Override
-        public Action getAction(Actor actor, GameMap map) {
+        public Action operate(Actor actor, Location location) {
+            GameMap map = location.map();
             if (isStunned(actor)) {
                 return new DoNothingAction();
             }

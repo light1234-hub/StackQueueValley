@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Farmer;
+import game.blueprint.Consumable;
 import game.farmeraction.ConsumeAction;
 
 import java.util.Map;

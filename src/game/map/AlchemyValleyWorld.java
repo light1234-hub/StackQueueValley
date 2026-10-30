@@ -1,5 +1,6 @@
 package game.map;
 
+import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
@@ -30,8 +31,8 @@ public class AlchemyValleyWorld {
     private final WishingWell returnWell = new WishingWell(0);
 
     /** @param groundCreator the existing creator that maps '#', '.', 'R' to terrain */
-    public AlchemyValleyWorld(GroundCreator groundCreator) {
-        map = new GameMap(groundCreator, LAYOUT);
+    public AlchemyValleyWorld(GroundCreator groundCreator) throws GameEngineException {
+        map = new GameMap("Alchemy Valley", groundCreator, LAYOUT);
         map.at(4, 1).setGround(new OrchardCauldron());
         map.at(7, 1).setGround(new TamingCauldron());
         map.at(10, 1).setGround(new QuarryCauldron());
@@ -52,7 +53,7 @@ public class AlchemyValleyWorld {
     }
 
     /** Must be called after the map has been added to the World. */
-    public void populate() {
+    public void populate() throws GameEngineException {
         map.at(7, 5).addActor(new Wizard());
         map.at(3, 6).addActor(new Slime());
         map.at(9, 6).addActor(new Bat());
