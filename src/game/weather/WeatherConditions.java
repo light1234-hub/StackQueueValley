@@ -9,10 +9,10 @@ public class WeatherConditions
 {
     private final WeatherEventAbility eventType;
     private final int minContributingTiles;
-    private final double minRainMmPerHour;
-    private final double minTemperatureC;
-    private final double minWindKmh;
-    private final double minHumidity;
+    private final Double minRainMmPerHour;
+    private final Double minTemperatureC;
+    private final Double minWindKmh;
+    private final Double minHumidity;
 
     /**
      * Creates an object of the WeatherConditions class

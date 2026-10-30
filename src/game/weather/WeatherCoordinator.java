@@ -87,6 +87,7 @@ public final class WeatherCoordinator {
             context.updateTileWeather(tileWeather);
             triggerQualifiedEvent(tileWeather, weatherCentre);
         } catch (WeatherDataException exception) {
+            System.err.println("Weather API Error: " + exception.getMessage());
         }
     }
 
@@ -170,7 +171,9 @@ public final class WeatherCoordinator {
 
         return new WeatherCoordinator(
                 new game.weatherapi.OpenMeteoProvider(),
-                new WeatherLocationMapper(52.52, 13.41, 0.00009, 0.00014),
+                new WeatherLocationMapper(Double.parseDouble(System.getenv("WEATHER_LATITUDE")),
+                                            Double.parseDouble(System.getenv("WEATHER_LONGITUDE")),
+                                            0.00009,0.00014),
                 new TileWeatherGenerator(),
                 new WeatherEvaluator(conditions),
                 events,
