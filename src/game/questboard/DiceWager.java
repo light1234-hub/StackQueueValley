@@ -30,6 +30,7 @@ public class DiceWager {
     private int points;
     private int cooldown;
 
+
     /**
      * Creates a dice challenge with a newly generated random source.
      *
@@ -169,5 +170,15 @@ public class DiceWager {
         roundsPlayed = 0;
         points = 0;
         cooldown = applyCooldown ? COOLDOWN_TURNS : 0;
+    }
+
+    /**
+     * Returns the number of turns remaining before another dice
+     * challenge can be attempted.
+     *
+     * @return remaining cooldown turns
+     */
+    public int cooldownTurns() {
+        return cooldown;
     }
 }

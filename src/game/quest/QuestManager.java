@@ -351,6 +351,33 @@ public class QuestManager {
         return left.map() == right.map() &&
                 Math.max(Math.abs(left.x() - right.x()), Math.abs(left.y() - right.y())) == 1;
     }
+
+    /**
+     * Returns the remaining turns for the active quest.
+     *
+     * @return remaining turns, or zero if no quest is active
+     */
+    public int turnsRemaining() {
+        return session == null ? 0 : session.turnsRemaining();
+    }
+
+    /**
+     * Returns the number of completed quest objectives.
+     *
+     * @return completed objectives, or zero if no quest is active
+     */
+    public int completedObjectives() {
+        return session == null ? 0 : session.completedObjectives();
+    }
+
+    /**
+     * Returns the total number of objectives in the active quest.
+     *
+     * @return total objectives, or zero if no quest is active
+     */
+    public int totalObjectives() {
+        return session == null ? 0 : session.totalObjectives();
+    }
 }
 
 
