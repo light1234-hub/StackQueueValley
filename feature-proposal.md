@@ -139,9 +139,9 @@ Alchemy Valley is a new map, reached through a paid Wishing Well, where the farm
 
 ### Travel and the Wizard
 
-A `WishingWell` on the farm map lets the farmer perform a `WishAction`. It costs 100 coins and teleports the farmer to Alchemy Valley. A second well in Alchemy Valley returns the farmer to the farm.
+A `WishingWell` on the farm map lets the farmer perform a `WishAction`. It costs 100 coins and teleports the farmer to Alchemy Valley. If the arrival tile is occupied, the wish fails and no coins are taken. A second well in Alchemy Valley (cost 0) returns the farmer to the farm. Wells and cauldrons are impassable furniture: the farmer uses them from an adjacent tile.
 
-A Wizard NPC in Alchemy Valley tells the farmer each potion's ingredients, XP requirement and brewing time, and how much XP the farmer is still missing.
+A Wizard NPC in Alchemy Valley tells the farmer each potion's ingredients, XP requirement and brewing time, and how much XP the farmer is still missing (zero once the requirement is met).
 
 ### Multi-turn Brewing
 
@@ -165,17 +165,25 @@ Three potions are available:
 
 Drinking reuses the existing `Consumable` and `ConsumeAction`.
 
-* **Gale Draught:** AoE, radius 3. Every actor in range is pushed up to 3 tiles directly away from the farmer. Anything blocked by an obstacle stops early. Hostile creatures hit this way are stunned for 2 turns.
-* **Aegis Elixir:** Applies a reflect Status for 10 turns. While active, the farmer takes no damage, and every attacker takes the damage that was blocked.
-* **Prospector's Elixir:** AoE, radius 4. Every item on the ground in range is pulled into the farmer's inventory, and every Rock in range is shattered and replaced with Stone items on the ground, which changes the terrain.
+* **Gale Draught:** AoE, radius 3. Every actor in range is pushed up to 3 tiles directly away from the farmer. Anything blocked by an obstacle or the map edge stops early. Hostile creatures hit this way are stunned for 2 turns.
+* **Aegis Elixir:** Applies a reflect Status for 10 turns. While active, the farmer takes no damage, and the damage that was blocked is dealt to the creature that attacked. The engine does not tell a Status who the attacker was, so the attacker is identified from the adjacent hostile creatures: the one whose attack damage equals the blocked amount and which has not already been reflected onto that turn. If no creature matches, another adjacent hostile creature that has not yet been reflected onto takes the damage.
+* **Prospector's Elixir:** AoE, radius 4. Every portable item on the ground in range is pulled into the farmer's inventory, and every Rock in range is shattered, replaced with Dirt, and leaves a Stone item on the ground on that tile, which changes the terrain.
 
 ### Cauldron Effects While Brewing
 
 Each cauldron is linked to one potion and changes the world every turn of the brew.
 
-* **Orchard Cauldron (brews Gale Draught, 3 turns):** Each turn it plants one `ArcaneSapling` on a random empty tile on the map. A sapling grows over 3 turns into an `ArcaneTree`, even after the potion is collected. A tree cannot be walked through and drops a random Strawberry or Tomato on its tile every 2 turns. A hostile creature that steps onto a sapling tramples it and it is removed.
-* **Taming Cauldron (brews Aegis Elixir, 4 turns):** Each turn it places one `Lure` item on a random empty tile on the map. Every hostile creature drops its current behaviour and walks toward a random lure. When a creature reaches a lure, the lure is used up and the creature permanently gets a `TAMED` status: it stops attacking the farmer and instead attacks any untamed hostile creature it meets. Unused lures disappear when the potion is collected.
-* **Quarry Cauldron (brews Prospector's Elixir, 5 turns):** When the brew starts it spawns a `StoneGolem` actor. Each turn the golem walks to a random Rock on the map and shatters it, removing the Rock and adding Stone items to the cauldron's output. The golem crumbles when the potion is collected.
+* **Orchard Cauldron (brews Gale Draught, 3 turns):** Each turn it plants one `ArcaneSapling` on a random empty tile on the map (a Dirt tile with no actor and no item). A sapling grows over 3 turns into an `ArcaneTree`, even after the potion is collected. A tree cannot be walked through and drops a random Strawberry or Tomato on its tile every 2 turns. A hostile creature that steps onto a sapling tramples it and the previous ground is restored.
+* **Taming Cauldron (brews Aegis Elixir, 4 turns):** Each turn it places one `Lure` item on a random empty tile on the map. Every hostile creature that is not already tamed drops its current behaviour and walks toward a random lure. When a creature reaches a lure, the lure is used up and the creature permanently gets a `TAMED` status: it stops attacking the farmer and instead attacks any untamed hostile creature it meets. Unused lures disappear when the potion is collected. This applies to every hostile creature, including the Zombie.
+* **Quarry Cauldron (brews Prospector's Elixir, 5 turns):** When the brew starts it spawns a `StoneGolem` actor on a free tile next to the cauldron. Each turn the golem takes one step along the shortest path towards a random Rock on the map. When it is next to that Rock it shatters it: the Rock is replaced with Dirt and a Stone item is left on that same tile. The Stone is not given to the farmer or the cauldron; the farmer walks over and picks it up. The golem crumbles when the potion is collected.
+
+### Controlling existing creatures without modifying them
+
+Stun, lure-seeking and taming are applied from outside the existing creature classes. Stun and taming are `Status` objects, and their effects are behaviours added to the creature at a higher priority than its existing behaviours. The Zombie chooses its action from its own state machine and ignores behaviours, so the first time a Zombie is affected it is replaced by a `ControlledZombie` (a subclass of Zombie) on the same tile, with the same health, inventory, statuses and abilities. A `ControlledZombie` checks the control behaviours first and otherwise plays exactly like a Zombie.
+
+### Type checks
+
+The feature does not use `instanceof`. Hostile creatures are recognised through the engine's capability lookup (`asCapability`). Lures carry their own ability (`LURE`). Concrete terrain (Dirt, Rock) cannot use capabilities, so it is compared by exact class in one place only (`TileFinder`). The farmer's XP is read through a direct cast, which is safe because only the farmer can execute the load and wizard actions.
 
 ## The Architecture
 
@@ -186,7 +194,7 @@ Each cauldron is linked to one potion and changes the world every turn of the br
 | `Potion`         | Abstract class | `Item`   |
 | `BrewingStation` | Abstract class | `Ground` |
 
-`Potion` holds the ingredient list, XP requirement, and a `drink` method that each potion implements. `BrewingStation` holds the brew timer, the READY state, the load and collect logic, and an abstract hook for the in-brew effect that each cauldron implements.
+`Potion` holds the ingredient list, XP requirement, brew time, and a `drink` method that each potion implements. `BrewingStation` holds the brew timer, the IDLE / BREWING / READY state, the load and collect logic, and an abstract hook for the in-brew effect that each cauldron implements (plus optional hooks for when the brew starts and when the potion is collected).
 
 ### Concrete Classes
 
@@ -206,10 +214,15 @@ All six concrete classes are entirely new. No classes from Assignments 1 to 3 ar
 These are not counted towards the six.
 
 * `WishingWell` (extends `Ground`) and `WishAction`: the travel mechanism.
-* `Wizard` (extends `Actor`): the recipe guide NPC.
+* `Wizard` (extends `Actor`) and `RecipeInfoAction`: the recipe guide NPC and the action it offers for each potion.
 * `LoadAction` and `CollectAction`: the farmer's actions at a cauldron.
-* `AlchemyValleyWorld` (map): the new map containing the three cauldrons, the wizard, and the return well.
+* `AlchemyValleyWorld` (map): builds the new map containing the three cauldrons, the wizard, two hostile creatures and the return well. It is linked to the farm in `StackQueueValleyWorld`.
+* `ArcaneSapling` and `ArcaneTree` (extend `Ground`), `Lure` (extends `Item`), `StoneGolem` (extends `NonPlayerCharacter`): what the cauldrons create.
+* `StunStatus`, `TamedStatus`, `ReflectStatus` (implement `Status`) and `ReflectingHealth` (extends `BaseStatistic`): the effects.
+* `CreatureControl`, `ControlledZombie` and `BehaviourHost`: apply stun, lure-seeking and taming to existing creatures.
+* `TileFinder` (finds map tiles for the cauldrons) and `AlchemyAbility` (ability markers).
 
 ### Existing Classes Used (Unmodified)
 
-`Item`, `Ground`, `Actor`, `Status`, `Consumable`, `ConsumeAction`, `Puddle`, `Rock`, `CopperNode`, `Geode`, `StoneItem`, `CopperItem`, `DiamondItem`, `StrawberryItem`, `TomatoItem`, `FinanceStatistics`.
+`Item`, `Ground`, `Actor`, `Status`, `Consumable`, `ConsumeAction`, `Rock`, `Dirt`, `Zombie`, `HostileCreature`, `NonPlayerCharacter`, `Farmer`, `StoneItem`, `CopperItem`, `DiamondItem`, `StrawberryItem`, `TomatoItem`, `PortableResourceTransfer`, `FinanceStatistics`.
+
