@@ -26,7 +26,7 @@ public final class RainstormEvent implements WeatherEvent
     {
         for (Location location : affectedLocations)
         {
-            if (location.getGroundAs(Drainable.class) != null)
+            if (location.getGroundAs(Drainable.class) != null || location.getGround().hasAbility(TerrainAbility.FLOOD_RESISTANT))
             {
                 continue;
             }
