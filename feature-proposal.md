@@ -88,7 +88,7 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 
 * QuestJournal and QuestAbandonAction- Provides ability to farmer to abandon the quest
 
-**Tavern and drinking contest**
+**Dice challenge**
 * DiceWager - manages the challenge's state, rolls and outcomes.
 * DiceChoice - defines Safe, Risky and Forfeit choices.
 * StartDiceWagerAction - begins an eligible challenge.
