@@ -55,7 +55,7 @@ public final class Req1PlantUnitTests {
         map.at(0, 0).setGround(PlantGrowth.sprout(PlantGrowth.Species.MELON));
         map.at(1, 0).setGround(new Soil());
         for (int turn = 0; turn < 10; turn++) tickGrounds(map, 2, 1);
-        Plant child = map.at(1, 0).getGroundAs(Plant.class);
+        Plant child = (Plant) map.at(1, 0).getGround();
         assertEquals(0, child.age(), "A newborn spread onto a later tile must stay age zero this turn.");
         tickGrounds(map, 2, 1);
         assertEquals(1, child.age(), "The newborn should age on the next world turn.");
