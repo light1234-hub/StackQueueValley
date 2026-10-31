@@ -21,6 +21,16 @@ public class ItemRequirement {
      * @param description name of the materials
      */
     public ItemRequirement(Predicate<Item> matches, int count, String description){
+
+        if(matches == null || description == null){
+            throw new IllegalArgumentException("Requirement fields cannot be null");
+
+        }
+
+        if (count <= 0){
+            throw new IllegalArgumentException("Requirement quantity must be positive");
+        }
+
         this.matches = matches;
         this.description = description;
         this.count = count;
