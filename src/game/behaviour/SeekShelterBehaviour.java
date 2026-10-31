@@ -41,13 +41,20 @@ public class SeekShelterBehaviour implements Behaviour<Actor, Action>
                 if (distance < minDistance)
                 {
                     minDistance = distance;
-                    nearestShelter = location;
+                    nearestShelter = currentLocation;
                 }
             }
         }
 
         if (nearestShelter != null)
         {
+            int currentDistanceToShelter = distanceBetween(location,nearestShelter);
+
+            if (currentDistanceToShelter <= 1)
+            {
+                return  null;
+            }
+
             MoveActorAction bestMove = null;
             int bestDistance = minDistance;
 
@@ -58,7 +65,7 @@ public class SeekShelterBehaviour implements Behaviour<Actor, Action>
                 {
                     int distanceToShelter = distanceBetween(destination,nearestShelter);
 
-                    if (distanceToShelter < bestDistance)
+                    if (distanceToShelter < bestDistance && distanceToShelter >= 1)
                     {
                         bestDistance = distanceToShelter;
                         bestMove = new MoveActorAction(destination, exit.getName());

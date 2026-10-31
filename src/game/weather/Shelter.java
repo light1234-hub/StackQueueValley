@@ -10,7 +10,7 @@ public class Shelter extends WeatherResponseStructure {
 
     public Shelter() {
         super('H', "Wildlife Shelter", new ShelterResponse());
-        this.hasAbility(TerrainAbility.SHELTER);
+        this.enableAbility(TerrainAbility.SHELTER);
     }
 }
 

@@ -27,7 +27,6 @@ import java.util.ArrayList;
  */
 public class Merchant extends PassiveCreature implements WeatherShelterable
 {
-    private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
     private final List<Buyable> productsForSale = new ArrayList<>();
 
     /**
@@ -39,32 +38,6 @@ public class Merchant extends PassiveCreature implements WeatherShelterable
         productsForSale.add(new ParsnipCropProduct());
         productsForSale.add(new SwordProduct());
         productsForSale.add(new TomatoCropProduct());
-    }
-
-    /**
-     * Determines the action for the merchant to perform during it's turn
-     * If the merchant is unconscious it does nothing, if not it randomly wanders around the map
-     * @param actions collection of possible Actions for this Actor
-     * @param lastAction The Action this Actor took last turn. Can do
-     * interesting things in conjunction with Action.getNextAction()
-     * @param map the map containing the Actor
-     * @param display the I/O object to which messages may be written
-     * @return The action performed by the merchant for a singular turn (wandering or do nothing)
-     */
-    @Override
-    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display)
-    {
-        if (!this.isConscious())
-        {
-            this.unconscious(map);
-            return new DoNothingAction();
-        }
-        else
-        {
-            Action wanderAction = wanderBehaviour.operate(this,map.locationOf(this));
-
-            return wanderAction != null ? wanderAction : new DoNothingAction();
-        }
     }
 
     /**
