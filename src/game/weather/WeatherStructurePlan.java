@@ -31,6 +31,10 @@ public class WeatherStructurePlan {
      * @param copperRequired amount of copper required
      */
     public WeatherStructurePlan(String name,char kitSymbol,WeatherStructureType type,int stoneRequired,int copperRequired) {
+        if (stoneRequired < 0 || copperRequired < 0 || (stoneRequired == 0 && copperRequired == 0)) {
+            throw new IllegalArgumentException(
+                    "A weather structure must require valid materials.");
+        }
         this.name = name;
         this.kitSymbol = kitSymbol;
         this.type = type;
