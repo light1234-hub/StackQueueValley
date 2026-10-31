@@ -8,13 +8,13 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.ability.IngredientAbility;
+import game.ability.GroundAbility;
 import game.blueprint.AnimalFood;
 import game.blueprint.Ingredient;
 import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.recipe.AdjacentLocations;
-import game.terrain.PlantableGround;
 import game.terrain.Plant;
 import game.terrain.PlantGrowth;
 
@@ -108,7 +108,7 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
 
         for (Location adjacent : AdjacentLocations.from(station))
         {
-            if (adjacent.getGroundAs(PlantableGround.class) != null)
+            if (adjacent.getGround().hasAbility(GroundAbility.FERTILE))
             {
                 plantableLocations.add(adjacent);
             }

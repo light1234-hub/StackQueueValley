@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.GroundAbility;
 import game.ability.TerrainAbility;
 import game.blueprint.Harvestable;
 import game.blueprint.Waterable;
@@ -114,8 +115,8 @@ public final class Plant extends Ground implements Harvestable, Waterable {
         List<Location> soil = new ArrayList<>();
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
-            if (adjacent.getGroundAs(PlantableGround.class) != null
-                    && adjacent.getGroundAs(Plant.class) == null) soil.add(adjacent);
+            if (adjacent.getGround().hasAbility(GroundAbility.FERTILE)
+                    && adjacent.getGround().getClass() != Plant.class) soil.add(adjacent);
         }
         if (soil.isEmpty()) return null;
         Location target = soil.get(random.nextInt(soil.size()));
