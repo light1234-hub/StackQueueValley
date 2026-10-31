@@ -7,14 +7,17 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.farmeraction.BuyAction;
 import game.farmeraction.SellAction;
 import game.behaviour.WanderBehaviour;
+import game.item.Sword;
 import game.products.TomatoCropProduct;
 import game.products.ParsnipCropProduct;
 import game.products.SwordProduct;
 import game.blueprint.Sellable;
 import game.blueprint.Buyable;
+import game.weatherblueprint.WeatherShelterable;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 /**
  * Represents the merchant that wanders around the map that can buy and sell items to the farmer
  */
-public class Merchant extends Actor
+public class Merchant extends PassiveCreature implements WeatherShelterable
 {
     private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
     private final List<Buyable> productsForSale = new ArrayList<>();
@@ -88,5 +91,14 @@ public class Merchant extends Actor
         }
 
         return actions;
+    }
+
+    @Override
+    public void onRelocated(Location destination)
+    {
+        Sword freeReward = new Sword();
+        destination.addItem(freeReward);
+        System.out.println(this + " found refuge in the shelter and left a token of their appreciation on the ground: " + freeReward);
+
     }
 }
