@@ -11,6 +11,12 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract base class fot NPC
+ * provides shared behaviour managment and execution
+ * Behaviours are evaluated in priority order, with first behaviour
+ * having the highest priority
+ */
 public abstract class NPC extends Actor {
 
     private final List<Behaviour<Actor, Action>> behaviours = new ArrayList<>();
