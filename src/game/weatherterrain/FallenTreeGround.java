@@ -44,6 +44,7 @@ public class FallenTreeGround extends WeatherGround implements WeatherRecoverabl
         if(location.getGround() != this || location.containsAnActor()){
             return false;
         }
+
         boolean dropCopper = random.nextBoolean();
         location.setGround(getOriginalGround());
 
