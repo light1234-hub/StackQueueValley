@@ -54,15 +54,15 @@ public class StackQueueValleyWorld extends World {
         this.addGameMap(inheritedFarmMap);
 
         // REQ1: the farm starts with every plant stage already established.
-        inheritedFarmMap.at(1, 2).setGround(new StrawberrySeedling());
-        inheritedFarmMap.at(2, 2).setGround(new StrawberrySprout());
-        inheritedFarmMap.at(3, 2).setGround(new StrawberryCrop());
-        inheritedFarmMap.at(4, 2).setGround(new CauliflowerSprout());
-        inheritedFarmMap.at(5, 2).setGround(new CauliflowerCrop());
-        inheritedFarmMap.at(6, 2).setGround(new MelonSprout());
-        inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
-        inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
-        inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
+        inheritedFarmMap.at(1, 2).setGround(PlantGrowth.seedling(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(2, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(3, 2).setGround(PlantGrowth.crop(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(4, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.CAULIFLOWER));
+        inheritedFarmMap.at(5, 2).setGround(PlantGrowth.crop(PlantGrowth.Species.CAULIFLOWER));
+        inheritedFarmMap.at(6, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.MELON));
+        inheritedFarmMap.at(7, 2).setGround(PlantGrowth.crop(PlantGrowth.Species.MELON));
+        inheritedFarmMap.at(8, 2).setGround(PlantGrowth.crop(PlantGrowth.Species.TOMATO));
+        inheritedFarmMap.at(9, 2).setGround(PlantGrowth.crop(PlantGrowth.Species.PARSNIP));
 
         // REQ2: place the farm-side ladder and teleportation circle. Set with
         // .setGround() the same way crops are, rather than baking them into

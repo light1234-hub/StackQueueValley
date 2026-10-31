@@ -14,8 +14,9 @@ import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.recipe.AdjacentLocations;
-import game.terrain.ParsnipCrop;
 import game.terrain.PlantableGround;
+import game.terrain.Plant;
+import game.terrain.PlantGrowth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +121,7 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
         }
 
         Location plantedLocation = plantableLocations.get(random.nextInt(plantableLocations.size()));
-        plantedLocation.setGround(new ParsnipCrop());
+        plantedLocation.setGround(PlantGrowth.crop(PlantGrowth.Species.PARSNIP));
 
         return "A Parsnip Crop has been planted next to the Cooking Station";
     }

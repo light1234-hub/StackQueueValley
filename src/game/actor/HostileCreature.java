@@ -19,7 +19,7 @@ import edu.monash.fit2099.engine.positions.Exit;
  * Shared turn, wandering, and attack behavior for hostile mine creatures.
  * Concrete creatures provide their own attack damage and hit chance.
  */
-public abstract class HostileCreature extends Actor implements AttackReactive {
+public abstract class HostileCreature extends NPC implements AttackReactive {
     private final WanderBehaviour wander = new WanderBehaviour();
 
     /**

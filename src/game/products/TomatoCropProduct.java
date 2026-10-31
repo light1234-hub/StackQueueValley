@@ -6,7 +6,8 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actor.FinanceStatistics;
 import game.blueprint.Buyable;
 import game.products.PlantingLocations;
-import game.terrain.TomatoCrop;
+import game.terrain.Plant;
+import game.terrain.PlantGrowth;
 
 import java.util.List;
 import java.util.Random;
@@ -52,7 +53,7 @@ public class TomatoCropProduct implements Buyable
 
         Location plantLocation = plantableLocations.get(random.nextInt(plantableLocations.size()));
 
-        plantLocation.setGround(new TomatoCrop());
+        plantLocation.setGround(PlantGrowth.crop(PlantGrowth.Species.TOMATO));
 
         if (random.nextDouble() < KINDNESS_CHANCE)
         {

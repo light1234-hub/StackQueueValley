@@ -7,7 +7,8 @@ import game.actor.FinanceStatistics;
 import game.blueprint.Buyable;
 import game.products.PlantingLocations;
 import game.item.ParsnipItem;
-import game.terrain.ParsnipCrop;
+import game.terrain.Plant;
+import game.terrain.PlantGrowth;
 
 import java.util.Random;
 import java.util.List;
@@ -77,7 +78,7 @@ public class ParsnipCropProduct implements Buyable
 
         Location plantLocation = plantableLocations.get(random.nextInt(plantableLocations.size()));
 
-        plantLocation.setGround(new ParsnipCrop());
+        plantLocation.setGround(PlantGrowth.crop(PlantGrowth.Species.PARSNIP));
         dropParsnipsNearby(plantLocation);
 
         return merchant + " plants a Parsnip Crop costing you " + PURCHASE_PRICE;
