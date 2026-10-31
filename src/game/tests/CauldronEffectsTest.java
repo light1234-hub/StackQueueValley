@@ -30,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /** The in-brew effect of each cauldron and the terrain / items it creates. */
 class CauldronEffectsTest {
 
-    private static long saplings(GameMap map) throws Exception {
+    private static long saplings(GameMap map) {
         return TileFinder.all(map).stream()
                 .filter(l -> l.getGround().getClass() == ArcaneSapling.class).count();
     }
 
     @Test
-    void orchardPlantsOneSaplingPerBrewTurn() throws Exception {
+    void orchardPlantsOneSaplingPerBrewTurn() {
         GameMap map = map();
         Location at = map.at(4, 1);
         at.setGround(new OrchardCauldron());
@@ -56,7 +56,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void saplingGrowsIntoImpassableTreeAfterThreeTurns() throws Exception {
+    void saplingGrowsIntoImpassableTreeAfterThreeTurns() {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneSapling(new Dirt()));
@@ -69,7 +69,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void hostileCreatureTramplesSapling() throws Exception {
+    void hostileCreatureTramplesSapling() {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneSapling(new Dirt()));
@@ -79,7 +79,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void treeDropsStrawberryOrTomatoEveryTwoTurns() throws Exception {
+    void treeDropsStrawberryOrTomatoEveryTwoTurns() {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneTree());
@@ -91,7 +91,7 @@ class CauldronEffectsTest {
         assertTrue(type == StrawberryItem.class || type == TomatoItem.class);
     }
 
-    private Farmer loadTaming(GameMap map, Location at) throws Exception {
+    private Farmer loadTaming(GameMap map, Location at) {
         Farmer farmer = farmerAt(map, 7, 2);
         give(farmer, 3, StoneItem::new);
         give(farmer, 2, StrawberryItem::new);
@@ -102,7 +102,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void tamingPlacesOneLurePerTurnAndRemovesUnusedOnesOnCollect() throws Exception {
+    void tamingPlacesOneLurePerTurnAndRemovesUnusedOnesOnCollect() {
         GameMap map = map();
         Location at = map.at(7, 1);
         at.setGround(new TamingCauldron());
@@ -119,7 +119,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void creatureReachingLureUsesItUpAndBecomesTamed() throws Exception {
+    void creatureReachingLureUsesItUpAndBecomesTamed() {
         GameMap map = map();
         Location l = map.at(8, 4);
         Slime slime = new Slime();
@@ -133,7 +133,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void quarryGolemWalksToRockAndLeavesStoneOnThatTileThenCrumbles() throws Exception {
+    void quarryGolemWalksToRockAndLeavesStoneOnThatTileThenCrumbles() {
         GameMap map = map(new int[]{5, 3});
         Location at = map.at(4, 1);
         at.setGround(new QuarryCauldron());
@@ -158,5 +158,23 @@ class CauldronEffectsTest {
         assertEquals(1, count(farmer, ProspectorElixir.class));
         long actorsAfter = TileFinder.all(map).stream().filter(Location::containsAnActor).count();
         assertEquals(1, actorsAfter, "golem crumbled");
+    }
+
+    @Test
+    void quarryRefusesToStartWhenGolemHasNowhereToAppearAndKeepsIngredients() {
+        GameMap map = map(new int[]{4, 0}, new int[]{5, 0}, new int[]{3, 1}, new int[]{5, 1},
+                new int[]{3, 2}, new int[]{4, 2}, new int[]{5, 2});
+        Location at = map.at(4, 1);
+        at.setGround(new QuarryCauldron());
+        Farmer farmer = farmerAt(map, 3, 0);
+        give(farmer, 2, CopperItem::new);
+        give(farmer, 2, TomatoItem::new);
+        give(farmer, 1, StoneItem::new);
+        farmer.gainExp(150);
+        BrewingStation s = station(at);
+        s.load(farmer, at);
+        assertTrue(s.isIdle(), "brew must not start");
+        assertEquals(2, count(farmer, CopperItem.class), "ingredients not consumed");
+        assertEquals(1, count(farmer, StoneItem.class));
     }
 }

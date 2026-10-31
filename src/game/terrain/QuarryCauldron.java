@@ -31,6 +31,23 @@ public class QuarryCauldron extends BrewingStation {
         super('U', "Quarry Cauldron", ProspectorElixir::new);
     }
 
+    /** The brew only starts if the golem has a free tile to appear on, so ingredients are never wasted. */
+    @Override
+    protected boolean canStartBrew(Location location) {
+        StoneGolem probe = new StoneGolem();
+        for (Exit e : location.getExits()) {
+            if (e.getDestination().canActorEnter(probe)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected String cannotStartMessage() {
+        return "There is no free tile next to the " + this + " for the Stone Golem. Ingredients were not used.";
+    }
+
     @Override
     protected void onBrewStarted(Location location) {
         targetRock = null;

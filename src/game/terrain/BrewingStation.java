@@ -47,6 +47,16 @@ public abstract class BrewingStation extends Ground {
     /** Applied once on every turn of the brew, including the final one. */
     protected abstract void applyBrewEffect(Location location);
 
+    /** Hook: return false to refuse a load (before anything is consumed) when the brew could not work. */
+    protected boolean canStartBrew(Location location) {
+        return true;
+    }
+
+    /** Hook: message shown when {@link #canStartBrew(Location)} refuses the load. */
+    protected String cannotStartMessage() {
+        return "The " + this + " cannot start brewing right now.";
+    }
+
     /** Hook: called right after the farmer loads the cauldron. */
     protected void onBrewStarted(Location location) { }
 
@@ -91,6 +101,10 @@ public abstract class BrewingStation extends Ground {
         }
         if (state == BrewState.READY) {
             return "The " + this + " holds a finished potion. Collect it before loading again.";
+        }
+
+        if (!canStartBrew(location)) {
+            return cannotStartMessage();
         }
 
         int xp = Potion.currentXp(actor);
