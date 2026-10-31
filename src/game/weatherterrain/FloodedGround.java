@@ -24,7 +24,7 @@ public final class FloodedGround extends DryingWeatherGround implements Drainabl
     @Override
     protected void onDry(Location location)
     {
-        location.setGround(new Soil());
+        location.setGround(getOriginalGround());
     }
 
     @Override

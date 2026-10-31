@@ -1,6 +1,5 @@
 package game.weather;
 
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.ability.WeatherEventAbility;
@@ -22,6 +21,7 @@ public final class WeatherCoordinator {
     private static final int DEFAULT_REFRESH_INTERVAL = 5;
     private static final int DEFAULT_EVENT_RADIUS = 2;
 
+    private final GameMap farmMap;
     private final WeatherDataProvider provider;
     private final WeatherLocationMapper coordinateMapper;
     private final TileWeatherGenerator tileWeatherGenerator;
@@ -34,6 +34,7 @@ public final class WeatherCoordinator {
     private int turnsUntilRefresh;
 
     public WeatherCoordinator(
+            GameMap farmMap,
             WeatherDataProvider provider,
             WeatherLocationMapper coordinateMapper,
             TileWeatherGenerator tileWeatherGenerator,
@@ -48,6 +49,7 @@ public final class WeatherCoordinator {
             );
         }
 
+        this.farmMap = farmMap;
         this.provider = provider;
         this.coordinateMapper = coordinateMapper;
         this.tileWeatherGenerator = tileWeatherGenerator;
@@ -64,6 +66,12 @@ public final class WeatherCoordinator {
      * @param weatherCentre current location used for API coordinates and event radius
      */
     public void updateOnTurn(Location weatherCentre) {
+
+        if (weatherCentre.map() != farmMap)
+        {
+            return;
+        }
+
         if (turnsUntilRefresh > 0) {
             turnsUntilRefresh--;
             return;
@@ -71,7 +79,6 @@ public final class WeatherCoordinator {
 
         turnsUntilRefresh = refreshInterval - 1;
 
-        GameMap map = weatherCentre.map();
         GeographicCoordinate coordinate =
                 coordinateMapper.toCoordinate(weatherCentre);
 
@@ -82,11 +89,12 @@ public final class WeatherCoordinator {
             );
 
             Map<Location, TileWeather> tileWeather =
-                    generateWeatherForEveryTile(snapshot, map);
+                    generateWeatherForEveryTile(snapshot,farmMap);
 
             context.updateTileWeather(tileWeather);
             triggerQualifiedEvent(tileWeather, weatherCentre);
         } catch (WeatherDataException exception) {
+            System.err.println("Weather API Error: " + exception.getMessage());
         }
     }
 
@@ -95,8 +103,8 @@ public final class WeatherCoordinator {
             GameMap map) {
         Map<Location, TileWeather> tileWeather = new LinkedHashMap<>();
 
-        for (int x : map.getXRange()) {
-            for (int y : map.getYRange()) {
+        for (int x : farmMap.getXRange()) {
+            for (int y : farmMap.getYRange()) {
                 Location location = map.at(x, y);
                 tileWeather.put(
                         location,
@@ -116,7 +124,7 @@ public final class WeatherCoordinator {
 
             if (event != null) {
                 event.apply(
-                        farmerLocation.map(),
+                        farmMap,
                         locationsWithinRadius(farmerLocation),
                         context
                 );
@@ -128,8 +136,8 @@ public final class WeatherCoordinator {
         Set<Location> locations = new LinkedHashSet<>();
         int radiusSquared = eventRadius * eventRadius;
 
-        for (int x : centre.map().getXRange()) {
-            for (int y : centre.map().getYRange()) {
+        for (int x : farmMap.getXRange()) {
+            for (int y : farmMap.getYRange()) {
                 int dx = x - centre.x();
                 int dy = y - centre.y();
 
@@ -146,7 +154,7 @@ public final class WeatherCoordinator {
      * Creates the default event rules. Adjust the coordinate origin to the
      * real-world location represented by the farm.
      */
-    public static WeatherCoordinator createDefault() {
+    public static WeatherCoordinator createDefault(GameMap farmMap) {
         List<WeatherConditions> conditions = List.of(
                 new WeatherConditions(
                         WeatherEventAbility.TORNADO, 5,
@@ -169,8 +177,11 @@ public final class WeatherCoordinator {
         events.put(WeatherEventAbility.TORNADO, new TornadoEvent());
 
         return new WeatherCoordinator(
+                farmMap,
                 new game.weatherapi.OpenMeteoProvider(),
-                new WeatherLocationMapper(52.52, 13.41, 0.00009, 0.00014),
+                new WeatherLocationMapper(Double.parseDouble(System.getenv("WEATHER_LATITUDE")),
+                                            Double.parseDouble(System.getenv("WEATHER_LONGITUDE")),
+                                            0.00009,0.00014),
                 new TileWeatherGenerator(),
                 new WeatherEvaluator(conditions),
                 events,

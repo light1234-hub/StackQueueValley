@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.Ground;
+import game.ability.IndestructibleAbility;
 import game.farmeraction.CookAction;
 import game.recipe.Recipe;
 
@@ -25,6 +26,7 @@ public class CookingStation extends Ground
     {
         super('K',"Cooking Station");
         this.recipes = List.copyOf(recipes);
+        this.enableAbility(IndestructibleAbility.PROTECTED);
     }
 
     /**

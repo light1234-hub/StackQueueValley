@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.ability.IndestructibleAbility;
 import game.farmeraction.TeleportAction;
 
 /**
@@ -12,11 +13,13 @@ import game.farmeraction.TeleportAction;
  * setDestination() once both maps exist. Arriving sets the ground on fire
  * around the destination -- see TeleportAction.
  */
-public class TeleportationCircle extends Ground {
+public class TeleportationCircle extends Ground
+{
     private Location destination;
 
     public TeleportationCircle() {
         super('O', "Teleportation circle");
+        this.enableAbility(IndestructibleAbility.PROTECTED);
     }
 
     public void setDestination(Location destination) {
