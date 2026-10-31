@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.Ground;
 import game.blueprint.Ingredient;
 import game.recipe.Recipe;
 
@@ -19,6 +20,7 @@ public class CookAction extends Action
 {
     private final Recipe recipe;
     private final Location station;
+    private final Ground expectedStationGround;
 
     /**
      * A constructor that creates an object of the CookAction class
@@ -30,6 +32,7 @@ public class CookAction extends Action
     {
         this.recipe = recipe;
         this.station = station;
+        this.expectedStationGround = station.getGround();
     }
 
     /**
@@ -43,6 +46,11 @@ public class CookAction extends Action
     @Override
     public String execute(Actor actor, GameMap map)
     {
+        if (station.getGround() != expectedStationGround)
+        {
+            return "The Cooking Station is currently unavailable";
+        }
+
         if (!isAdjacent(actor, map))
         {
             return "You must be beside the Cooking Station in order to cook";

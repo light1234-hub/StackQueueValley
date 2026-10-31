@@ -5,7 +5,7 @@ import edu.monash.fit2099.engine.positions.Location;
 
 public abstract class DryingWeatherGround extends WeatherGround
 {
-    private static final double DRYING_REQUIRED = 5.0;
+    private static final double DRYING_REQUIRED = 10.0;
     private double dryingProgress;
 
     protected DryingWeatherGround(char symbol, String name, Ground originalGround)

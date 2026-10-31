@@ -96,7 +96,7 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 
 * ContractBartender - Provides the Farmer with available tavern interaction
 
-* BartenderDialogue - Manages dialoge stages and conversation choices
+* BartenderDialogue - Manages dialogue stages and conversation choices
 
 * DrinkingContest - Manages the drinking rounds, scores and the chances of getting blackout, its cooldown and random Quest selection
 
@@ -198,25 +198,33 @@ These are not counted towards the six.
 
 ## REQ 5: Weather System
 
-We will introduce a synamic weather system that uses real world weather information to nfluce Farmer's environment. Depending on multitude of factors such as wind condition or even precipitation retrived from external API, the farm can experience flooding, heatwave or even strong winds that would modify the farms terrain, affect nearby actors and redistribute resources. Different Environmental responses allow the farm to adpat to changing conditions, crreating new gameplay challenges and interactions.
+We will introduce a dynamic weather system that uses real world weather information to influence the Farm Map depending on the Farmer's Location. It also important to note that the WeatherEvents do not have an effect on the Mines section of the game. Depending on multitude of factors such as wind condition, rainfall and temperature retrieved from an external API, the farm can experience flooding, heatwaves or even strong winds that would modify the farms terrain, affect nearby actors and redistribute resources. Different Environmental responses allow the farm to adapt to changing conditions, creating new gameplay challenges and interactions.
 
 ## The Mechanics
 
 ### Weather System
-The game retrieves weather information using the Open-Meteo Forecast API. The API then generate a request that uses Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, precipitation, wind speed, and weather conditions. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
+The game retrieves weather information using the Open-Meteo Forecast API. The API will then generate a request that uses  the Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, rainfall and wind speed. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
+
+In order for the StackQueueValleyWorld Game initialisation to work properly, environment variables need to be created. Follow the below steps in order to ensure that the game can be created. 
+
+1. In IntelliJ click on RUN and find the EDIT CONFIGURATIONS BUTTON
+2. If there is already a run configuration added, click on it and find the ENVIRONMENT VARIABLES
+3. Add a WEATHER_LATITUDE and WEATHER_LONGITUDE variables and initialize them to any coordinate of a real life location that you wish to use in the game, an example would be WEATHER_LATITUDE=3.1390; WEATHER_LONGITUDE=101.6869 (these coordinates represent Kuala Lumpur, Malaysia)
+4. If there are no existing run configurations, click on the PLUS sign to create a new run configuration
+5. Click on APPLICATION and go back to Step 2 to continue initializing the environment variables.
 
 ### Weather Events
-**Rainstorm**: Heavy rainful causes selected soil to turn into puddle temporarily and applies a soak status to actors within the affected area
+**Rainstorm**: Heavy rainful causes selected ground to turn into puddles temporarily and applies a soaked status to actors within the affected area. It is important to note that Ground that is flooded upon drying first turns into Mud. Mud also has a slowed affect similar to the SoakedStatus and it dries depending on the temperature of the current tile.  Mud then dries back into its original terrain.
 
-**Heatwaves**: High temperature turn selected soil tiles into dry ground, create a temporary fire hazard and apply burning effects to actors standing on affected tiles.
+**Heatwaves**: High temperature turn selected soil tiles into scorched ground, creating a temporary fire hazard and apply burning effects to actors standing on affected tiles. Scorched ground can be converted back into its original terrain by being watered, there is no natural restoration for Scorched Ground.
 
-**Tornado**: Strong winds scatter items across adjacent locations, introduces fallen tree obstacles and disrupt nearby actors.
+**Tornado**: Strong winds scatter items across adjacent locations, introduces fallen tree obstacles and disrupt nearby actors. It is important to note that FallenTrees can only fall on selected tiles, protected ground (e.g. Cooking Stations, Ladders, Teleportation Circles and Weather Response Structures can not be destroyed by a Fallen Tree).
 
 ### Environmental Response
 
-**Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to Soil and collected water becomes usable
+**Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to their original terrain directly without having to go through the mud stage and collected water becomes usable.
 
-**Wildlife Response:** Chickens and Cows attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
+**Wildlife Response:** All animals attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
 
 **Resources Response:** Weather-damaged terrain exposes additional resources, converting suitable ground into mining nodes and placing collectible materials nearby. 
 
@@ -231,19 +239,19 @@ Responsibility: Defines how a weather condition changes by modifying the terrain
 
 **Concrete implementation:**
 
-| Class         |                                                                               Complex effect                                                                               |
-|---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| RainstormEvent | Converts selected tiles into temporary puddles and applies a soaked status to all actors caught in the storm. Actor can only move 1 step every 3 turns while being soaked. |
-| HeatwaveEvent |            Converts selected tiles into dry ground, creates temporary fire hazards and applies the burning effect to all actors standing on the selected tiles.            |
-| Tornado       |   Scatters items into nearby adjacent locations, creates fallen-tree obstacles and disrupts nearby actors. Fallen trees block 2 tiles and forces actors to move around.    |
+| Class          |                                                                                                   Complex effect                                                                                                    |
+|----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| RainstormEvent |                     Converts selected tiles into temporary puddles and applies a soaked status to all actors caught in the storm. Actor can only move 1 step every 3 turns while being soaked.                      |
+| HeatwaveEvent  |                              Converts selected tiles into scorched ground, creates temporary fire hazards and applies the burning effect to all actors standing on the selected tiles.                              |
+| TornadoEvent   | Scatters items into nearby adjacent locations, creates fallen-tree obstacles and disrupts nearby actors. Fallen trees block 1 tiles and forces actors to move around. Fallen trees appear as obstacles for 5 turns. |
 
 **Abstraction 2: WeatherResponse **
 Type: New interface
 
 Responsibility: Defines how the farm, the animals within said farm and its resources respond to weather damages and hazards.
 
-| Class                    |                                                                                                                      Complex effect                                                                                                                      |
-|--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| DrainageResponse         |        Redirects floodwater into drainage channels, changes the temporary puddles back into soil and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map.         |
-| WildlifeResponse         |          Moves Chicken and Cows into towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items. WildlifeResponse can be crafted by the farmer and placed down on the map.          |
-| ResourceRecoveryResponse | Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations. |
+| Class                    |                                                                                                                       Complex effect                                                                                                                       |
+|--------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| DrainageResponse         | Redirects floodwater into drainage channels, changes the temporary puddles back into their original ground and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map. |
+| WildlifeResponse         |                  Moves animals towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items. WildlifeResponse can be crafted by the farmer and placed down on the map.                  |
+| ResourceRecoveryResponse |  Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations.  |
