@@ -39,6 +39,16 @@ public class FallenTreeGround extends WeatherGround implements WeatherRecoverabl
             location.setGround(getOriginalGround());
         }
     }
+    /**
+     * Recovers resources from the fallen tree and clears the terrain.
+     * When recovery succeeds, the fallen tree is replaced with Dirt.
+     * There is a 50% chance of producing five Copper items and a
+     * 50% chance of producing ten Stone items. The resulting items
+     * are placed at the recovered location.
+     * @param location the location where recovery is attempted
+     * @return true if the fallen tree was successfully recovered;
+     *         false if the location is invalid or occupied by an actor
+     */
     @Override
     public boolean recover(Location location){
         if(location.getGround() != this || location.containsAnActor()){
