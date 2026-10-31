@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.ability.IndestructibleAbility;
+import game.ability.TerrainAbility;
 
 /**
  * A weather structure that activates its response
@@ -18,6 +19,7 @@ public abstract class WeatherResponseStructure extends Ground
         super(symbol, name);
         this.response = response;
         this.enableAbility(IndestructibleAbility.PROTECTED);
+        this.enableAbility(TerrainAbility.FLOOD_RESISTANT);
     }
     @Override
     public final void tick(Location location) {
