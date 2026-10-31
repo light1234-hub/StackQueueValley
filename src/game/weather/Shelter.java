@@ -6,10 +6,10 @@ import game.ability.TerrainAbility;
 /**
  * Automatically relocates endangered livestock.
  */
-public class WildlifeShelter extends WeatherResponseStructure {
+public class Shelter extends WeatherResponseStructure {
 
-    public WildlifeShelter() {
-        super('H', "Wildlife Shelter", new WildlifeResponse());
+    public Shelter() {
+        super('H', "Wildlife Shelter", new ShelterResponse());
         this.hasAbility(TerrainAbility.SHELTER);
     }
 }

@@ -67,7 +67,7 @@ public class WeatherStructurePlan {
                 return new DrainageStructure();
 
             case WILDLIFE:
-                return new WildlifeShelter();
+                return new Shelter();
 
             case RECOVERY:
                 return new ResourceRecoveryStructure();

@@ -6,7 +6,7 @@ The Farmer can visit the Drunken Tavern and accept one of three fantasy quest, e
 
 ## The Mechanics
 ### Tavern Quest System
-The Farmer can travel between the inherited farm and the Drunken Tavern using connected doorways. The bartender provides an interactives dialogue system where the Farmer can ask about the quests, choose a quest or participate in a drinking content.
+The Farmer can travel between the inherited farm and the Drunken Tavern using connected doorways. The bartender provides an interactive dialogue system where the Farmer can ask about the quests, choose a quest or participate in a drinking content.
 
 Three Quest are available:
 
@@ -224,7 +224,7 @@ In order for the StackQueueValleyWorld Game initialisation to work properly, env
 
 **Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to their original terrain directly without having to go through the mud stage and collected water becomes usable.
 
-**Wildlife Response:** All animals attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
+**Shelter Response:** All animals and passive NPCS attempt to relocate to safer tiles during dangerous weather. The process can generate animal products at their new locations and generate gifts from passive creatures at their new locations.
 
 **Resources Response:** Weather-damaged terrain exposes additional resources, converting suitable ground into mining nodes and placing collectible materials nearby. 
 
@@ -250,8 +250,8 @@ Type: New interface
 
 Responsibility: Defines how the farm, the animals within said farm and its resources respond to weather damages and hazards.
 
-| Class                    |                                                                                                                       Complex effect                                                                                                                       |
-|--------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| DrainageResponse         | Redirects floodwater into drainage channels, changes the temporary puddles back into their original ground and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map. |
-| WildlifeResponse         |                  Moves animals towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items. WildlifeResponse can be crafted by the farmer and placed down on the map.                  |
-| ResourceRecoveryResponse |  Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations.  |
+| Class                    |                                                                                                                                           Complex effect                                                                                                                                           |
+|--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| DrainageResponse         |                     Redirects floodwater into drainage channels, changes the temporary puddles back into their original ground and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map.                     |
+| ShelterResponse          | Moves animals and passive NPCs towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items and passive NPCS will spawn new items are their location≠. ShelterResponse can be crafted by the farmer and placed down on the map. |
+| ResourceRecoveryResponse |                      Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations.                      |

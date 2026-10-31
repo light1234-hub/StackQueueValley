@@ -10,7 +10,7 @@ import game.weatherblueprint.WeatherShelterable;
  * Protects nearby livestock from Tornado
  * by relocating them to safe locations.
  */
-public class WildlifeResponse implements WeatherResponse{
+public class ShelterResponse implements WeatherResponse{
 
     private static final int RADIUS = 3;
 
