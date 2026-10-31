@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
+import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
@@ -41,6 +42,11 @@ public final class CreatureControl {
     }
 
     /** Swaps a plain Zombie for a ControlledZombie (same tile, same health); others are returned as is. */
+    /** Attack damage of a hostile creature (its damage() method is only visible inside this package). */
+    public static int attackDamage(HostileCreature c) {
+        return c.damage();
+    }
+
     private static HostileCreature prepare(HostileCreature c, GameMap map) {
         if (c.getClass() != Zombie.class) {
             return c;
@@ -56,6 +62,16 @@ public final class CreatureControl {
         }
         if (lost > 0) {
             replacement.hurt(lost);
+        }
+        for (Item carried : new ArrayList<>(c.getInventory().getItems())) {
+            c.getInventory().remove(carried);
+            replacement.getInventory().add(carried);
+        }
+        for (Status status : c.statuses()) {
+            replacement.addStatus(status);
+        }
+        for (Enum<?> ability : c.abilities()) {
+            replacement.enableAbility(ability);
         }
         return replacement;
     }

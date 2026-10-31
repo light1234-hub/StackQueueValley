@@ -63,59 +63,59 @@ public class StackQueueValleyWorld extends World {
         //inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
         inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
         /**
-        // REQ2: place the farm-side ladder and teleportation circle. Set with
-        // .setGround() the same way crops are, rather than baking them into
-        // the ASCII strings above, so the original farm layout stays untouched.
-        inheritedFarmMap.at(0, 5).setGround(new Ladder());
-        inheritedFarmMap.at(9, 6).setGround(new TeleportationCircle());
+         // REQ2: place the farm-side ladder and teleportation circle. Set with
+         // .setGround() the same way crops are, rather than baking them into
+         // the ASCII strings above, so the original farm layout stays untouched.
+         inheritedFarmMap.at(0, 5).setGround(new Ladder());
+         inheritedFarmMap.at(9, 6).setGround(new TeleportationCircle());
 
-        // REQ5: Zombie on the farm
-        //inheritedFarmMap.addActor(new Zombie(), inheritedFarmMap.at(2, 4));
-        */
+         // REQ5: Zombie on the farm
+         //inheritedFarmMap.addActor(new Zombie(), inheritedFarmMap.at(2, 4));
+         */
 
         /**
-        inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
-        inheritedFarmMap.at(0, 4).addItem(new MelonItem());
-        inheritedFarmMap.at(1, 3).addItem(new StrawberryItem(false));
-        inheritedFarmMap.at(3, 3).addItem(new CauliflowerItem());
-        inheritedFarmMap.at(4, 4).addItem(new StrawberryItem(false));
-        inheritedFarmMap.at(3, 5).addItem(new ParsnipItem());
+         inheritedFarmMap.at(1, 4).addItem(new ParsnipItem());
+         inheritedFarmMap.at(0, 4).addItem(new MelonItem());
+         inheritedFarmMap.at(1, 3).addItem(new StrawberryItem(false));
+         inheritedFarmMap.at(3, 3).addItem(new CauliflowerItem());
+         inheritedFarmMap.at(4, 4).addItem(new StrawberryItem(false));
+         inheritedFarmMap.at(3, 5).addItem(new ParsnipItem());
          */
         /**
-        // --- Mines map (new for REQ2) ---
-        List<String> mines = Arrays.asList(
-                "RRRRRRRRRR",
-                "R........R",
-                "R.C....g.R",
-                "R........R",
-                "R....R...R",
-                "H........R",
-                "RRRRRRRRRO"
-        );
+         // --- Mines map (new for REQ2) ---
+         List<String> mines = Arrays.asList(
+         "RRRRRRRRRR",
+         "R........R",
+         "R.C....g.R",
+         "R........R",
+         "R....R...R",
+         "H........R",
+         "RRRRRRRRRO"
+         );
 
-        GameMap minesMap = new GameMap("The Mines", groundCreator, mines);
-        this.addGameMap(minesMap);
+         GameMap minesMap = new GameMap("The Mines", groundCreator, mines);
+         this.addGameMap(minesMap);
 
-        // REQ2: link the farm and mines ladders/circles together. This must
-        // happen after both maps exist, since each side needs a real
-        // Location from the other map.
-        Location farmLadderLocation = inheritedFarmMap.at(0, 5);
-        Location minesLadderLocation = minesMap.at(0, 5);
-        ((Ladder) farmLadderLocation.getGround()).setDestination(minesLadderLocation);
-        ((Ladder) minesLadderLocation.getGround()).setDestination(farmLadderLocation);
+         // REQ2: link the farm and mines ladders/circles together. This must
+         // happen after both maps exist, since each side needs a real
+         // Location from the other map.
+         Location farmLadderLocation = inheritedFarmMap.at(0, 5);
+         Location minesLadderLocation = minesMap.at(0, 5);
+         ((Ladder) farmLadderLocation.getGround()).setDestination(minesLadderLocation);
+         ((Ladder) minesLadderLocation.getGround()).setDestination(farmLadderLocation);
 
-        Location farmCircleLocation = inheritedFarmMap.at(9, 6);
-        Location minesCircleLocation = minesMap.at(9, 6);
-        ((TeleportationCircle) farmCircleLocation.getGround()).setDestination(minesCircleLocation);
-        ((TeleportationCircle) minesCircleLocation.getGround()).setDestination(farmCircleLocation);
+         Location farmCircleLocation = inheritedFarmMap.at(9, 6);
+         Location minesCircleLocation = minesMap.at(9, 6);
+         ((TeleportationCircle) farmCircleLocation.getGround()).setDestination(minesCircleLocation);
+         ((TeleportationCircle) minesCircleLocation.getGround()).setDestination(farmCircleLocation);
 
-        // Extra travel points: three ladders and three teleportation circles in total.
-        // Ladders: (0,5) above, plus these two pairs.
-        linkLadders(inheritedFarmMap.at(0, 1), minesMap.at(1, 1));
-        linkLadders(inheritedFarmMap.at(9, 1), minesMap.at(8, 1));
-        // Circles: (9,6) above, plus these two pairs.
-        linkCircles(inheritedFarmMap.at(3, 6), minesMap.at(4, 5));
-        linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
+         // Extra travel points: three ladders and three teleportation circles in total.
+         // Ladders: (0,5) above, plus these two pairs.
+         linkLadders(inheritedFarmMap.at(0, 1), minesMap.at(1, 1));
+         linkLadders(inheritedFarmMap.at(9, 1), minesMap.at(8, 1));
+         // Circles: (9,6) above, plus these two pairs.
+         linkCircles(inheritedFarmMap.at(3, 6), minesMap.at(4, 5));
+         linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
          */
 
         // --- Farmer setup ---
@@ -124,19 +124,19 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
 
         /**
-        // REQ2: give the farmer a pickaxe and an alien device with one fixed
-        // destination on each map.
-        farmer.getInventory().add(new Pickaxe());
+         // REQ2: give the farmer a pickaxe and an alien device with one fixed
+         // destination on each map.
+         farmer.getInventory().add(new Pickaxe());
 
-        AlienDevice device = new AlienDevice();
-        device.addDestination(inheritedFarmMap.at(5, 3));
-        device.addDestination(minesMap.at(5, 3));
-        // REQ2: the device is found on the farm map, not carried from the start
-        inheritedFarmMap.at(7, 4).addItem(device);
+         AlienDevice device = new AlienDevice();
+         device.addDestination(inheritedFarmMap.at(5, 3));
+         device.addDestination(minesMap.at(5, 3));
+         // REQ2: the device is found on the farm map, not carried from the start
+         inheritedFarmMap.at(7, 4).addItem(device);
 
-        minesMap.addActor(new Bat(), minesMap.at(3, 2));
-        minesMap.addActor(new Slime(), minesMap.at(6, 3));
-        minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+         minesMap.addActor(new Bat(), minesMap.at(3, 2));
+         minesMap.addActor(new Slime(), minesMap.at(6, 3));
+         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
          **/
         // A3 REQ3 phase 1: the Tavern and one reusable Quest Arena.
         // Existing farm/mines maps and all A1/A2 travel links remain intact.
@@ -192,6 +192,16 @@ public class StackQueueValleyWorld extends World {
         arenaExit.linkTo(tavernMap.at(2, 2));
         tavernMap.addActor(new ContractBartender(quests,farmer), bartenderLocation);
         farmer.getInventory().add(new QuestJournal(quests));
+
+        // A3 REQ4: Alchemy Valley, reached through a paid Wishing Well on the farm.
+        // The map must be added to this World before populate() places actors on it.
+        AlchemyValleyWorld valley = new AlchemyValleyWorld(groundCreator);
+        this.addGameMap(valley.getMap());
+        valley.populate();
+        WishingWell farmWell = new WishingWell(100);
+        inheritedFarmMap.at(0, 0).setGround(farmWell);
+        farmWell.setDestination(valley.arrivalLocation());
+        valley.getReturnWell().setDestination(inheritedFarmMap.at(0, 1));
 
     }
 
