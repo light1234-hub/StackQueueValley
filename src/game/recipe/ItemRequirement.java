@@ -19,6 +19,7 @@ public class ItemRequirement {
      * @param matches condtion used to identify matching items
      * @param count quantity required
      * @param description name of the materials
+     * @throws  IllegalArgumentException if the maching condition or description is null or quantity is not positive
      */
     public ItemRequirement(Predicate<Item> matches, int count, String description){
 
