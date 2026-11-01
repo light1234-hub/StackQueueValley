@@ -11,7 +11,9 @@ import game.behaviour.WanderBehaviour;
 import game.farmeraction.FeedAction;
 import game.blueprint.AnimalFood;
 import game.blueprint.Feedable;
+import game.item.Egg;
 import game.item.Milk;
+import game.weatherblueprint.WeatherShelterable;
 
 import java.util.List;
 import java.util.Random;
@@ -19,7 +21,7 @@ import java.util.Random;
 /**
  * A cow that wanders around the farm and produces milk when fed.
  */
-public class Cow extends Actor implements Feedable {
+public class Cow extends Actor implements Feedable, WeatherShelterable {
     private Random random = new Random();
     private WanderBehaviour wanderBehaviour;
     /**
@@ -28,6 +30,15 @@ public class Cow extends Actor implements Feedable {
     public Cow(){
         super("Cow",'C',20);
         this.wanderBehaviour = new WanderBehaviour();
+    }
+
+    /**
+     *  Produces a Milk  when it relocates to a safer place
+     * @param destination the animal's new location
+     */
+    @Override
+    public void onRelocated(Location destination){
+        destination.addItem(new Milk());
     }
 
     /**

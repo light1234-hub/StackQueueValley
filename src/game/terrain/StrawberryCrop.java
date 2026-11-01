@@ -15,8 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 
+/** A mature strawberry crop that produces fruit and supports harvesting and watering. */
 public class StrawberryCrop extends Plant implements Harvestable, Waterable {
+    /** Number of times this crop has been watered; affects harvest destruction chance. */
     private int timeWatered = 0;
+    /** Random source used to choose adjacent plots for the watering effect. */
     private Random random = new Random();
     /**
      * Creates a strawberry crop.
@@ -25,6 +28,11 @@ public class StrawberryCrop extends Plant implements Harvestable, Waterable {
         super('S',"Strawberry Crop");
     }
 
+    /** Produces one strawberry every fifth turn.
+     * @param location location occupied by this crop
+     * @param age current crop age in turns
+     * @return produce message when due, otherwise {@code null}
+     */
     @Override
     protected String takeTurn(Location location, int age) {
         if (due(age, 5)) return produce(location, "Strawberry", StrawberryItem::new);
@@ -55,7 +63,7 @@ public class StrawberryCrop extends Plant implements Harvestable, Waterable {
     }
 
     /**
-     * Waters the strawberry, healing the actor and risking crop destruction.
+     * Waters the strawberry and drops two strawberry items on adjacent tiles.
      *
      * @param actor actor watering the crop
      * @param location crop location

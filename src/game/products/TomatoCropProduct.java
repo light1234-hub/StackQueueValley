@@ -16,8 +16,11 @@ import java.util.Random;
  */
 public class TomatoCropProduct implements Buyable
 {
+    /** Price charged when the merchant does not plant the crop for free. */
     private static final int PURCHASE_PRICE = 500;
+    /** Probability that the merchant waives the crop's price after planting. */
     private static final double KINDNESS_CHANCE = 0.5;
+    /** Random source used to select a planting location and kindness outcome. */
     private final Random random = new Random();
 
     /**
@@ -32,10 +35,10 @@ public class TomatoCropProduct implements Buyable
 
     /**
      * Carries out the logic of the tomato crop product purchase after it has been bought
-     * @param buyer
-     * @param merchant
-     * @param merchantLocation
-     * @return a string describing the result of the purchase (successful, refund or free tomatos)
+     * @param buyer actor purchasing the crop
+     * @param merchant merchant completing the transaction
+     * @param merchantLocation location used to find nearby plantable ground
+     * @return description of planting, refund, or free-crop outcome
      */
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)

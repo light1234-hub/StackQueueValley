@@ -10,8 +10,6 @@ import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.ability.TavernAbility;
-import game.progression.ExperienceTracker;
 import game.tool.Hoe;
 import game.tool.WateringCan;
 import game.farmeraction.CoatingActionProvider;
@@ -21,63 +19,6 @@ import game.farmeraction.CoatingActionProvider;
  */
 public class Farmer extends Actor {
     private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
-    private final ExperienceTracker experience = new ExperienceTracker();
-    private ActionList conversationActions;
-    private GameMap conversationMap;
-
-    /**
-     * Replaces the regular menu with actions for the current conversation.
-     *
-     * @param actions dialogue actions available to the Farmer
-     * @param map map on which the conversation takes place
-     */
-    public void startConversation(ActionList actions, GameMap map) {
-        if (actions == null || map == null) {
-            throw new IllegalArgumentException("Conversation actions and map are required");
-        }
-        this.conversationActions = new ActionList();
-        this.conversationActions.add(actions);
-        this.conversationMap = map;
-    }
-
-    /** Restores the normal action menu after the conversation finishes. */
-    public void endConversation() {
-        this.conversationActions = null;
-        this.conversationMap = null;
-    }
-
-    /**
-     * Gives this the farmer quest experience
-     * @param amount amount of experience gain
-     */
-    public void gainExp(int amount){
-        experience.award(amount);
-    }
-
-    /**
-     * Allow to spend experience without knowing the quest
-     * @param amount amount of exp to spend
-     */
-    public void spendExp(int amount){
-        experience.spend(amount);
-    }
-
-    /**
-     * Getter method for levels and exps
-     */
-
-    public int getLevel(){
-        return experience.level();
-    }
-
-    public int getTotalExperience(){
-        return experience.totalEarned();
-    }
-
-    public int getAvailableExperience(){
-        return experience.available();
-    }
-
     /**
      * Creates a farmer with starting stamina and farming tools.
      *
@@ -90,14 +31,11 @@ public class Farmer extends Actor {
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
         this.addNewStatistic(FinanceStatistics.COINS, new BaseStatistic(10000));
 
-        this.modifyStatistic(FinanceStatistics.COINS,StatisticOperations.UPDATE,1000);
         // give farmer the Item
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
 
         this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
-        this.enableAbility(TavernAbility.CAN_USE_TAVERN);
-
 
     }
 
@@ -131,17 +69,10 @@ public class Farmer extends Actor {
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
         display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
         display.println("Inventory: " + this.getInventory().getItems());
-        display.println(("Coins: " + this.getStatistic(FinanceStatistics.COINS)));
-        display.println("Level: " + getLevel() + " | Earned XP: " + getTotalExperience() + " | Available XP: " + getAvailableExperience());
-        // return/print the console menu
-        if (conversationActions != null && conversationMap != map) {
-            endConversation();
-        }
-        ActionList displayedActions = conversationActions != null
-                ? conversationActions
-                : actions;
 
-        return new Menu(displayedActions).showMenu(this, display);
+        // return/print the console menu
+        Menu menu = new Menu(actions);
+        return menu.showMenu(this, display);
     }
 
 }

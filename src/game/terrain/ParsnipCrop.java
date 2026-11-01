@@ -18,10 +18,13 @@ import java.util.Random;
 import java.util.List;
 
 /**
- * A parsnip crop that can be harvested for a parsnip item.
+ * Mature parsnip crop that produces a parsnip every fifteen turns and supports
+ * the existing watering and harvesting interactions.
  */
 public class ParsnipCrop extends Plant implements Harvestable, Waterable {
+    /** Random source used when harvesting may drop a parsnip on an adjacent tile. */
     private Random random = new Random();
+    /** Number of times this crop has been watered, affecting its destruction chance. */
     private int timeWatered = 0;
 
     /**
@@ -31,6 +34,11 @@ public class ParsnipCrop extends Plant implements Harvestable, Waterable {
         super('P',"Parsnip Crop");
     }
 
+    /** Produces one parsnip every fifteenth turn.
+     * @param location location occupied by this crop
+     * @param age current crop age in turns
+     * @return produce message when due, otherwise {@code null}
+     */
     @Override
     protected String takeTurn(Location location, int age) {
         if (due(age, 15)) return produce(location, "Parsnip", ParsnipItem::new);
