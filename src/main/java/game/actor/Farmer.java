@@ -1,0 +1,163 @@
+
+package game.actor;
+
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.ActionList;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.displays.Display;
+import edu.monash.fit2099.engine.displays.Menu;
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.progression.ExperienceTracker;
+import game.tool.Hoe;
+import game.tool.WateringCan;
+import game.farmeraction.CoatingActionProvider;
+import game.weather.WeatherCoordinator;
+import game.weather.WeatherCraftingProvider;
+
+/**
+ * The player-controlled farmer who manages the farm and performs actions.
+ */
+public class Farmer extends Actor {
+
+    private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
+    private final ExperienceTracker experience = new ExperienceTracker();
+    private ActionList conversationActions;
+    private GameMap conversationMap;
+
+    /**
+     * Replaces the regular menu with actions for the current conversation.
+     *
+     * @param actions dialogue actions available to the Farmer
+     * @param map map on which the conversation takes place
+     */
+    public void startConversation(ActionList actions, GameMap map) {
+        if (actions == null || map == null) {
+            throw new IllegalArgumentException("Conversation actions and map are required");
+        }
+        this.conversationActions = new ActionList();
+        this.conversationActions.add(actions);
+        this.conversationMap = map;
+    }
+
+    /** Restores the normal action menu after the conversation finishes. */
+    public void endConversation() {
+        this.conversationActions = null;
+        this.conversationMap = null;
+    }
+
+    /**
+     * Gives this the farmer quest experience
+     * @param amount amount of experience gain
+     */
+    public void gainExp(int amount){
+        experience.award(amount);
+    }
+
+    /**
+     * Allow to spend experience without knowing the quest
+     * @param amount amount of exp to spend
+     */
+    public void spendExp(int amount){
+        experience.spend(amount);
+    }
+
+    /**
+     * Getter method for levels and exps
+     */
+
+    public int getLevel(){
+        return experience.level();
+    }
+
+    public int getTotalExperience(){
+        return experience.totalEarned();
+    }
+
+    public int getAvailableExperience(){
+        return experience.available();
+    }
+
+    private final WeatherCoordinator weatherCoordinator;
+    private final WeatherCraftingProvider weatherCraftingProvider = new WeatherCraftingProvider();
+
+    /**
+     * Creates a farmer with starting stamina and farming tools.
+     *
+     * @param name farmer's name
+     * @param weatherCoordinator coordinator for weather events
+     */
+    public Farmer(String name, WeatherCoordinator weatherCoordinator) {
+        super("Farmer " + name, '@', 100);
+
+        this.weatherCoordinator = weatherCoordinator;
+
+        this.addNewStatistic(
+                ActorStatistics.STAMINA, new BaseStatistic(20));
+
+        this.addNewStatistic(
+                FinanceStatistics.COINS, new BaseStatistic(10000));
+
+        this.modifyStatistic(FinanceStatistics.COINS,StatisticOperations.UPDATE,1000);
+        // give farmer the Item
+        this.getInventory().add(new Hoe());
+        this.getInventory().add(new WateringCan());
+
+        this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
+
+
+    }
+
+    /**
+     * Handles the farmer's turn, including weather updates,
+     * stamina regeneration, crafting actions and menu display.
+     *
+     * @param actions available actions
+     * @param lastAction farmer's previous action
+     * @param map current game map
+     * @param display current display
+     * @return the action selected for the turn
+     */
+    @Override
+    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+
+        if (!this.isConscious()) {this.unconscious(map);return new DoNothingAction();
+        }
+
+        weatherCoordinator.updateOnTurn(map.locationOf(this));
+
+        // Handle multi-turn actions
+        if (lastAction.getNextAction() != null) {
+            return lastAction.getNextAction();
+        }
+
+        // Regenerate stamina
+        this.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.INCREASE, 1);
+
+        // Existing coating actions
+        coatingActionProvider.addAvailableActions(this, map, actions);
+
+        // Your REQ5 weather crafting actions
+        weatherCraftingProvider.addAvailableActions(this, actions);
+
+        display.println(this.name);
+        display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
+        display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
+        display.println("Inventory: " + this.getInventory().getItems());
+        display.println(("Coins: " + this.getStatistic(FinanceStatistics.COINS)));
+        display.println("Level: " + getLevel() + " | Earned XP: " + getTotalExperience() + " | Available XP: " + getAvailableExperience());
+        // return/print the console menu
+        if (conversationActions != null && conversationMap != map) {
+            endConversation();
+        }
+        ActionList displayedActions = conversationActions != null
+                ? conversationActions
+                : actions;
+
+        return new Menu(displayedActions).showMenu(this, display);
+    }
+}
+

@@ -38,7 +38,7 @@ StackQueue Valley is a Java console game built for the FIT2099 assignment. The p
 
 ## Running the game
 
-The repository does not include a Maven or Gradle build file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`.
+The repository does not include a Maven or Gradle build file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`. The combined application requires weather coordinates for the Assignment 3 REQ5 weather system; see that section below before launching.
 
 To compile and launch from PowerShell with a JDK installed:
 
@@ -49,6 +49,46 @@ javac -d out $javaFiles
 java -cp out game.app.Application
 ```
 
+## Running the tests
+
+The project uses JUnit 5 and Mockito. Maven downloads the test dependencies and runs the tests through Surefire. Run commands from the project root, in the same folder as `pom.xml`:
+
+```powershell
+mvn test
+```
+
+This runs all 113 JUnit tests under `src/test/java`. The tests are grouped by requirement:
+
+- **REQ1:** `game.req1tests.PlantCropFactoryUnitTest` (4 tests)
+- **REQ2:** `game.req2tests.Req2CookingTest` (21 tests)
+- **REQ3:** `game.req3tests.Req3SystemTest` (17 tests)
+- **REQ4:** `game.req4tests.AegisAttributionTest` (1 test)
+- **REQ4:** `game.req4tests.BrewingStationTest` (8 tests)
+- **REQ4:** `game.req4tests.CauldronEffectsTest` (8 tests)
+- **REQ4:** `game.req4tests.PotionEffectsTest` (8 tests)
+- **REQ4:** `game.req4tests.PotionRecipeTest` (4 tests)
+- **REQ4:** `game.req4tests.WishingWellAndWizardTest` (7 tests)
+- **REQ5:** `game.req5tests.Req5WeatherTest` (35 tests)
+
+`Req5WeatherTest` uses a fake weather provider, so it does not make live API requests. Its simulated network-failure case verifies the coordinator's error handling and captures the expected log output.
+
+To run one class from PowerShell, use its class name:
+
+```powershell
+mvn -Dtest=PlantCropFactoryUnitTest test
+mvn -Dtest=Req2CookingTest test
+mvn -Dtest=Req3SystemTest test
+mvn -Dtest=AegisAttributionTest test
+mvn -Dtest=BrewingStationTest test
+mvn -Dtest=CauldronEffectsTest test
+mvn -Dtest=PotionEffectsTest test
+mvn -Dtest=PotionRecipeTest test
+mvn -Dtest=WishingWellAndWizardTest test
+mvn -Dtest=Req5WeatherTest test
+```
+
+In IntelliJ, open the project as a Maven project by opening `pom.xml` and reloading Maven. If needed, right-click `src/test/java` and select **Mark Directory as → Test Sources Root**. Use the green run icon beside a test class or right-click `src/test/java` and choose **Run 'All Tests'** to run the entire suite.
+
 ## Gameplay overview
 
 - Explore the farm and the mines, which are linked by ladders and teleportation circles.
@@ -56,7 +96,7 @@ java -cp out game.app.Application
 - Mine resources and interact with terrain and characters in the world.
 - Select actions through the game's menu as your Farmer takes turns.
 
-## REQ5: Zombie states
+## Assignment 2 REQ5: Zombie states
 
 The Zombie uses interchangeable states for wandering, attacking, fleeing, and healing. Its attacking behavior searches for the nearest reachable `ZombieTarget`, attacks when a target is adjacent, and wanders when it cannot find a reachable target.
 
@@ -139,6 +179,46 @@ Key classes and interfaces:
 - `game.behaviour.FleeBehaviour`
 - `game.zombieaction.TwoStepMoveAction`
 - `game.actor.ZombieTarget`
+
+## Assignment 3 REQ5: Weather system
+
+### Weather data and event selection
+
+`WeatherCoordinator` refreshes weather every five world turns. It maps the farm location to latitude and longitude, retrieves a snapshot through `OpenMeteoProvider`, generates weather values for each farm tile, updates `WeatherContext`, and asks `WeatherEvaluator` to select an event. The default rules require at least five qualifying tiles: wind of 70 km/h or higher triggers a Tornado, temperature of 35 °C or higher triggers a Heatwave, and rainfall of 1.0 mm/h or higher triggers a Rainstorm. If more than one rule qualifies, the first rule in the configured order is selected: Tornado, Heatwave, then Rainstorm. The selected event affects tiles within a radius of two from the current farm location.
+
+The application requires `WEATHER_LATITUDE` and `WEATHER_LONGITUDE` environment variables. In PowerShell, set them before launching; this example uses Kuala Lumpur coordinates:
+
+```powershell
+$env:WEATHER_LATITUDE = '3.1390'
+$env:WEATHER_LONGITUDE = '101.6869'
+```
+
+In IntelliJ, add both variables under **Run → Edit Configurations → Environment variables** for the Application configuration. Use coordinates for any real-world location you want the weather system to represent.
+
+### Weather events and temporary terrain
+
+- **Rainstorm:** Floods affected terrain unless it is already drainable or marked flood-resistant. Actors on flooded tiles receive `SoakedStatus` for three turns. `FloodedGround` naturally dries into `MudGround`, which later restores the original terrain.
+- **Heatwave:** Replaces puddle-capable terrain with `ScorchedGround`. Scorched terrain has a fire effect and can be watered to restore the ground it replaced.
+- **Tornado:** Scatters items to adjacent tiles, attempts to move actors to adjacent safe tiles, and creates `FallenTreeGround` on suitable unoccupied, unprotected terrain. Fallen trees expire after five turns or can be recovered for either five Copper or ten Stone.
+
+The terrain types retain the ground they replaced, so each event effect can restore or transition terrain appropriately. Flooded terrain uses temperature-dependent drying; natural flooding passes through mud, while drainage can bypass that stage.
+
+### Weather response structures and crafting
+
+`WeatherCraftingProvider` offers three structure recipes: Drainage Structure (two Stone and one Copper), Wildlife Shelter (three Stone and one Copper), and Resource Recovery Structure (one Stone and two Copper). Crafting creates a kit. `PlaceWeatherStructureAction` places it on a valid adjacent tile, installs the structure, and then calls `onPlaced()`.
+
+`WeatherResponseStructure` shares protection, entry, and activation rules. Shelter and Resource Recovery structures run their responses automatically each world turn. Shelter moves at most one endangered animal to safety per turn; the animal's `WeatherShelterable.onRelocated()` behavior can produce an Egg or Milk. Resource Recovery processes at most one eligible terrain tile per turn.
+
+Drainage Structure has a different activation mode: it runs once immediately after placement. `DrainageResponse` scans all tiles within Manhattan distance five, excluding the structure's own tile, and attempts to drain every ground implementing `Drainable`. Flooded tiles are restored directly to their original ground, bypassing the natural Mud stage. It does not run again on later world turns; later flooding requires another Drainage Structure.
+
+Key weather classes and interfaces:
+
+- `game.weather.WeatherCoordinator`, `WeatherEvaluator`, `WeatherContext`
+- `game.weather.WeatherEvent`, `RainstormEvent`, `HeatwaveEvent`, `TornadoEvent`
+- `game.weather.WeatherResponseStructure`, `DrainageStructure`, `Shelter`, `ResourceRecoveryStructure`
+- `game.weather.WeatherCraftingProvider`, `WeatherStructurePlan`, `PlaceWeatherStructureAction`
+- `game.weatherblueprint.Drainable`, `WeatherRecoverable`, `WeatherHazard`, `WeatherShelterable`
+- `game.weatherterrain.FloodedGround`, `MudGround`, `ScorchedGround`, `FallenTreeGround`
 
 ## Source layout
 

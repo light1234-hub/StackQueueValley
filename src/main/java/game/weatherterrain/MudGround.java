@@ -1,0 +1,34 @@
+package game.weatherterrain;
+
+import edu.monash.fit2099.engine.positions.Ground;
+import edu.monash.fit2099.engine.positions.Location;
+import game.weatherblueprint.MovementSlowingTerrain;
+
+
+/**
+ * Temporary muddy terrain created after drainage.
+ * The mud dries after three world turns and restores
+ * the terrain that existed before the rainstorm.
+ */
+public final class MudGround extends DryingWeatherGround implements MovementSlowingTerrain
+{
+
+    /**
+     * Creates mud terrain.
+     *
+     * @param originalGround terrain to restore after drying
+     */
+    public MudGround(Ground originalGround){
+        super('m',"Mud",originalGround);
+    }
+
+    /**
+     * On drying, the mud ground returns back into its original ground
+     * @param location
+     */
+    @Override
+    protected void onDry(Location location)
+    {
+        location.setGround(getOriginalGround());
+    }
+}
