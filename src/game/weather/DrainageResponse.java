@@ -5,7 +5,7 @@ import game.behaviour.NearbyLocationFinderBehaviour;
 import game.weatherblueprint.Drainable;
 
 /**
- * Drains at most one flooded tile per turn
+ * Drains all the withing a 5 tile radius
  */
 public class DrainageResponse implements WeatherResponse{
     private static final int RADIUS = 5;

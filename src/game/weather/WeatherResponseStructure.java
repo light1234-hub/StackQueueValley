@@ -8,8 +8,9 @@ import game.ability.IndestructibleAbility;
 import game.ability.TerrainAbility;
 
 /**
- * A weather structure that activates its response
- * automatically on each world turn.
+ * Base class for weather-response structures.
+ * Supports either one-time activation on placement
+ * or automatic activation during each world turn.
  */
 public abstract class WeatherResponseStructure extends Ground
 {
