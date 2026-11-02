@@ -1,39 +1,36 @@
 package game.actor;
 
-import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.displays.Display;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.weapons.Weapon;
+import game.behaviour.AttackBehaviour;
 import game.behaviour.WanderBehaviour;
 import game.blueprint.AttackReactive;
 import game.blueprint.Coatable;
 import game.farmeraction.SwordAttackAction;
-import game.farmeraction.CreatureAttackAction;
-import edu.monash.fit2099.engine.weapons.Weapon;
-import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.Exit;
 
-/**
- * Shared turn, wandering, and attack behavior for hostile mine creatures.
- * Concrete creatures provide their own attack damage and hit chance.
- */
-public abstract class HostileCreature extends Actor implements AttackReactive {
-    private final WanderBehaviour wander = new WanderBehaviour();
-
+/** Shared registered attack and wandering behaviors for hostile creatures. */
+public abstract class HostileCreature extends NPC implements AttackReactive {
     /**
-     * Creates a hostile mine creature.
+     * Creates a hostile mine creature and registers its turn behaviors.
+     * Attack has priority over wandering.
+     *
      * @param name creature name
      * @param glyph map display character
      * @param hp starting health points
      */
     protected HostileCreature(String name, char glyph, int hp) {
         super(name, glyph, hp);
+        addBehaviour(new AttackBehaviour(this::damage, this::hitChance));
+        addBehaviour(new WanderBehaviour());
     }
 
     /** @return damage dealt by this creature's attack */
     protected abstract int damage();
+
     /** @return percentage chance that this creature's attack hits */
     protected abstract int hitChance();
 
@@ -46,24 +43,7 @@ public abstract class HostileCreature extends Actor implements AttackReactive {
     @Override
     public void onAttacked(Location location, boolean killed) { }
 
-    /** Attacks an adjacent farmer; otherwise wanders to an available tile. */
-    @Override
-    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
-        if (!isConscious()) {
-            unconscious(map);
-            return new edu.monash.fit2099.engine.actions.DoNothingAction();
-        }
-        Location here = map.locationOf(this);
-        for (Exit exit : here.getExits()) {
-            Location next = exit.getDestination();
-            if (next.containsAnActor() && next.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))
-                return new CreatureAttackAction(next.getActor(), exit.getName(), damage(), hitChance());
-        }
-        Action action = wander.operate(this, here);
-        return action == null ? new edu.monash.fit2099.engine.actions.DoNothingAction() : action;
-    }
-
-    /** Offers sword attacks only to an adjacent farmer carrying a coatable weapon. */
+    /** Offers sword attacks to an adjacent target carrying a coatable weapon. */
     @Override
     public ActionList allowableActions(Actor other, String direction, GameMap map) {
         ActionList actions = new ActionList();

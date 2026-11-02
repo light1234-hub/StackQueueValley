@@ -15,7 +15,7 @@ import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.recipe.AdjacentLocations;
 import game.terrain.ParsnipCrop;
-import game.terrain.PlantableGround;
+import game.ability.GroundAbility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +107,7 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
 
         for (Location adjacent : AdjacentLocations.from(station))
         {
-            if (adjacent.getGroundAs(PlantableGround.class) != null)
+            if (adjacent.getGround().hasAbility(GroundAbility.FERTILE))
             {
                 plantableLocations.add(adjacent);
             }
