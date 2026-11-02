@@ -1,108 +1,49 @@
 package game.terrain;
 
-import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
-import edu.monash.fit2099.engine.positions.Ground;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
-import game.farmeraction.HarvestAction;
-import game.farmeraction.WaterAction;
-import game.blueprint.Harvestable;
-import game.blueprint.Waterable;
 import game.item.StrawberryItem;
 
-import java.util.List;
-import java.util.Random;
-
-
-public class StrawberryCrop extends Ground implements Harvestable, Waterable {
-    private int timeWatered = 0;
-    private Random random = new Random();
-    /**
-     * Creates a strawberry crop.
-     */
-    public StrawberryCrop() {
-        super('S',"Strawberry crop");
-    }
-
-    /**
-     * Harvests the crop, collecting two strawberries and potentially replacing
-     * the plot with dirt depending on the crop's watered state.
-     *
-     * @param actor actor harvesting the crop
-     * @param location crop location
-     * @return a description of the harvest result
-     */
+/** Mature strawberry crop behavior. */
+public class StrawberryCrop extends WaterablePlantCrop {
+    public StrawberryCrop() { super('S', "Strawberry crop"); }
 
     @Override
-    public String harvest(Actor actor, Location location){
+    protected String takeTurn(Location location) {
+        if (!due(5)) return null;
+        Location target = randomAdjacent(location);
+        if (target == null) return null;
+        target.addItem(new StrawberryItem());
+        return "drops a Strawberry at (" + target.x() + ", " + target.y() + ") on " + target.map() + ".";
+    }
+
+    @Override
+    public String harvest(Actor actor, Location location) {
         actor.getInventory().add(new StrawberryItem());
         actor.getInventory().add(new StrawberryItem());
-
-        double destructionChance =Math.max(0, 50.0 - timeWatered) / 100.0;
-
-        if(Math.random() < destructionChance){
+        double destructionChance = Math.max(0, 50.0 - timeWatered) / 100.0;
+        if (random.nextDouble() < destructionChance) {
             location.setGround(new Dirt());
             return "Harvested two Strawberries, but the crop was destroyed!";
         }
         return "Harvested Two Strawberry!!";
     }
 
-    /**
-     * Waters the strawberry, healing the actor and risking crop destruction.
-     *
-     * @param actor actor watering the crop
-     * @param location crop location
-     * @return a description of the watering result
-     */
     @Override
-    public String water(Actor actor,Location location){
-        this.timeWatered ++;
+    public int staminaCost() { return 1; }
 
-        List<Exit>exits = location.getExits();
-
-        for(int i = 0; i<2; i++){
-            int randomidx = random.nextInt(exits.size());
-            Location plot = exits.get(randomidx).getDestination();
-            plot.addItem(new StrawberryItem());
+    @Override
+    public String water(Actor actor, Location location) {
+        timeWatered++;
+        int added = 0;
+        for (int i = 0; i < 2; i++) {
+            Location target = randomAdjacent(location);
+            if (target != null) {
+                target.addItem(new StrawberryItem());
+                added++;
+            }
         }
-
-        return "Watered Strawberry and added two Strawberry.";
-    }
-
-    /**
-     * Returns the stamina required to harvest the crop.
-     *
-     * @return stamina cost
-     */
-    @Override
-    public int staminaCost(){
-        return 1;
-    }
-
-    /**
-     * Returns the stamina required to water the crop.
-     *
-     * @return water stamina cost
-     */
-    @Override
-    public int waterStamina(){
-        return 1;
-    }
-
-    /**
-     * Adds the harvest action for this crop.
-     *
-     * @param actor actor interacting with the crop
-     * @param location crop location
-     * @param direction direction from the actor to the crop
-     * @return available actions
-     */
-    @Override
-    public ActionList allowableActions(Actor actor, Location location, String direction) {
-        ActionList actions = super.allowableActions(actor, location, direction);
-        actions.add(new HarvestAction(this,location));
-        actions.add(new WaterAction(this,location));
-        return actions;
+        return "Watered Strawberry and added " + added + " Strawberry.";
     }
 }

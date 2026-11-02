@@ -9,6 +9,11 @@ import game.actor.*;
 import game.item.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
+import game.recipe.HarvestFeastRecipe;
+import game.recipe.JamRecipe;
+import game.recipe.OmeletteRecipe;
+import game.weather.WeatherCoordinator;
+import game.weatherterrain.WeatherMap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,13 +50,19 @@ public class StackQueueValleyWorld extends World {
                 ".........."
         );
 
-        GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
+        WeatherMap inheritedFarmMap = new WeatherMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
 
-        inheritedFarmMap.at(3, 2).setGround(new ParsnipCrop());
-        inheritedFarmMap.at(4, 2).setGround(new StrawberryCrop());
-        inheritedFarmMap.at(6, 2).setGround(new CauliflowerCrop());
+        // REQ1: the farm starts with every plant stage already established.
+        inheritedFarmMap.at(1, 2).setGround(PlantGrowth.seedling(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(2, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(3, 2).setGround(new StrawberryCrop());
+        inheritedFarmMap.at(4, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.CAULIFLOWER));
+        inheritedFarmMap.at(5, 2).setGround(new CauliflowerCrop());
+        inheritedFarmMap.at(6, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.MELON));
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
+        inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
+        inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
 
         // REQ2: place the farm-side ladder and teleportation circle. Set with
         // .setGround() the same way crops are, rather than baking them into
@@ -106,9 +117,11 @@ public class StackQueueValleyWorld extends World {
         linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
 
         // --- Farmer setup ---
-        Farmer farmer = new Farmer("Bob");
+        WeatherCoordinator weatherCoordinator = WeatherCoordinator.createDefault(inheritedFarmMap);
+        Farmer farmer = new Farmer("Bob", weatherCoordinator);
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
+        inheritedFarmMap.addActor(new Chicken(), inheritedFarmMap.at(6,5));
 
         // REQ2: give the farmer a pickaxe and an alien device with one fixed
         // destination on each map.
@@ -123,6 +136,9 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+
+        // REQ 2 A3: The Cooking Station
+        inheritedFarmMap.at(5,4).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
 
     }
 
@@ -148,3 +164,4 @@ public class StackQueueValleyWorld extends World {
         ((TeleportationCircle) b.getGround()).setDestination(a);
     }
 }
+

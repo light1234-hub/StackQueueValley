@@ -7,14 +7,17 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.farmeraction.BuyAction;
 import game.farmeraction.SellAction;
 import game.behaviour.WanderBehaviour;
+import game.item.Sword;
 import game.products.TomatoCropProduct;
 import game.products.ParsnipCropProduct;
 import game.products.SwordProduct;
 import game.blueprint.Sellable;
 import game.blueprint.Buyable;
+import game.weatherblueprint.WeatherShelterable;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -22,9 +25,8 @@ import java.util.ArrayList;
 /**
  * Represents the merchant that wanders around the map that can buy and sell items to the farmer
  */
-public class Merchant extends Actor
+public class Merchant extends PassiveCreature implements WeatherShelterable
 {
-    private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
     private final List<Buyable> productsForSale = new ArrayList<>();
 
     /**
@@ -36,32 +38,6 @@ public class Merchant extends Actor
         productsForSale.add(new ParsnipCropProduct());
         productsForSale.add(new SwordProduct());
         productsForSale.add(new TomatoCropProduct());
-    }
-
-    /**
-     * Determines the action for the merchant to perform during it's turn
-     * If the merchant is unconscious it does nothing, if not it randomly wanders around the map
-     * @param actions collection of possible Actions for this Actor
-     * @param lastAction The Action this Actor took last turn. Can do
-     * interesting things in conjunction with Action.getNextAction()
-     * @param map the map containing the Actor
-     * @param display the I/O object to which messages may be written
-     * @return The action performed by the merchant for a singular turn (wandering or do nothing)
-     */
-    @Override
-    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display)
-    {
-        if (!this.isConscious())
-        {
-            this.unconscious(map);
-            return new DoNothingAction();
-        }
-        else
-        {
-            Action wanderAction = wanderBehaviour.operate(this,map.locationOf(this));
-
-            return wanderAction != null ? wanderAction : new DoNothingAction();
-        }
     }
 
     /**
@@ -88,5 +64,14 @@ public class Merchant extends Actor
         }
 
         return actions;
+    }
+
+    @Override
+    public void onRelocated(Location destination)
+    {
+        Sword freeReward = new Sword();
+        destination.addItem(freeReward);
+        System.out.println(this + " found refuge in the shelter and left a token of their appreciation on the ground: " + freeReward);
+
     }
 }

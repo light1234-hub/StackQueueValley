@@ -1,8 +1,8 @@
 package game.products;
 
 import edu.monash.fit2099.engine.positions.Location;
-import game.ability.GroundAbility;
 import game.blueprint.Harvestable;
+import game.ability.GroundAbility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +50,10 @@ public final class PlantingLocations
 
         for (Location nearby : nearbyLocations)
         {
-            boolean isFertile = nearby.getGround().hasAbility(GroundAbility.FERTILE);
+            boolean isPlantable = nearby.getGround().hasAbility(GroundAbility.FERTILE);
             boolean hasNoCrop = (nearby.getGroundAs(Harvestable.class) == null);
 
-            if (isFertile && hasNoCrop)
+            if (isPlantable && hasNoCrop)
             {
                 plantableLocations.add(nearby);
             }
@@ -62,3 +62,4 @@ public final class PlantingLocations
         return plantableLocations;
     }
 }
+

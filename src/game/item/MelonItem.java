@@ -5,13 +5,22 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.ability.IngredientAbility;
+import game.blueprint.Ingredient;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.blueprint.CoatingSource;
 import game.effect.MelonCoating;
+import game.recipe.AdjacentLocations;
 
-public class MelonItem extends Item implements Consumable, CoatingSource {
+import java.util.Random;
+
+public class MelonItem extends Item implements Consumable, CoatingSource, Ingredient
+{
+    private static final double BURST_CHANCE = 0.5;
+    private final Random random = new Random();
 
     public MelonItem(){
         super("Melon",'q');
@@ -59,6 +68,41 @@ public class MelonItem extends Item implements Consumable, CoatingSource {
     @Override
     public boolean isConsumedOnUse() {
         return true;
+    }
+
+    /**
+     * A getter that returns the ingredient category of the Melon
+     * @return the ingredient cateogry Fruit
+     */
+    public IngredientAbility category()
+    {
+        return IngredientAbility.FRUIT;
+    }
+
+    /**
+     * Applies the effect of the Melon onto the dish
+     * @param farmer
+     * @param station
+     * @return a string describing the result of using the melon as an ingredient
+     */
+    @Override
+    public String useEffect(Actor farmer, Location station)
+    {
+        if (random.nextDouble() >= BURST_CHANCE)
+        {
+            return "The melon goes into the dish without bursting.";
+        }
+
+        for (Location adjacent : AdjacentLocations.from(station))
+        {
+            if (adjacent.containsAnActor())
+            {
+                adjacent.getActor().hurt(15);
+            }
+        }
+
+        return "The melon bursts and damages all actors around the station," +
+                " the melon still goes into the dish";
     }
 
 }
