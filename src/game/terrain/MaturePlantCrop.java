@@ -8,8 +8,6 @@ import game.farmeraction.HarvestAction;
 
 /** Shared behavior and harvesting contract for mature crop grounds. */
 abstract class MaturePlantCrop extends PlantLifeGround implements Harvestable {
-    protected int timeWatered;
-
     protected MaturePlantCrop(char glyph, String name) { super(glyph, name); }
 
     @Override

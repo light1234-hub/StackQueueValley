@@ -7,7 +7,7 @@ import game.ability.GroundAbility;
 /**
  * Tilled ground that can be used as a farm plot.
  */
-public class Soil extends Ground implements PlantableGround {
+public class Soil extends Ground {
 
     /**
      * A class representing puddle on the ground.

@@ -8,6 +8,7 @@ import game.farmeraction.WaterAction;
 
 /** Shared interaction setup for crops that can be watered. */
 abstract class WaterablePlantCrop extends MaturePlantCrop implements Waterable {
+    protected int timeWatered;
     protected WaterablePlantCrop(char glyph, String name) {
         super(glyph, name);
     }
