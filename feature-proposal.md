@@ -1,12 +1,12 @@
 # Assignment 3- Creative Mode Feature Proposal
 
-## REQ 3- QuestBoard Challenge
+## REQ 3-The Drunken Tavern
 
-The Farmer can interact with a Quest Board on the farm to accept one of three fantasy contracts, each transforming a reusable Quest Arena into a different challenge. Completing a contract grants coins and experience points and changes the farm, while failing or abandoning one triggers persistent consequences. A Farmer who cannot afford a contract can attempt a three-round dice challenge for a chance to enter a quest without paying its entry fee.
+The Farmer can visit the Drunken Tavern and accept one of three fantasy quest, each transforming a quest arena into different challenge. Completing a contract earns coins and experience points, while failing or abandoning a quest can introduce penalties such as mob spawning and other related stuff. Farmer who cannot afford the quest can instead challenge the bartender to a drinking contest, the downside is that he may receive a difficult quest if he wins.
 
 ## The Mechanics
 ### Tavern Quest System
-The Farmer interacts with the Quest Board on the farm to view available contracts or attempt a dice challenge when a contract is unaffordable
+The Farmer can travel between the inherited farm and the Drunken Tavern using connected doorways. The bartender provides an interactives dialogue system where the Farmer can ask about the quests, choose a quest or participate in a drinking content.
 
 Three Quest are available:
 
@@ -16,24 +16,28 @@ Three Quest are available:
 | The Lost Survivors      | 200     | 450            | 160        | 55 turns          |
 | The Ancient Relic      | 350     | 800            |  260       | 65 turns         |
 
-* Accepting a paid contract deducts its entry fee and transport the Farmer to the shared Quest Arena
-* Each QuestScenario configures the arena with its own terrain, objectives, items and enemies
-* The Farmer must complete the required objectives before the contract deadline. The Quest Journal allows the Farmer to abandon a quest.
-* Success awards coins and XP and applies that quest's success consequence to the farm. Failure, abandonment or timeout applies its failure consequence instead.
-* The arena resets between Req3 so different scenarios can reuse it.
+Accepting a quest deducts the required coins and transport farmer to the Quest Arena. Each quest uses the same arena but generate different terrain, objectives, items and enemies.
 
-### Dice Challenge
-A Farmer who lacks enough coins for a contract may attempt a dice challenge to obtain entry without paying.
+The farmer must activate all required objectives before the contracts time limit expires.
 
-The challenge has three rounds; each round offers the following choices:
+Completing a quest reward the farmer with coins, experience and triggers chnages on the inherited farm. Abandoning a quest or exceeding the time limit will trigger consequences, this inslcude but not limited to hostile creature spawning and terrain corruption
 
-| Choice  |                        Effect                        |
-| ------------- |:----------------------------------------------------:|
-| Safe roll     |  Roll a six-sided die (1–6); all results add to the score   |
-| Risky roll   | Roll a ten-sided die (1–10); rolling 1 or 2 immediately loses the challenge.|
- | Forfeit    | 	End the challenge and take the normal failure penalty.|
+The arena is reset between quest so it can be reused for different quest
 
-Winning provides the opportunity to enter the challenged quest for free. Losing or forfeiting applies a four-stamina penalty; the existing challenge cooldown limits immediate retries.
+### Drinking Contest
+When a Farmer cannot afford at least one contract, the bartender provides the option to enter a drinking content
+
+The content consists of three rounds, with two choices available for each round
+
+| Sip  | Chug |
+| ------------- |:-------------:|
+| Safely drinks one cup      | Drinks two cups with a 20% chance of blacking out     |
+
+The bartender drinks a randomly one or two drinks each round.
+
+The farmer must finish with more cups than the bartender before blacking out. Winning frants entry to a randomly selected quest for free. Each quest has a set probability of being chosen with the hardest quest having a 15% rate of being chosen.
+
+Losing or tying results in a 4 points stamina deduction and no quest is handed to you. Farmer is able to challenge the bartender again after 5 turn
 
 ## Architecture
 Here we introduce two new interface and 6 brand new concrete classes with 3 concrete implementation for each interface
@@ -57,15 +61,15 @@ Type: New interface
 
 Responsibility: Defines how a completed or failed contract changes the inherited farm.
 
-| Class  |                                                                                                             Complex effect                                                                                                              |
-| ------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| ForestConsequence     |                                                         Success: Creates a magical grove that gradually purifies corrupted terrain within a radius and allows new vegetation to grow on restored land. Failure: Creates a corruption source that expands across adjacent Soil over time, infects crops and applies a harmful status to actors entering contaminated areas.                                                        |
-| RescueConsequence      |                                                     Success: Spawns rescued survivors with AI behaviour. They collect dropped resources, navigate back to a supply camp and gradually repair damaged farmland. Failure:Introduces hostile scavengers that patrol the farm, steal dropped resources and construct traps that restrict movement.                                                     |
-| RelicConsequence      |   Success: Generates connected magical crystal veins that trigger a chain reaction when mined, transforming multiple terrain tiles and producing resources. Failure: Creates unstable terrain that collapses after a countdown, affecting nearby actors, scattering items and generating obstacles   |
+| Class  | Complex effect |
+| ------------- |:-------------:|
+| ForestConsequence     | Success: Restore soil and generate a Strawberry. Failure: Converts farm terrain into Corrupted Dirt and spawns a Slime     |
+| RescueConsequence      | Success: Restore Soil, Spawns a Chicken and creates an Egg. Failure:Creates Rock terrain, drops a Stone item and spawns a Slime     |
+| RelicConsequence      | Success: Restores Soil and places Diamond and Copper items. Failure: Creates Geode and Corrupted Dirt terrain and spawns a Cave Ghost     |
 
 ## Supporting Class
 **Quest management:**
-* QuestManager - coordinates contract acceptance, objective progression, deadlines, completion/failure, and return travel.
+* QuestManager - Manages Quest acceptance, objective tracking, time limit, completion, failure and player transportation
 
 * QuestDefinition - Stores quest name, fee, reward, time limit, rules, scenario and consequence
 
@@ -78,23 +82,35 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 * ArenaQuest - Manges the resuable arena, including placement and reset
 
 **Quest interaction**
-* QuestBoardGround - provides the on-map interaction point for contracts and dice challenges.
-
-* AcceptContractAction - Allow farmer to accept Quest
+* AcceptContractAction - Allow farmer to accept QUest
 
 * QuestObjectiveGround - represent any interactive objectives inside the arena
 
-* QuestClockGround - tracks quest deadlines.
+* QuestClockGround - Deals the the quest timer
 
-* QuestJournal and QuestAbandonAction- Provides ability to farmer to abandon the quest
+* QuestJournal - Provides ability to farmer to abandon the quest
 
-**Dice challenge**
-* DiceWager - manages the challenge's state, rolls and outcomes.
-* DiceChoice - defines Safe, Risky and Forfeit choices.
-* StartDiceWagerAction - begins an eligible challenge.
-* PlayDiceRoundAction - resolves a selected dice choice.
+* QuestAbandonAction - Handles abandoning a contract
+
+**Tavern and drinking contest**
+
+* ContractBartender - Provides the Farmer with available tavern interaction
+
+* BartenderDialogue - Manages dialoge stages and conversation choices
+
+* DrinkingContest - Manages the drinking rounds, scores and the chances of getting blackout, its cooldown and random Quest selection
+
+* DrinkRoundAction - Processes individual drinking rounds
+
+* StartDrinkingContestAction - Starts an eligible drinking contest.
+
+* TavernDoor, QuestExitDoor, and TavernTravelAction - Support transportation between game locations.
+
+* TavernFloor and TavernWall - Represent Tavern terrain
+
+* TavernAbility - Controls eligibility to use Tavern interactions.
+
 * ExperienceTracker - Maintains the Farmer's accumulated and available experience points.
-
 
 
 ## REQ 4 - Alchemy Valley
@@ -139,9 +155,12 @@ Drinking reuses the existing `Consumable` and `ConsumeAction`.
 
 ### Cauldron Effects While Brewing
 
-* **Tidal Cauldron:** When its brew finishes, it floods all ground within radius 2 into Puddles, a terrain change that also pulls ground items into the cauldron's tile.
-* **Ward Cauldron:** On every turn of the brew, it damages every hostile creature within radius 3, an area-of-effect over time.
-* **Quarry Cauldron:** On every turn of the brew, it has a chance to spawn an ore node (Copper Node or Geode) on a random empty tile within radius 5, dynamic spawning over time.
+Each cauldron is linked to one potion and changes the world every turn of the brew.
+
+* **Orchard Cauldron (brews Gale Draught, 3 turns):** Each turn it plants one `ArcaneSapling` on a random empty tile on the map. A sapling grows over 3 turns into an `ArcaneTree`, even after the potion is collected. A tree cannot be walked through and drops a random Strawberry or Tomato on its tile every 2 turns. A hostile creature that steps onto a sapling tramples it and it is removed.
+* **Taming Cauldron (brews Aegis Elixir, 4 turns):** Each turn it places one `Lure` item on a random empty tile on the map. Every hostile creature drops its current behaviour and walks toward a random lure. When a creature reaches a lure, the lure is used up and the creature permanently gets a `TAMED` status: it stops attacking the farmer and instead attacks any untamed hostile creature it meets. Unused lures disappear when the potion is collected.
+* **Quarry Cauldron (brews Prospector's Elixir, 5 turns):** When the brew starts it spawns a `StoneGolem` actor. Each turn the golem walks to a random Rock on the map and shatters it, removing the Rock and adding Stone items to the cauldron's output. The golem crumbles when the potion is collected.
+
 
 ## The Architecture
 
@@ -161,8 +180,8 @@ Drinking reuses the existing `Consumable` and `ConsumeAction`.
 | 1   | `GaleDraught`      | `Potion`             | New    |
 | 2   | `AegisElixir`      | `Potion`             | New    |
 | 3   | `ProspectorElixir` | `Potion`             | New    |
-| 4   | `TidalCauldron`    | `BrewingStation`     | New    |
-| 5   | `WardCauldron`     | `BrewingStation`     | New    |
+| 4   | `OrchardCauldron`  | `BrewingStation`     | New    |
+| 5   | `TamingCauldron`   | `BrewingStation`     | New    |
 | 6   | `QuarryCauldron`   | `BrewingStation`     | New    |
 
 All six concrete classes are entirely new. No classes from Assignments 1 to 3 are retrofitted.

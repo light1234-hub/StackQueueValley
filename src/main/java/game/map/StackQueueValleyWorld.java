@@ -171,6 +171,17 @@ public class StackQueueValleyWorld extends World {
         // REQ 2 A3: The Cooking Station
         inheritedFarmMap.at(4,3).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
 
+        // A3 REQ4: Alchemy Valley is a separate map, accessed via a paid Wishing Well.
+        // Preserve the newer Quest Board, Cooking Station and weather coordinator setup.
+        AlchemyValleyWorld alchemyValley = new AlchemyValleyWorld(groundCreator);
+        this.addGameMap(alchemyValley.getMap());
+        alchemyValley.populate();
+
+        WishingWell farmWell = new WishingWell(100);
+        inheritedFarmMap.at(0, 0).setGround(farmWell);
+        farmWell.setDestination(alchemyValley.arrivalLocation());
+        alchemyValley.getReturnWell().setDestination(inheritedFarmMap.at(1, 0));
+
     }
 
     /**
@@ -195,4 +206,3 @@ public class StackQueueValleyWorld extends World {
         ((TeleportationCircle) b.getGround()).setDestination(a);
     }
 }
-

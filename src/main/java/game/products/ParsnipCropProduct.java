@@ -17,10 +17,14 @@ import java.util.List;
  */
 public class ParsnipCropProduct implements Buyable
 {
+    /** Price charged for a planted parsnip crop. */
     private static final int PURCHASE_PRICE = 250;
+    /** Number of parsnip items dropped near the newly planted crop. */
     private static final int PARSNIPS_DROPPED = 3;
+    /** Radius used to find locations where the bonus parsnips can be dropped. */
     private static final int ADJACENT_RADIUS = 1;
 
+    /** Random source used to choose planting and produce-drop locations. */
     private final Random random = new Random();
 
     /**
@@ -36,7 +40,7 @@ public class ParsnipCropProduct implements Buyable
     /**
      * Drops a set number of parsnips into randomly selected tiles
      * that are adjacent to the planted parsnip
-     * @param cropLocation
+     * @param cropLocation location of the newly planted crop
      */
     private void dropParsnipsNearby(Location cropLocation)
     {
@@ -58,10 +62,10 @@ public class ParsnipCropProduct implements Buyable
 
     /**
      * Carries out the logic of the parsnip crop purchase after it has been bought
-     * @param buyer
-     * @param merchant
-     * @param merchantLocation
-     * @return a string describing the result of the purchase (successful or refund)
+     * @param buyer actor purchasing the crop
+     * @param merchant merchant completing the transaction
+     * @param merchantLocation location used to find nearby plantable ground
+     * @return description of planting or refund outcome
      */
     @Override
     public String bought(Actor buyer, Actor merchant, Location merchantLocation)
