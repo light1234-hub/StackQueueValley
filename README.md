@@ -57,22 +57,22 @@ The project uses JUnit 5 and Mockito. Maven downloads the test dependencies and 
 mvn test
 ```
 
-This runs all 42 JUnit tests under `src/test/java`. The tests are grouped by requirement:
+This runs all 77 JUnit tests under `src/test/java`. The tests are grouped by requirement:
 
 - **REQ1:** `game.req1tests.PlantCropFactoryUnitTest` (4 tests)
 - **REQ2:** `game.req2tests.Req2CookingTest` (21 tests)
-- **REQ3:** `game.req3tests.QuestDefinitionAndSessionTest` (3 tests)
-- **REQ3:** `game.req3tests.QuestDiceAndConsequencesTest` (5 tests)
-- **REQ3:** `game.req3tests.QuestManagerTest` (9 tests)
+- **REQ3:** `game.req3tests.Req3SystemTest` (17 tests)
+- **REQ5:** `game.req5tests.Req5WeatherTest` (35 tests)
 
-`Req3Fixture` is a shared test helper and does not run as a test by itself.
+`Req5WeatherTest` uses a fake weather provider, so it does not make live API requests. Its simulated network-failure case verifies the coordinator's error handling and captures the expected log output.
 
 To run one class from PowerShell, use its class name:
 
 ```powershell
 mvn -Dtest=PlantCropFactoryUnitTest test
 mvn -Dtest=Req2CookingTest test
-mvn -Dtest=QuestManagerTest test
+mvn -Dtest=Req3SystemTest test
+mvn -Dtest=Req5WeatherTest test
 ```
 
 In IntelliJ, open the project as a Maven project by opening `pom.xml` and reloading Maven. If needed, right-click `src/test/java` and select **Mark Directory as → Test Sources Root**. Use the green run icon beside a test class or right-click `src/test/java` and choose **Run 'All Tests'** to run the entire suite.
