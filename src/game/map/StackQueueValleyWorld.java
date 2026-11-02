@@ -6,7 +6,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actor.*;
+import game.arena.ArenaQuest;
 import game.item.*;
+import game.quest.*;
+import game.questboard.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
 import game.recipe.HarvestFeastRecipe;
@@ -38,7 +41,7 @@ public class StackQueueValleyWorld extends World {
         groundCreator.registerGround('g', Geode::new);
         groundCreator.registerGround('H', Ladder::new);
         groundCreator.registerGround('O', TeleportationCircle::new);
-
+        groundCreator.registerGround('#', QuestArenaWall::new);
         // --- Farm map (unchanged layout from REQ1) ---
         List<String> inheritedFarm = Arrays.asList(
                 "..........",
@@ -50,16 +53,16 @@ public class StackQueueValleyWorld extends World {
                 ".........."
         );
 
-        WeatherMap inheritedFarmMap = new WeatherMap("Inherited Farm", groundCreator, inheritedFarm);
+        GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
 
         // REQ1: the farm starts with every plant stage already established.
-        inheritedFarmMap.at(1, 2).setGround(PlantGrowth.seedling(PlantGrowth.Species.STRAWBERRY));
-        inheritedFarmMap.at(2, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.STRAWBERRY));
+        inheritedFarmMap.at(1, 2).setGround(new StrawberrySeedling());
+        inheritedFarmMap.at(2, 2).setGround(new StrawberrySprout());
         inheritedFarmMap.at(3, 2).setGround(new StrawberryCrop());
-        inheritedFarmMap.at(4, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.CAULIFLOWER));
+        inheritedFarmMap.at(4, 2).setGround(new CauliflowerSprout());
         inheritedFarmMap.at(5, 2).setGround(new CauliflowerCrop());
-        inheritedFarmMap.at(6, 2).setGround(PlantGrowth.sprout(PlantGrowth.Species.MELON));
+        inheritedFarmMap.at(6, 2).setGround(new MelonSprout());
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
         inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
         inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
@@ -136,6 +139,38 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Bat(), minesMap.at(3, 2));
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
+
+        // A3 REQ3: one reusable arena, accessed from a quest board on the farm.
+        List<String> arenaRows = Arrays.asList(
+                "###############",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "###############"
+        );
+        GameMap arenaMap = new GameMap("Reusable Quest Arena", groundCreator, arenaRows);
+        this.addGameMap(arenaMap);
+        ArenaQuest arena = new ArenaQuest(arenaMap, farmer);
+
+        // A3 REQ3: three contracts use the same arena and shared XP.
+        List<QuestDefinition> contracts = List.of(
+                new QuestDefinition("The Cursed Forest", 120, 280, 100, 45,
+                        false, new CursedForestScenario(), new ForestConsequence()),
+                new QuestDefinition("The Lost Survivors", 200, 450, 160, 55,
+                        false, new RescueMissionScenario(), new RescueConsequence()),
+                new QuestDefinition("The Ancient Relic", 350, 800, 260, 65,
+                        true, new AncientRelicScenario(), new RelicConsequence())
+        );
+        Location boardLocation = inheritedFarmMap.at(5, 4);
+        QuestManager quests = new QuestManager(farmer, arena, inheritedFarmMap.at(5, 3),
+                boardLocation, inheritedFarmMap, contracts);
+        DiceWager dice = new DiceWager(quests);
+        boardLocation.setGround(new QuestBoardGround(quests, dice, farmer));
+        farmer.getInventory().add(new QuestJournal(quests));
 
         // REQ 2 A3: The Cooking Station
         inheritedFarmMap.at(5,4).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));

@@ -1,12 +1,12 @@
 # Assignment 3- Creative Mode Feature Proposal
 
-## REQ 3-The Drunken Tavern
+## REQ 3- QuestBoard Challenge
 
-The Farmer can visit the Drunken Tavern and accept one of three fantasy quest, each transforming a quest arena into different challenge. Completing a contract earns coins and experience points, while failing or abandoning a quest can introduce penalties such as mob spawning and other related stuff. Farmer who cannot afford the quest can instead challenge the bartender to a drinking contest, the downside is that he may receive a difficult quest if he wins.
+The Farmer can interact with a Quest Board on the farm to accept one of three fantasy contracts, each transforming a reusable Quest Arena into a different challenge. Completing a contract grants coins and experience points and changes the farm, while failing or abandoning one triggers persistent consequences. A Farmer who cannot afford a contract can attempt a three-round dice challenge for a chance to enter a quest without paying its entry fee.
 
 ## The Mechanics
 ### Tavern Quest System
-The Farmer can travel between the inherited farm and the Drunken Tavern using connected doorways. The bartender provides an interactive dialogue system where the Farmer can ask about the quests, choose a quest or participate in a drinking content.
+The Farmer interacts with the Quest Board on the farm to view available contracts or attempt a dice challenge when a contract is unaffordable
 
 Three Quest are available:
 
@@ -16,28 +16,24 @@ Three Quest are available:
 | The Lost Survivors      | 200     | 450            | 160        | 55 turns          |
 | The Ancient Relic      | 350     | 800            |  260       | 65 turns         |
 
-Accepting a quest deducts the required coins and transport farmer to the Quest Arena. Each quest uses the same arena but generate different terrain, objectives, items and enemies.
+* Accepting a paid contract deducts its entry fee and transport the Farmer to the shared Quest Arena
+* Each QuestScenario configures the arena with its own terrain, objectives, items and enemies
+* The Farmer must complete the required objectives before the contract deadline. The Quest Journal allows the Farmer to abandon a quest.
+* Success awards coins and XP and applies that quest's success consequence to the farm. Failure, abandonment or timeout applies its failure consequence instead.
+* The arena resets between quests so different scenarios can reuse it.
 
-The farmer must activate all required objectives before the contracts time limit expires.
+### Dice Challenge
+A Farmer who lacks enough coins for a contract may attempt a dice challenge to obtain entry without paying.
 
-Completing a quest reward the farmer with coins, experience and triggers chnages on the inherited farm. Abandoning a quest or exceeding the time limit will trigger consequences, this inslcude but not limited to hostile creature spawning and terrain corruption
+The challenge has three rounds; each round offers the following choices:
 
-The arena is reset between quest so it can be reused for different quest
+| Choice  |                        Effect                        |
+| ------------- |:----------------------------------------------------:|
+| Safe roll     |  Roll a six-sided die (1–6); all results add to the score   |
+| Risky roll   | Roll a ten-sided die (1–10); rolling 1 or 2 immediately loses the challenge.|
+ | Forfeit    | 	End the challenge and take the normal failure penalty.|
 
-### Drinking Contest
-When a Farmer cannot afford at least one contract, the bartender provides the option to enter a drinking content
-
-The content consists of three rounds, with two choices available for each round
-
-| Sip  | Chug |
-| ------------- |:-------------:|
-| Safely drinks one cup      | Drinks two cups with a 20% chance of blacking out     |
-
-The bartender drinks a randomly one or two drinks each round.
-
-The farmer must finish with more cups than the bartender before blacking out. Winning frants entry to a randomly selected quest for free. Each quest has a set probability of being chosen with the hardest quest having a 15% rate of being chosen.
-
-Losing or tying results in a 4 points stamina deduction and no quest is handed to you. Farmer is able to challenge the bartender again after 5 turn
+Winning provides the opportunity to enter the challenged quest for free. Losing or forfeiting applies a four-stamina penalty; the existing challenge cooldown limits immediate retries.
 
 ## Architecture
 Here we introduce two new interface and 6 brand new concrete classes with 3 concrete implementation for each interface
@@ -61,15 +57,15 @@ Type: New interface
 
 Responsibility: Defines how a completed or failed contract changes the inherited farm.
 
-| Class  | Complex effect |
-| ------------- |:-------------:|
-| ForestConsequence     | Success: Restore soil and generate a Strawberry. Failure: Converts farm terrain into Corrupted Dirt and spawns a Slime     |
-| RescueConsequence      | Success: Restore Soil, Spawns a Chicken and creates an Egg. Failure:Creates Rock terrain, drops a Stone item and spawns a Slime     |
-| RelicConsequence      | Success: Restores Soil and places Diamond and Copper items. Failure: Creates Geode and Corrupted Dirt terrain and spawns a Cave Ghost     |
+| Class  |                                                                                                             Complex effect                                                                                                              |
+| ------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| ForestConsequence     |                                                         Success: Creates a magical grove that gradually purifies corrupted terrain within a radius and allows new vegetation to grow on restored land. Failure: Creates a corruption source that expands across adjacent Soil over time, infects crops and applies a harmful status to actors entering contaminated areas.                                                        |
+| RescueConsequence      |                                                     Success: Spawns rescued survivors with AI behaviour. They collect dropped resources, navigate back to a supply camp and gradually repair damaged farmland. Failure:Introduces hostile scavengers that patrol the farm, steal dropped resources and construct traps that restrict movement.                                                     |
+| RelicConsequence      |   Success: Generates connected magical crystal veins that trigger a chain reaction when mined, transforming multiple terrain tiles and producing resources. Failure: Creates unstable terrain that collapses after a countdown, affecting nearby actors, scattering items and generating obstacles   |
 
 ## Supporting Class
 **Quest management:**
-* QuestManager - Manages Quest acceptance, objective tracking, time limit, completion, failure and player transportation
+* QuestManager - coordinates contract acceptance, objective progression, deadlines, completion/failure, and return travel.
 
 * QuestDefinition - Stores quest name, fee, reward, time limit, rules, scenario and consequence
 
@@ -82,35 +78,23 @@ Responsibility: Defines how a completed or failed contract changes the inherited
 * ArenaQuest - Manges the resuable arena, including placement and reset
 
 **Quest interaction**
-* AcceptContractAction - Allow farmer to accept QUest
+* QuestBoardGround - provides the on-map interaction point for contracts and dice challenges.
+
+* AcceptContractAction - Allow farmer to accept Quest
 
 * QuestObjectiveGround - represent any interactive objectives inside the arena
 
-* QuestClockGround - Deals the the quest timer
+* QuestClockGround - tracks quest deadlines.
 
-* QuestJournal - Provides ability to farmer to abandon the quest
+* QuestJournal and QuestAbandonAction- Provides ability to farmer to abandon the quest
 
-* QuestAbandonAction - Handles abandoning a contract
-
-**Tavern and drinking contest**
-
-* ContractBartender - Provides the Farmer with available tavern interaction
-
-* BartenderDialogue - Manages dialogue stages and conversation choices
-
-* DrinkingContest - Manages the drinking rounds, scores and the chances of getting blackout, its cooldown and random Quest selection
-
-* DrinkRoundAction - Processes individual drinking rounds
-
-* StartDrinkingContestAction - Starts an eligible drinking contest.
-
-* TavernDoor, QuestExitDoor, and TavernTravelAction - Support transportation between game locations.
-
-* TavernFloor and TavernWall - Represent Tavern terrain
-
-* TavernAbility - Controls eligibility to use Tavern interactions.
-
+**Dice challenge**
+* DiceWager - manages the challenge's state, rolls and outcomes.
+* DiceChoice - defines Safe, Risky and Forfeit choices.
+* StartDiceWagerAction - begins an eligible challenge.
+* PlayDiceRoundAction - resolves a selected dice choice.
 * ExperienceTracker - Maintains the Farmer's accumulated and available experience points.
+
 
 
 ## REQ 4 - Alchemy Valley
@@ -198,25 +182,25 @@ These are not counted towards the six.
 
 ## REQ 5: Weather System
 
-We will introduce a dynamic weather system that uses real world weather information to influence the Farm Map depending on the Farmer's Location. It also important to note that the WeatherEvents do not have an effect on the Mines section of the game. Depending on multitude of factors such as wind condition, rainfall and temperature retrieved from an external API, the farm can experience flooding, heatwaves or even strong winds that would modify the farms terrain, affect nearby actors and redistribute resources. Different Environmental responses allow the farm to adapt to changing conditions, creating new gameplay challenges and interactions.
+We will introduce a synamic weather system that uses real world weather information to nfluce Farmer's environment. Depending on multitude of factors such as wind condition or even precipitation retrived from external API, the farm can experience flooding, heatwave or even strong winds that would modify the farms terrain, affect nearby actors and redistribute resources. Different Environmental responses allow the farm to adpat to changing conditions, crreating new gameplay challenges and interactions.
 
 ## The Mechanics
 
 ### Weather System
-The game retrieves weather information using the Open-Meteo Forecast API. The API will then generate a request that uses  the Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, rainfall and wind speed. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
+The game retrieves weather information using the Open-Meteo Forecast API. The API then generate a request that uses Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, precipitation, wind speed, and weather conditions. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
 
 ### Weather Events
-**Rainstorm**: Heavy rainful causes selected ground to turn into puddles temporarily and applies a soaked status to actors within the affected area. It is important to note that Ground that is flooded upon drying first turns into Mud. Mud also has a slowed affect similar to the SoakedStatus and it dries depending on the temperature of the current tile.  Mud then dries back into its original terrain.
+**Rainstorm**: Heavy rainful causes selected soil to turn into puddle temporarily and applies a soak status to actors within the affected area
 
-**Heatwaves**: High temperature turn selected soil tiles into scorched ground, creating a temporary fire hazard and apply burning effects to actors standing on affected tiles. Scorched ground can be converted back into its original terrain by being watered, there is no natural restoration for Scorched Ground.
+**Heatwaves**: High temperature turn selected soil tiles into dry ground, create a temporary fire hazard and apply burning effects to actors standing on affected tiles.
 
-**Tornado**: Strong winds scatter items across adjacent locations, introduces fallen tree obstacles and disrupt nearby actors. It is important to note that FallenTrees can only fall on selected tiles, protected ground (e.g. Cooking Stations, Ladders, Teleportation Circles and Weather Response Structures can not be destroyed by a Fallen Tree).
+**Tornado**: Strong winds scatter items across adjacent locations, introduces fallen tree obstacles and disrupt nearby actors.
 
 ### Environmental Response
 
-**Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to their original terrain directly without having to go through the mud stage and collected water becomes usable.
+**Drainage response:** Floodwater is redirected into drainage channels,flooded terrain is restored to Soil and collected water becomes usable
 
-**Shelter Response:** All animals and passive NPCS attempt to relocate to safer tiles during dangerous weather. The process can generate animal products at their new locations and generate gifts from passive creatures at their new locations.
+**Wildlife Response:** Chickens and Cows attempt to relocate to safer tiles during dangerous weather. The process can alter nearby terrain and generate animal products at their new locations
 
 **Resources Response:** Weather-damaged terrain exposes additional resources, converting suitable ground into mining nodes and placing collectible materials nearby. 
 
@@ -231,19 +215,19 @@ Responsibility: Defines how a weather condition changes by modifying the terrain
 
 **Concrete implementation:**
 
-| Class          |                                                                                                   Complex effect                                                                                                    |
-|----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| RainstormEvent |                     Converts selected tiles into temporary puddles and applies a soaked status to all actors caught in the storm. Actor can only move 1 step every 3 turns while being soaked.                      |
-| HeatwaveEvent  |                              Converts selected tiles into scorched ground, creates temporary fire hazards and applies the burning effect to all actors standing on the selected tiles.                              |
-| TornadoEvent   | Scatters items into nearby adjacent locations, creates fallen-tree obstacles and disrupts nearby actors. Fallen trees block 1 tiles and forces actors to move around. Fallen trees appear as obstacles for 5 turns. |
+| Class         |                                                                               Complex effect                                                                               |
+|---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| RainstormEvent | Converts selected tiles into temporary puddles and applies a soaked status to all actors caught in the storm. Actor can only move 1 step every 3 turns while being soaked. |
+| HeatwaveEvent |            Converts selected tiles into dry ground, creates temporary fire hazards and applies the burning effect to all actors standing on the selected tiles.            |
+| Tornado       |   Scatters items into nearby adjacent locations, creates fallen-tree obstacles and disrupts nearby actors. Fallen trees block 2 tiles and forces actors to move around.    |
 
 **Abstraction 2: WeatherResponse **
 Type: New interface
 
 Responsibility: Defines how the farm, the animals within said farm and its resources respond to weather damages and hazards.
 
-| Class                    |                                                                                                                                           Complex effect                                                                                                                                           |
-|--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| DrainageResponse         |                     Redirects floodwater into drainage channels, changes the temporary puddles back into their original ground and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map.                     |
-| ShelterResponse          | Moves animals and passive NPCs towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items and passive NPCS will spawn new items are their location≠. ShelterResponse can be crafted by the farmer and placed down on the map. |
-| ResourceRecoveryResponse |                      Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations.                      |
+| Class                    |                                                                                                                      Complex effect                                                                                                                      |
+|--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| DrainageResponse         |        Redirects floodwater into drainage channels, changes the temporary puddles back into soil and makes the collected rainwater available to be used by the farmer. DrainageResponse can be crafted by the farmer and placed down on the map.         |
+| WildlifeResponse         |          Moves Chicken and Cows into towards safe tiles during any sort of dangerous weather events. The animals will also spawn new animal items at their new items. WildlifeResponse can be crafted by the farmer and placed down on the map.          |
+| ResourceRecoveryResponse | Uses weather-damaged terrain to expose and collect additional resources, changing ground into mining ores. ResourceRecoveryResponse can be crafted by the farmer and placed down on the map. It spawns mining ore on the farm on the selected locations. |
