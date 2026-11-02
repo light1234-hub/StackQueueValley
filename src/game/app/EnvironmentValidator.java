@@ -26,7 +26,7 @@ public class EnvironmentValidator
         if (missingVariables)
         {
             errorMessage.append("\nPlease define your environment variables first before initializing the game."
-            + "\nRefer to the feature-proposal.md file for further instructions on how to initialize the variables.");
+            + "\nRefer to the README.md file for further instructions on how to initialize the variables.");
             System.err.println(errorMessage.toString());
             System.exit(1);
         }
