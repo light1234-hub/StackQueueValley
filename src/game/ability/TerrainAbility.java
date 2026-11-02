@@ -6,5 +6,4 @@ public enum TerrainAbility {
     WEATHER_STRUCTURE_PLACEABLE,
     FLOOD_RESISTANT,
     SHELTER,
-    SOAKABLE_TRAVEL
 }
