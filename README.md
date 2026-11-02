@@ -38,7 +38,7 @@ StackQueue Valley is a Java console game built for the FIT2099 assignment. The p
 
 ## Running the game
 
-The repository does not include a Maven or Gradle build file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`. The combined application requires weather coordinates for the Assignment 3 REQ5 weather system; see that section below before launching.
+The repository does include a Maven build file which is called pom.xml. You need to run the pom.xml as a maven file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`. The combined application requires weather coordinates for the Assignment 3 REQ5 weather system; see that section below before launching.
 
 To compile and launch from PowerShell with a JDK installed:
 
@@ -57,7 +57,7 @@ The project uses JUnit 5 and Mockito. Maven downloads the test dependencies and 
 mvn test
 ```
 
-This runs all 113 JUnit tests under `src/test/java`. The tests are grouped by requirement:
+This runs all 149 JUnit tests under `src/test/java`. The tests are grouped by requirement:
 
 - **REQ1:** `game.req1tests.PlantCropFactoryUnitTest` (4 tests)
 - **REQ2:** `game.req2tests.Req2CookingTest` (21 tests)
