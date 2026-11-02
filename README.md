@@ -38,7 +38,7 @@ StackQueue Valley is a Java console game built for the FIT2099 assignment. The p
 
 ## Running the game
 
-The repository does not include a Maven or Gradle build file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`.
+The repository does not include a Maven or Gradle build file. You can import the project into a Java IDE, mark `src` as a source folder, and run `game.app.Application`. The combined application requires weather coordinates for the Assignment 3 REQ5 weather system; see that section below before launching.
 
 To compile and launch from PowerShell with a JDK installed:
 
@@ -56,7 +56,7 @@ java -cp out game.app.Application
 - Mine resources and interact with terrain and characters in the world.
 - Select actions through the game's menu as your Farmer takes turns.
 
-## REQ5: Zombie states
+## Assignment 2 REQ5: Zombie states
 
 The Zombie uses interchangeable states for wandering, attacking, fleeing, and healing. Its attacking behavior searches for the nearest reachable `ZombieTarget`, attacks when a target is adjacent, and wanders when it cannot find a reachable target.
 
@@ -140,23 +140,45 @@ Key classes and interfaces:
 - `game.zombieaction.TwoStepMoveAction`
 - `game.actor.ZombieTarget`
 
-### Weather drainage response
+## Assignment 3 REQ5: Weather system
 
-`DrainageStructure` activates once immediately after successful placement. `PlaceWeatherStructureAction` installs the structure on the selected tile, then calls `onPlaced()` to run its response. The drainage response scans the surrounding tiles at Manhattan distance five or less, excluding the structure's own tile, and attempts to drain every ground that implements `Drainable`. In the current implementation, this restores flooded tiles directly to their original ground; drainage does not run again on later world turns.
+### Weather data and event selection
 
-Without drainage, `FloodedGround` dries naturally into `MudGround`, which later restores the original ground. Drainage skips the mud stage and restores the original ground immediately. By contrast, `Shelter` and `ResourceRecoveryStructure` activate automatically each world turn. Their responses process at most one eligible animal or terrain tile per turn.
+`WeatherCoordinator` refreshes weather every five world turns. It maps the farm location to latitude and longitude, retrieves a snapshot through `OpenMeteoProvider`, generates weather values for each farm tile, updates `WeatherContext`, and asks `WeatherEvaluator` to select an event. The default rules require at least five qualifying tiles: wind of 70 km/h or higher triggers a Tornado, temperature of 35 °C or higher triggers a Heatwave, and rainfall of 1.0 mm/h or higher triggers a Rainstorm. If more than one rule qualifies, the first rule in the configured order is selected: Tornado, Heatwave, then Rainstorm. The selected event affects tiles within a radius of two from the current farm location.
 
-Key classes and interfaces:
+The application requires `WEATHER_LATITUDE` and `WEATHER_LONGITUDE` environment variables. In PowerShell, set them before launching; this example uses Kuala Lumpur coordinates:
 
-- `game.weather.DrainageStructure`
-- `game.weather.DrainageResponse`
-- `game.weather.WeatherResponseStructure`
-- `game.weather.PlaceWeatherStructureAction`
-- `game.weather.Shelter`
-- `game.weather.ResourceRecoveryStructure`
-- `game.weatherblueprint.Drainable`
-- `game.weatherterrain.FloodedGround`
-- `game.weatherterrain.MudGround`
+```powershell
+$env:WEATHER_LATITUDE = '3.1390'
+$env:WEATHER_LONGITUDE = '101.6869'
+```
+
+In IntelliJ, add both variables under **Run → Edit Configurations → Environment variables** for the Application configuration. Use coordinates for any real-world location you want the weather system to represent.
+
+### Weather events and temporary terrain
+
+- **Rainstorm:** Floods affected terrain unless it is already drainable or marked flood-resistant. Actors on flooded tiles receive `SoakedStatus` for three turns. `FloodedGround` naturally dries into `MudGround`, which later restores the original terrain.
+- **Heatwave:** Replaces puddle-capable terrain with `ScorchedGround`. Scorched terrain has a fire effect and can be watered to restore the ground it replaced.
+- **Tornado:** Scatters items to adjacent tiles, attempts to move actors to adjacent safe tiles, and creates `FallenTreeGround` on suitable unoccupied, unprotected terrain. Fallen trees expire after five turns or can be recovered for either five Copper or ten Stone.
+
+The terrain types retain the ground they replaced, so each event effect can restore or transition terrain appropriately. Flooded terrain uses temperature-dependent drying; natural flooding passes through mud, while drainage can bypass that stage.
+
+### Weather response structures and crafting
+
+`WeatherCraftingProvider` offers three structure recipes: Drainage Structure (two Stone and one Copper), Wildlife Shelter (three Stone and one Copper), and Resource Recovery Structure (one Stone and two Copper). Crafting creates a kit. `PlaceWeatherStructureAction` places it on a valid adjacent tile, installs the structure, and then calls `onPlaced()`.
+
+`WeatherResponseStructure` shares protection, entry, and activation rules. Shelter and Resource Recovery structures run their responses automatically each world turn. Shelter moves at most one endangered animal to safety per turn; the animal's `WeatherShelterable.onRelocated()` behavior can produce an Egg or Milk. Resource Recovery processes at most one eligible terrain tile per turn.
+
+Drainage Structure has a different activation mode: it runs once immediately after placement. `DrainageResponse` scans all tiles within Manhattan distance five, excluding the structure's own tile, and attempts to drain every ground implementing `Drainable`. Flooded tiles are restored directly to their original ground, bypassing the natural Mud stage. It does not run again on later world turns; later flooding requires another Drainage Structure.
+
+Key weather classes and interfaces:
+
+- `game.weather.WeatherCoordinator`, `WeatherEvaluator`, `WeatherContext`
+- `game.weather.WeatherEvent`, `RainstormEvent`, `HeatwaveEvent`, `TornadoEvent`
+- `game.weather.WeatherResponseStructure`, `DrainageStructure`, `Shelter`, `ResourceRecoveryStructure`
+- `game.weather.WeatherCraftingProvider`, `WeatherStructurePlan`, `PlaceWeatherStructureAction`
+- `game.weatherblueprint.Drainable`, `WeatherRecoverable`, `WeatherHazard`, `WeatherShelterable`
+- `game.weatherterrain.FloodedGround`, `MudGround`, `ScorchedGround`, `FallenTreeGround`
 
 ## Source layout
 
