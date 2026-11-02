@@ -6,9 +6,16 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actor.*;
+import game.arena.ArenaQuest;
 import game.item.*;
+import game.req3tests.*;
+import game.questboard.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
+import game.recipe.HarvestFeastRecipe;
+import game.recipe.JamRecipe;
+import game.recipe.OmeletteRecipe;
+import game.weather.WeatherCoordinator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +40,7 @@ public class StackQueueValleyWorld extends World {
         groundCreator.registerGround('g', Geode::new);
         groundCreator.registerGround('H', Ladder::new);
         groundCreator.registerGround('O', TeleportationCircle::new);
-
+        groundCreator.registerGround('#', QuestArenaWall::new);
         // --- Farm map (unchanged layout from REQ1) ---
         List<String> inheritedFarm = Arrays.asList(
                 "..........",
@@ -49,12 +56,9 @@ public class StackQueueValleyWorld extends World {
         this.addGameMap(inheritedFarmMap);
 
         // REQ1: the farm starts with every plant stage already established.
-        inheritedFarmMap.at(1, 2).setGround(new StrawberrySeedling());
-        inheritedFarmMap.at(2, 2).setGround(new StrawberrySprout());
+
         inheritedFarmMap.at(3, 2).setGround(new StrawberryCrop());
-        inheritedFarmMap.at(4, 2).setGround(new CauliflowerSprout());
         inheritedFarmMap.at(5, 2).setGround(new CauliflowerCrop());
-        inheritedFarmMap.at(6, 2).setGround(new MelonSprout());
         inheritedFarmMap.at(7, 2).setGround(new MelonCrop());
         inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
         inheritedFarmMap.at(9, 2).setGround(new ParsnipCrop());
@@ -112,9 +116,11 @@ public class StackQueueValleyWorld extends World {
         linkCircles(inheritedFarmMap.at(6, 0), minesMap.at(4, 1));
 
         // --- Farmer setup ---
-        Farmer farmer = new Farmer("Bob");
+        WeatherCoordinator weatherCoordinator = WeatherCoordinator.createDefault(inheritedFarmMap);
+        Farmer farmer = new Farmer("Bob", weatherCoordinator);
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
         inheritedFarmMap.addActor(new Merchant(), inheritedFarmMap.at(8, 5));
+        inheritedFarmMap.addActor(new Chicken(), inheritedFarmMap.at(6,5));
 
         // REQ2: give the farmer a pickaxe and an alien device with one fixed
         // destination on each map.
@@ -130,15 +136,52 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
 
-        // REQ4: Alchemy Valley, reached through a paid Wishing Well on the farm.
-        // The map must be added to this World before populate() places actors on it.
-        AlchemyValleyWorld valley = new AlchemyValleyWorld(groundCreator);
-        this.addGameMap(valley.getMap());
-        valley.populate();
+        // A3 REQ3: one reusable arena, accessed from a quest board on the farm.
+        List<String> arenaRows = Arrays.asList(
+                "###############",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "R.............R",
+                "###############"
+        );
+        GameMap arenaMap = new GameMap("Reusable Quest Arena", groundCreator, arenaRows);
+        this.addGameMap(arenaMap);
+        ArenaQuest arena = new ArenaQuest(arenaMap, farmer);
+
+        // A3 REQ3: three contracts use the same arena and shared XP.
+        List<QuestDefinition> contracts = List.of(
+                new QuestDefinition("The Cursed Forest", 120, 280, 100, 45,
+                        false, new CursedForestScenario(), new ForestConsequence()),
+                new QuestDefinition("The Lost Survivors", 200, 450, 160, 55,
+                        false, new RescueMissionScenario(), new RescueConsequence()),
+                new QuestDefinition("The Ancient Relic", 350, 800, 260, 65,
+                        true, new AncientRelicScenario(), new RelicConsequence())
+        );
+        Location boardLocation = inheritedFarmMap.at(5, 4);
+        QuestManager quests = new QuestManager(farmer, arena, inheritedFarmMap.at(5, 3),
+                boardLocation, inheritedFarmMap, contracts);
+        DiceWager dice = new DiceWager(quests);
+        boardLocation.setGround(new QuestBoardGround(quests, dice, farmer));
+        farmer.getInventory().add(new QuestJournal(quests));
+
+        // REQ 2 A3: The Cooking Station
+        inheritedFarmMap.at(4,3).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
+
+        // A3 REQ4: Alchemy Valley is a separate map, accessed via a paid Wishing Well.
+        // Preserve the newer Quest Board, Cooking Station and weather coordinator setup.
+        AlchemyValleyWorld alchemyValley = new AlchemyValleyWorld(groundCreator);
+        this.addGameMap(alchemyValley.getMap());
+        alchemyValley.populate();
+
         WishingWell farmWell = new WishingWell(100);
         inheritedFarmMap.at(0, 0).setGround(farmWell);
-        farmWell.setDestination(valley.arrivalLocation());
-        valley.getReturnWell().setDestination(inheritedFarmMap.at(1, 1));
+        farmWell.setDestination(alchemyValley.arrivalLocation());
+        alchemyValley.getReturnWell().setDestination(inheritedFarmMap.at(1, 0));
+
     }
 
     /**
@@ -163,3 +206,4 @@ public class StackQueueValleyWorld extends World {
         ((TeleportationCircle) b.getGround()).setDestination(a);
     }
 }
+

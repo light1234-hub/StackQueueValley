@@ -42,7 +42,7 @@ final class TestSupport {
     }
 
     static Farmer farmerAt(GameMap map, int x, int y) throws Exception {
-        Farmer farmer = new Farmer("Bob");
+        Farmer farmer = new Farmer("Bob", null);
         map.at(x, y).addActor(farmer);
         return farmer;
     }

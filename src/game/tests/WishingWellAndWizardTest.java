@@ -21,10 +21,9 @@ class WishingWellAndWizardTest {
         GameMap map = map();
         Farmer farmer = farmerAt(map, 1, 2);
         int before = farmer.getStatistic(FinanceStatistics.COINS);
-        addCoins(farmer, 100);
         new WishAction(map.at(12, 7), 100, "north").execute(farmer, map);
         assertSame(farmer, map.at(12, 7).getActor());
-        assertEquals(before, farmer.getStatistic(FinanceStatistics.COINS));
+        assertEquals(before - 100, farmer.getStatistic(FinanceStatistics.COINS));
     }
 
     @Test
