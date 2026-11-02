@@ -36,7 +36,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void orchardPlantsOneSaplingPerBrewTurn() {
+    void orchardPlantsOneSaplingPerBrewTurn() throws Exception {
         GameMap map = map();
         Location at = map.at(4, 1);
         at.setGround(new OrchardCauldron());
@@ -56,7 +56,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void saplingGrowsIntoImpassableTreeAfterThreeTurns() {
+    void saplingGrowsIntoImpassableTreeAfterThreeTurns() throws Exception {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneSapling(new Dirt()));
@@ -69,7 +69,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void hostileCreatureTramplesSapling() {
+    void hostileCreatureTramplesSapling() throws Exception {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneSapling(new Dirt()));
@@ -79,7 +79,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void treeDropsStrawberryOrTomatoEveryTwoTurns() {
+    void treeDropsStrawberryOrTomatoEveryTwoTurns() throws Exception {
         GameMap map = map();
         Location l = map.at(6, 6);
         l.setGround(new ArcaneTree());
@@ -91,7 +91,7 @@ class CauldronEffectsTest {
         assertTrue(type == StrawberryItem.class || type == TomatoItem.class);
     }
 
-    private Farmer loadTaming(GameMap map, Location at) {
+    private Farmer loadTaming(GameMap map, Location at) throws Exception {
         Farmer farmer = farmerAt(map, 7, 2);
         give(farmer, 3, StoneItem::new);
         give(farmer, 2, StrawberryItem::new);
@@ -102,7 +102,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void tamingPlacesOneLurePerTurnAndRemovesUnusedOnesOnCollect() {
+    void tamingPlacesOneLurePerTurnAndRemovesUnusedOnesOnCollect() throws Exception {
         GameMap map = map();
         Location at = map.at(7, 1);
         at.setGround(new TamingCauldron());
@@ -119,7 +119,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void creatureReachingLureUsesItUpAndBecomesTamed() {
+    void creatureReachingLureUsesItUpAndBecomesTamed() throws Exception {
         GameMap map = map();
         Location l = map.at(8, 4);
         Slime slime = new Slime();
@@ -133,7 +133,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void quarryGolemWalksToRockAndLeavesStoneOnThatTileThenCrumbles() {
+    void quarryGolemWalksToRockAndLeavesStoneOnThatTileThenCrumbles() throws Exception {
         GameMap map = map(new int[]{5, 3});
         Location at = map.at(4, 1);
         at.setGround(new QuarryCauldron());
@@ -161,7 +161,7 @@ class CauldronEffectsTest {
     }
 
     @Test
-    void quarryRefusesToStartWhenGolemHasNowhereToAppearAndKeepsIngredients() {
+    void quarryRefusesToStartWhenGolemHasNowhereToAppearAndKeepsIngredients() throws Exception {
         GameMap map = map(new int[]{4, 0}, new int[]{5, 0}, new int[]{3, 1}, new int[]{5, 1},
                 new int[]{3, 2}, new int[]{4, 2}, new int[]{5, 2});
         Location at = map.at(4, 1);
