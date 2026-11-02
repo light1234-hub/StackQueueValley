@@ -6,9 +6,9 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actor.Farmer;
 import game.actor.FinanceStatistics;
-import game.quest.AcceptContractAction;
-import game.quest.QuestDefinition;
-import game.quest.QuestManager;
+import game.req3tests.AcceptContractAction;
+import game.req3tests.QuestDefinition;
+import game.req3tests.QuestManager;
 
 import java.util.Objects;
 
@@ -30,7 +30,7 @@ public class QuestBoardGround extends Ground {
      */
     public QuestBoardGround(QuestManager quests, DiceWager wager, Farmer farmer) {
         super('+', "Quest Board");
-        this.quests = Objects.requireNonNull(quests, "quests");
+        this.quests = Objects.requireNonNull(quests, "Req3");
         this.wager = Objects.requireNonNull(wager, "wager");
         this.farmer = Objects.requireNonNull(farmer, "farmer");
     }
