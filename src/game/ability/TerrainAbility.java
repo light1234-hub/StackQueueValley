@@ -5,5 +5,6 @@ public enum TerrainAbility {
     CAN_BE_CORRUPTED,
     WEATHER_STRUCTURE_PLACEABLE,
     FLOOD_RESISTANT,
-    SHELTER
+    SHELTER,
+    SOAKABLE_TRAVEL
 }

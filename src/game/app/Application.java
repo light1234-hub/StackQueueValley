@@ -6,6 +6,7 @@ import game.map.StackQueueValleyWorld;
 
 public class Application {
     public static void main(String[] args) {
+        EnvironmentValidator.validateEnvironment();
         Display display = new Display();
         StackQueueValleyWorld world = new StackQueueValleyWorld(display);
         try{
