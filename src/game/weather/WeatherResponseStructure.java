@@ -23,11 +23,34 @@ public abstract class WeatherResponseStructure extends Ground
     }
     @Override
     public final void tick(Location location) {
-        response.respond(location);
+        if (!activatesOnPlacementOnly()) {
+            response.respond(location);
+        }
     }
+
     @Override
     public boolean canActorEnter(Actor actor) {
         return false;
+    }
+
+    /**
+     * Determines whether the response activates only on placement.
+     *
+     * @return true if the structure activates once when placed
+     */
+    public boolean activatesOnPlacementOnly() {
+        return false;
+    }
+
+    /**
+     * Activates the structure immediately after placement, if applicable.
+     *
+     * @param location the structure's location
+     */
+    public final void onPlaced(Location location) {
+        if (activatesOnPlacementOnly()) {
+            response.respond(location);
+        }
     }
 }
 
