@@ -24,7 +24,7 @@ public final class FloodedGround extends DryingWeatherGround implements Drainabl
     @Override
     protected void onDry(Location location)
     {
-        location.setGround(getOriginalGround());
+        location.setGround(new MudGround(getOriginalGround()));
     }
 
     @Override
@@ -34,8 +34,7 @@ public final class FloodedGround extends DryingWeatherGround implements Drainabl
         {
             return false;
         }
-
-        location.setGround(new MudGround(getOriginalGround()));
+        location.setGround(getOriginalGround());
         return true;
     }
 }
