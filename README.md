@@ -49,6 +49,34 @@ javac -d out $javaFiles
 java -cp out game.app.Application
 ```
 
+## Running the tests
+
+The project uses JUnit 5 and Mockito. Maven downloads the test dependencies and runs the tests through Surefire. Run commands from the project root, in the same folder as `pom.xml`:
+
+```powershell
+mvn test
+```
+
+This runs all 42 JUnit tests under `src/test/java`. The tests are grouped by requirement:
+
+- **REQ1:** `game.req1tests.PlantCropFactoryUnitTest` (4 tests)
+- **REQ2:** `game.req2tests.Req2CookingTest` (21 tests)
+- **REQ3:** `game.req3tests.QuestDefinitionAndSessionTest` (3 tests)
+- **REQ3:** `game.req3tests.QuestDiceAndConsequencesTest` (5 tests)
+- **REQ3:** `game.req3tests.QuestManagerTest` (9 tests)
+
+`Req3Fixture` is a shared test helper and does not run as a test by itself.
+
+To run one class from PowerShell, use its class name:
+
+```powershell
+mvn -Dtest=PlantCropFactoryUnitTest test
+mvn -Dtest=Req2CookingTest test
+mvn -Dtest=QuestManagerTest test
+```
+
+In IntelliJ, open the project as a Maven project by opening `pom.xml` and reloading Maven. If needed, right-click `src/test/java` and select **Mark Directory as → Test Sources Root**. Use the green run icon beside a test class or right-click `src/test/java` and choose **Run 'All Tests'** to run the entire suite.
+
 ## Gameplay overview
 
 - Explore the farm and the mines, which are linked by ladders and teleportation circles.
