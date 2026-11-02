@@ -5,8 +5,8 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actor.FinanceStatistics;
-import game.quest.QuestDefinition;
-import game.quest.QuestManager;
+import game.req3tests.QuestDefinition;
+import game.req3tests.QuestManager;
 
 import java.util.Objects;
 import java.util.Random;
@@ -48,7 +48,7 @@ public class DiceWager {
      * @param random random generator used for dice rolls and deterministic tests
      */
     public DiceWager(QuestManager quests, Random random) {
-        this.quests = Objects.requireNonNull(quests, "quests");
+        this.quests = Objects.requireNonNull(quests, "Req3");
         this.random = Objects.requireNonNull(random, "random");
     }
 

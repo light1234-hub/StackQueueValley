@@ -8,7 +8,7 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actor.*;
 import game.arena.ArenaQuest;
 import game.item.*;
-import game.quest.*;
+import game.req3tests.*;
 import game.questboard.*;
 import game.terrain.*;
 import game.tool.Pickaxe;
@@ -16,7 +16,6 @@ import game.recipe.HarvestFeastRecipe;
 import game.recipe.JamRecipe;
 import game.recipe.OmeletteRecipe;
 import game.weather.WeatherCoordinator;
-import game.weatherterrain.WeatherMap;
 
 import java.util.Arrays;
 import java.util.List;

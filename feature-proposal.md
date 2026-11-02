@@ -20,7 +20,7 @@ Three Quest are available:
 * Each QuestScenario configures the arena with its own terrain, objectives, items and enemies
 * The Farmer must complete the required objectives before the contract deadline. The Quest Journal allows the Farmer to abandon a quest.
 * Success awards coins and XP and applies that quest's success consequence to the farm. Failure, abandonment or timeout applies its failure consequence instead.
-* The arena resets between quests so different scenarios can reuse it.
+* The arena resets between Req3 so different scenarios can reuse it.
 
 ### Dice Challenge
 A Farmer who lacks enough coins for a contract may attempt a dice challenge to obtain entry without paying.
