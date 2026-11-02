@@ -158,9 +158,6 @@ public class Farmer extends Actor {
                 : actions;
 
         return new Menu(displayedActions).showMenu(this, display);
-
-        Menu menu = new Menu(actions);
-        return menu.showMenu(this, display);
     }
 }
 

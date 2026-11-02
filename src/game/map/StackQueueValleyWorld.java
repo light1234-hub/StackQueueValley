@@ -170,7 +170,7 @@ public class StackQueueValleyWorld extends World {
         farmer.getInventory().add(new QuestJournal(quests));
 
         // REQ 2 A3: The Cooking Station
-        inheritedFarmMap.at(5,4).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
+        inheritedFarmMap.at(4,3).setGround(new CookingStation(List.of(new JamRecipe(), new OmeletteRecipe(), new HarvestFeastRecipe())));
 
     }
 

@@ -63,7 +63,7 @@ public class LivingGroveGround extends Ground {
 
             if (plot.getGround().hasAbility(GroundAbility.GROVE_SEEDING_PLOT)
                     && !plot.containsAnActor()) {
-                plot.setGround(new StrawberrySeedling());
+                plot.setGround(PlantGrowth.seedling(PlantGrowth.Species.STRAWBERRY));
                 iterator.remove();
                 return true;
             }
@@ -122,4 +122,5 @@ public class LivingGroveGround extends Ground {
         return result;
     }
 }
+
 

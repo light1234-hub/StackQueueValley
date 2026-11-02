@@ -9,8 +9,7 @@ import edu.monash.fit2099.engine.weapons.Weapon;
 import game.behaviour.AttackBehaviour;
 import game.behaviour.WanderBehaviour;
 import game.blueprint.AttackReactive;
-import game.blueprint.Coatable;
-import game.farmeraction.SwordAttackAction;
+import game.farmeraction.WeaponAttackAction;
 
 /** Shared registered attack and wandering behaviors for hostile creatures. */
 public abstract class HostileCreature extends NPC implements AttackReactive {
@@ -50,8 +49,7 @@ public abstract class HostileCreature extends NPC implements AttackReactive {
         if (other.hasAbility(ZombieTarget.ZOMBIE_TARGET)) {
             for (Item item : other.getInventory().getItems()) {
                 item.asCapability(Weapon.class).ifPresent(weapon ->
-                        item.asCapability(Coatable.class).ifPresent(coatable ->
-                                actions.add(new SwordAttackAction(this, direction, item, weapon, coatable))));
+                        actions.add(new WeaponAttackAction(this, direction, item, weapon)));
             }
         }
         return actions;

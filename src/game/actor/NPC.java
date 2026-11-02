@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Abstract base class fot NPC
@@ -38,6 +39,11 @@ public abstract class NPC extends Actor {
      */
     public void addBehaviour(Behaviour<Actor,Action> behaviour){
         behaviours.add(behaviour);
+    }
+
+    /** Inserts a decision ahead of those registered by a superclass. */
+    public void addPriorityBehaviour(Behaviour<Actor, Action> behaviour) {
+        behaviours.add(0, behaviour);
     }
 
     /**

@@ -17,7 +17,7 @@ import java.util.Random;
 
 /** Test-only construction of small, isolated maps; no game loop or network needed. */
 final class Req3Fixture {
-    final Farmer farmer = new Farmer("Test");
+    final Farmer farmer = new Farmer("Test",null);
     final GameMap farm;
     final GameMap arenaMap;
     final ArenaQuest arena;
