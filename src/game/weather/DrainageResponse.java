@@ -18,13 +18,9 @@ public class DrainageResponse implements WeatherResponse{
     @Override
     public void respond(Location location){
         for(Location target : NearbyLocationFinderBehaviour.find(location,RADIUS)){
-            if(target.containsAnActor()){
-                continue;
-            }
             Drainable drainable = target.getGroundAs(Drainable.class);
-
-            if(drainable != null && drainable.drain(target)){
-                return;
+            if(drainable != null){
+                drainable.drain(target);
             }
         }
     }
