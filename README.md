@@ -57,11 +57,17 @@ The project uses JUnit 5 and Mockito. Maven downloads the test dependencies and 
 mvn test
 ```
 
-This runs all 77 JUnit tests under `src/test/java`. The tests are grouped by requirement:
+This runs all 113 JUnit tests under `src/test/java`. The tests are grouped by requirement:
 
 - **REQ1:** `game.req1tests.PlantCropFactoryUnitTest` (4 tests)
 - **REQ2:** `game.req2tests.Req2CookingTest` (21 tests)
 - **REQ3:** `game.req3tests.Req3SystemTest` (17 tests)
+- **REQ4:** `game.req4tests.AegisAttributionTest` (1 test)
+- **REQ4:** `game.req4tests.BrewingStationTest` (8 tests)
+- **REQ4:** `game.req4tests.CauldronEffectsTest` (8 tests)
+- **REQ4:** `game.req4tests.PotionEffectsTest` (8 tests)
+- **REQ4:** `game.req4tests.PotionRecipeTest` (4 tests)
+- **REQ4:** `game.req4tests.WishingWellAndWizardTest` (7 tests)
 - **REQ5:** `game.req5tests.Req5WeatherTest` (35 tests)
 
 `Req5WeatherTest` uses a fake weather provider, so it does not make live API requests. Its simulated network-failure case verifies the coordinator's error handling and captures the expected log output.
@@ -72,6 +78,12 @@ To run one class from PowerShell, use its class name:
 mvn -Dtest=PlantCropFactoryUnitTest test
 mvn -Dtest=Req2CookingTest test
 mvn -Dtest=Req3SystemTest test
+mvn -Dtest=AegisAttributionTest test
+mvn -Dtest=BrewingStationTest test
+mvn -Dtest=CauldronEffectsTest test
+mvn -Dtest=PotionEffectsTest test
+mvn -Dtest=PotionRecipeTest test
+mvn -Dtest=WishingWellAndWizardTest test
 mvn -Dtest=Req5WeatherTest test
 ```
 
