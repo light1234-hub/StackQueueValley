@@ -44,7 +44,6 @@ class CauldronEffectsTest {
         give(farmer, 3, StrawberryItem::new);
         give(farmer, 1, TomatoItem::new);
         give(farmer, 1, CopperItem::new);
-        farmer.gainExp(50);
         BrewingStation s = station(at);
         s.load(farmer, at);
         tick(s, at, 1);
@@ -96,7 +95,6 @@ class CauldronEffectsTest {
         give(farmer, 3, StoneItem::new);
         give(farmer, 2, StrawberryItem::new);
         give(farmer, 1, DiamondItem::new);
-        farmer.gainExp(100);
         station(at).load(farmer, at);
         return farmer;
     }
@@ -141,7 +139,6 @@ class CauldronEffectsTest {
         give(farmer, 2, CopperItem::new);
         give(farmer, 2, TomatoItem::new);
         give(farmer, 1, StoneItem::new);
-        farmer.gainExp(150);
         BrewingStation s = station(at);
         s.load(farmer, at);
         long actorsWithGolem = TileFinder.all(map).stream().filter(Location::containsAnActor).count();
@@ -170,7 +167,6 @@ class CauldronEffectsTest {
         give(farmer, 2, CopperItem::new);
         give(farmer, 2, TomatoItem::new);
         give(farmer, 1, StoneItem::new);
-        farmer.gainExp(150);
         BrewingStation s = station(at);
         s.load(farmer, at);
         assertTrue(s.isIdle(), "brew must not start");
