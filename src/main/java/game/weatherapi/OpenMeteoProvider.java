@@ -13,17 +13,31 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents the communication between the codebase and the OpenMeteo weather API
+ */
 public class OpenMeteoProvider implements WeatherDataProvider
 {
     private static final Pattern CURRENT_OBJECT = Pattern.compile("\"current\"\\s*:\\s*\\{([^}]*)\\}");
 
     private final HttpClient client;
 
+    /**
+     * Creates an Object of the OpenMeteoProvider class with a HTTP client with a 5-second connection timeout
+     */
     public OpenMeteoProvider()
     {
         client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     }
 
+    /**
+     * Fetches real time weather data for a specified latitude and longitude coordinates from the Open-Meteo API
+     * Validates the coordinate ranges, issues a HTTP Get request, verifies the HTTP status code and parses the response
+     * @param latitude
+     * @param longitude
+     * @return
+     * @throws WeatherDataException
+     */
     @Override
     public WeatherSnapshot fetch(double latitude, double longitude) throws WeatherDataException
     {
@@ -62,6 +76,12 @@ public class OpenMeteoProvider implements WeatherDataProvider
         }
     }
 
+    /**
+     * Parses the current weather object block from the JSON response and creates a WeatherSnapshot
+     * @param json
+     * @return
+     * @throws WeatherDataException
+     */
     private WeatherSnapshot parseCurrentWeather(String json)
             throws WeatherDataException {
         Matcher objectMatcher = CURRENT_OBJECT.matcher(json);
@@ -90,6 +110,12 @@ public class OpenMeteoProvider implements WeatherDataProvider
         }
     }
 
+    /**
+     * A helper method that uses a regular expression to extract a numeric property from the JSON object substring
+     * @param jsonObject
+     * @param property
+     * @return
+     */
     private double readNumber(String jsonObject, String property) {
         Pattern pattern = Pattern.compile(
                 "\"" + Pattern.quote(property) + "\"\\s*:\\s*"

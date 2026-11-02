@@ -4,7 +4,6 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.ability.IndestructibleAbility;
 import game.ability.WeatherEventAbility;
@@ -16,14 +15,29 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * Represents a Tornado WeatherEvent in the game
+ */
 public final class TornadoEvent implements WeatherEvent
 {
+    /**
+     * Returns the weather event ability type that is associated with the Tornado Event
+     * @return the tornado from the WeatherEventAbility enum
+     */
     @Override
     public WeatherEventAbility getType()
     {
         return WeatherEventAbility.TORNADO;
     }
 
+    /**
+     * Applies the tornado weather effect across the specified affected locations
+     * Scatters items, displaces any actors presents and changes eligible ground into FallenTreeGround
+     *
+     * @param map
+     * @param affectedLocations
+     * @param context
+     */
     @Override
     public void apply(GameMap map, Set<Location> affectedLocations, WeatherContext context)
     {
@@ -39,6 +53,10 @@ public final class TornadoEvent implements WeatherEvent
         }
     }
 
+    /**
+     * Scatters all items found in the adjacent tiles around the Source location
+     * @param source
+     */
     private void scatterItems(Location source)
     {
         List<Location> destinations = adjacentLocations(source);
@@ -58,6 +76,11 @@ public final class TornadoEvent implements WeatherEvent
         }
     }
 
+    /**
+     * Displaces an actor standing on the source location to the first
+     * available and enterable adjacent location
+     * @param source
+     */
     private void displaceActor(Location source)
     {
         if (!source.containsAnActor())
@@ -79,6 +102,11 @@ public final class TornadoEvent implements WeatherEvent
         }
     }
 
+    /**
+     * Retrieves a list of all neighboring adjacent locations around a source location
+     * @param source
+     * @return a list of adjacent locations
+     */
     private List<Location> adjacentLocations(Location source)
     {
         List<Location> locations = new ArrayList<>();
