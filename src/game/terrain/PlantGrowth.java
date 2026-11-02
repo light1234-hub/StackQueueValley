@@ -47,7 +47,7 @@ public final class PlantGrowth {
         return new Plant(species, stage);
     }
 
-    private static Ground createCrop(Species species) {
+    private static PlantLifeGround createCrop(Species species) {
         switch (species) {
             case STRAWBERRY: return new StrawberryCrop();
             case TOMATO: return new TomatoCrop();
@@ -58,4 +58,5 @@ public final class PlantGrowth {
         }
     }
 }
+
 
