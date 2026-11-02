@@ -3,6 +3,7 @@ package game.actor;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -15,12 +16,17 @@ import edu.monash.fit2099.engine.weapons.Weapon;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Shared turn, wandering, and attack behavior for hostile mine creatures.
  * Concrete creatures provide their own attack damage and hit chance.
  */
 public abstract class HostileCreature extends Actor implements AttackReactive {
     private final WanderBehaviour wander = new WanderBehaviour();
+    /** Extra behaviours (stun, lure-seeking, taming) that are tried before the normal turn. */
+    private final List<Behaviour<Actor, Action>> priorityBehaviours = new ArrayList<>();
 
     /**
      * Creates a hostile mine creature.
@@ -30,6 +36,16 @@ public abstract class HostileCreature extends Actor implements AttackReactive {
      */
     protected HostileCreature(String name, char glyph, int hp) {
         super(name, glyph, hp);
+    }
+
+    /**
+     * Adds a behaviour that is tried before attacking or wandering. The first one that
+     * returns an action decides the turn.
+     *
+     * @param behaviour behaviour to add
+     */
+    protected void addPriorityBehaviour(Behaviour<Actor, Action> behaviour) {
+        priorityBehaviours.add(behaviour);
     }
 
     /** @return damage dealt by this creature's attack */
@@ -54,6 +70,12 @@ public abstract class HostileCreature extends Actor implements AttackReactive {
             return new edu.monash.fit2099.engine.actions.DoNothingAction();
         }
         Location here = map.locationOf(this);
+        for (Behaviour<Actor, Action> behaviour : priorityBehaviours) {
+            Action priority = behaviour.operate(this, here);
+            if (priority != null) {
+                return priority;
+            }
+        }
         for (Exit exit : here.getExits()) {
             Location next = exit.getDestination();
             if (next.containsAnActor() && next.getActor().hasAbility(ZombieTarget.ZOMBIE_TARGET))

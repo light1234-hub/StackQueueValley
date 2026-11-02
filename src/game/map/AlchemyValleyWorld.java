@@ -17,20 +17,20 @@ import java.util.List;
 /** Factory for the Alchemy Valley map (not a World subclass). Call populate() after addGameMap. */
 public class AlchemyValleyWorld {
     private static final List<String> LAYOUT = List.of(
-            "###############",
-            "#.............#",
-            "#..R.......R..#",
-            "#.....R.R.....#",
-            "#.............#",
-            "#..R.......R..#",
-            "#.............#",
-            "#.............#",
-            "###############");
+            "...............",
+            "...............",
+            "...R.......R...",
+            "......R.R......",
+            "...............",
+            "...R.......R...",
+            "...............",
+            "...............",
+            "...............");
 
     private final GameMap map;
     private final WishingWell returnWell = new WishingWell(0);
 
-    /** @param groundCreator the existing creator that maps '#', '.', 'R' to terrain */
+    /** @param groundCreator the existing creator that maps '.' and 'R' to terrain (the map edge is the boundary) */
     public AlchemyValleyWorld(GroundCreator groundCreator) throws GameEngineException {
         map = new GameMap("Alchemy Valley", groundCreator, LAYOUT);
         map.at(4, 1).setGround(new OrchardCauldron());

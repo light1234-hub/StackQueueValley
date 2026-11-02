@@ -19,6 +19,10 @@ import game.farmeraction.CoatingActionProvider;
  */
 public class Farmer extends Actor {
     private final CoatingActionProvider coatingActionProvider = new CoatingActionProvider();
+
+    /** Experience points earned so far (read by the REQ 4 brewing XP requirement). */
+    private int totalExperience = 0;
+
     /**
      * Creates a farmer with starting stamina and farming tools.
      *
@@ -37,6 +41,24 @@ public class Farmer extends Actor {
 
         this.enableAbility(ZombieTarget.ZOMBIE_TARGET);
 
+    }
+
+    /**
+     * Adds experience points.
+     *
+     * @param amount points to add (negative values are ignored)
+     */
+    public void gainExp(int amount) {
+        if (amount > 0) {
+            totalExperience += amount;
+        }
+    }
+
+    /**
+     * @return all experience earned so far
+     */
+    public int getTotalExperience() {
+        return totalExperience;
     }
 
     @Override

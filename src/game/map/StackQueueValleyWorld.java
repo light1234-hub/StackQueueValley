@@ -130,6 +130,15 @@ public class StackQueueValleyWorld extends World {
         minesMap.addActor(new Slime(), minesMap.at(6, 3));
         minesMap.addActor(new CaveGhost(), minesMap.at(7, 4));
 
+        // REQ4: Alchemy Valley, reached through a paid Wishing Well on the farm.
+        // The map must be added to this World before populate() places actors on it.
+        AlchemyValleyWorld valley = new AlchemyValleyWorld(groundCreator);
+        this.addGameMap(valley.getMap());
+        valley.populate();
+        WishingWell farmWell = new WishingWell(100);
+        inheritedFarmMap.at(0, 0).setGround(farmWell);
+        farmWell.setDestination(valley.arrivalLocation());
+        valley.getReturnWell().setDestination(inheritedFarmMap.at(1, 1));
     }
 
     /**
