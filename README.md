@@ -140,6 +140,24 @@ Key classes and interfaces:
 - `game.zombieaction.TwoStepMoveAction`
 - `game.actor.ZombieTarget`
 
+### Weather drainage response
+
+`DrainageStructure` activates once immediately after successful placement. `PlaceWeatherStructureAction` installs the structure on the selected tile, then calls `onPlaced()` to run its response. The drainage response scans the surrounding tiles at Manhattan distance five or less, excluding the structure's own tile, and attempts to drain every ground that implements `Drainable`. In the current implementation, this restores flooded tiles directly to their original ground; drainage does not run again on later world turns.
+
+Without drainage, `FloodedGround` dries naturally into `MudGround`, which later restores the original ground. Drainage skips the mud stage and restores the original ground immediately. By contrast, `Shelter` and `ResourceRecoveryStructure` activate automatically each world turn. Their responses process at most one eligible animal or terrain tile per turn.
+
+Key classes and interfaces:
+
+- `game.weather.DrainageStructure`
+- `game.weather.DrainageResponse`
+- `game.weather.WeatherResponseStructure`
+- `game.weather.PlaceWeatherStructureAction`
+- `game.weather.Shelter`
+- `game.weather.ResourceRecoveryStructure`
+- `game.weatherblueprint.Drainable`
+- `game.weatherterrain.FloodedGround`
+- `game.weatherterrain.MudGround`
+
 ## Source layout
 
 | Path | Contents |
