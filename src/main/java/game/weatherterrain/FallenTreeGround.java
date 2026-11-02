@@ -10,6 +10,9 @@ import game.weatherblueprint.WeatherRecoverable;
 
 import java.util.Random;
 
+/**
+ * Represents a FallenTreeGround on the terrain
+ */
 public class FallenTreeGround extends WeatherGround implements WeatherRecoverable
 {
     private static final int LIFETIME_TURNS = 5;
@@ -18,17 +21,30 @@ public class FallenTreeGround extends WeatherGround implements WeatherRecoverabl
     private static final int STONE_AMOUNT = 10;
     private final Random random = new Random();
 
+    /**
+     * A constructor that creates an object of the FallenTreeGround class
+     */
     public FallenTreeGround()
     {
         super('T',"Fallen Tree", new Dirt());
     }
 
+    /**
+     * A method checks if an actor can enter a FallenTreeGround
+     * @param actor the Actor to check
+     * @return false
+     */
     @Override
     public boolean canActorEnter(Actor actor)
     {
         return false;
     }
 
+    /**
+     * Updates the fallen tree each turn, decrements its lifetime
+     * When the lifetime reaches zero, the ground is set back to its original ground before the FallenTreeGround
+     * @param location The location of the Ground
+     */
     @Override
     public void tick(Location location)
     {

@@ -33,6 +33,18 @@ public final class WeatherCoordinator {
 
     private int turnsUntilRefresh;
 
+    /**
+     * A constructor that creates an Object of the WeatherCoordinator class
+     * @param farmMap
+     * @param provider
+     * @param coordinateMapper
+     * @param tileWeatherGenerator
+     * @param evaluator
+     * @param events
+     * @param context
+     * @param refreshInterval
+     * @param eventRadius
+     */
     public WeatherCoordinator(
             GameMap farmMap,
             WeatherDataProvider provider,
@@ -98,6 +110,13 @@ public final class WeatherCoordinator {
         }
     }
 
+    /**
+     * Generates weather conditions for every tile across the entire farm game map
+     * using the fetched weather snapshot
+     * @param snapshot
+     * @param map
+     * @return a map with each tile having its own generated weather
+     */
     private Map<Location, TileWeather> generateWeatherForEveryTile(
             WeatherSnapshot snapshot,
             GameMap map) {
@@ -116,6 +135,12 @@ public final class WeatherCoordinator {
         return tileWeather;
     }
 
+    /**
+     * Evaluates the weather tile map to determine if any weather event qualifies
+     * and applies to the specified radius around the center location
+     * @param tileWeather
+     * @param farmerLocation
+     */
     private void triggerQualifiedEvent(
             Map<Location, TileWeather> tileWeather,
             Location farmerLocation) {
@@ -132,6 +157,11 @@ public final class WeatherCoordinator {
         });
     }
 
+    /**
+     * Calculates the set of all locations that exists within the specified radius around the center
+     * @param centre
+     * @return a set of locations around the center around the radius
+     */
     private Set<Location> locationsWithinRadius(Location centre) {
         Set<Location> locations = new LinkedHashSet<>();
         int radiusSquared = eventRadius * eventRadius;

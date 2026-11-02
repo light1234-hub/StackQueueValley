@@ -49,11 +49,20 @@ public class WeatherConditions
         return eventType;
     }
 
+    /**
+     * A getter that returns the smallest number of contributing tiles
+     * @return the minimum number of contributing tiles
+     */
     public int getMinContributingTiles()
     {
         return minContributingTiles;
     }
 
+    /**
+     * Evaluates a whether a given tile contributes towards triggering a weather effect
+     * @param weather
+     * @return true if at least one weather requirement is fulfilled
+     */
     public boolean isContributedBy(TileWeather weather) {
         return meets(weather.getPrecipitationMmPerHour(), minRainMmPerHour)
                 || meets(weather.getTemperatureC(), minTemperatureC)
@@ -61,6 +70,12 @@ public class WeatherConditions
                 || meets(weather.getRelativeHumidity(), minHumidity);
     }
 
+    /**
+     * A helper method to check if a specific value meets or exceeds a weather event threshold
+     * @param value
+     * @param threshold
+     * @return true if the value is not null and is greater than or equal to the threshold, false if not
+     */
     private boolean meets(double value, Double threshold)
     {
         return threshold != null && value >= threshold;

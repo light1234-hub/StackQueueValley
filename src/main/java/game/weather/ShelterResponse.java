@@ -40,6 +40,13 @@ public class ShelterResponse implements WeatherResponse{
             }
         }
     }
+
+    /**
+     * Checks whether a specified location on the map contains an
+     * active and dangerous weather hazard
+     * @param location
+     * @return true if a weather hazard is present and false if it isn't present
+     */
     private boolean isDangerous(Location location){
         WeatherHazard hazard = location.getGroundAs(WeatherHazard.class);
         return hazard != null && hazard.isDangerous();

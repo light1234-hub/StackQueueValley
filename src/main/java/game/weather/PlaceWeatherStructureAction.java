@@ -18,6 +18,12 @@ public class PlaceWeatherStructureAction extends Action {
     private final Location target;
     private final String direction;
 
+    /**
+     * A constructor that creates an object of the PlaceWeatherStructureAction class
+     * @param kit
+     * @param target
+     * @param direction
+     */
     public PlaceWeatherStructureAction(WeatherStructureKit kit, Location target, String direction) {
         this.kit = kit;
         this.target = target;
@@ -33,6 +39,14 @@ public class PlaceWeatherStructureAction extends Action {
                 TerrainAbility.WEATHER_STRUCTURE_PLACEABLE
         );
     }
+
+    /**
+     * Executes the actions, verifies that the actor has the kit and
+     * the target location is adjacent and valid.
+     * @param actor The actor performing the action.
+     * @param map The map the actor is on.
+     * @return a descriptive message describing the success or failure of the action
+     */
     @Override
     public String execute(Actor actor, GameMap map) {
         if (!actor.getInventory().getItems().contains(kit)) {
@@ -57,6 +71,11 @@ public class PlaceWeatherStructureAction extends Action {
         return actor + " places " + kit.plan().displayName() + " to the " + direction + ".";
     }
 
+    /**
+     * Returns a descriptive string for this action in the menu
+     * @param actor The actor performing the action.
+     * @return the menu description string
+     */
     @Override
     public String menuDescription(Actor actor) {
         return "Place " + kit.plan().displayName() + " " + direction;

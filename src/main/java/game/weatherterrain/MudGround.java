@@ -22,6 +22,10 @@ public final class MudGround extends DryingWeatherGround implements MovementSlow
         super('m',"Mud",originalGround);
     }
 
+    /**
+     * On drying, the mud ground returns back into its original ground
+     * @param location
+     */
     @Override
     protected void onDry(Location location)
     {
