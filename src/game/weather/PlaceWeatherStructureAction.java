@@ -48,7 +48,11 @@ public class PlaceWeatherStructureAction extends Action {
         if (!adjacent || !canPlace(target)) {
             return "Cannot build there; choose empty " + "adjacent Dirt or Soil.";
         }
-        target.setGround(kit.plan().createGround());
+        WeatherResponseStructure structure = kit.plan().createGround();
+
+        target.setGround(structure);
+        structure.onPlaced(target);
+
         actor.getInventory().remove(kit);
         return actor + " places " + kit.plan().displayName() + " to the " + direction + ".";
     }

@@ -8,15 +8,14 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.ability.IngredientAbility;
-import game.ability.GroundAbility;
 import game.blueprint.AnimalFood;
 import game.blueprint.Ingredient;
 import game.blueprint.Processable;
 import game.farmeraction.ConsumeAction;
 import game.blueprint.Consumable;
 import game.recipe.AdjacentLocations;
-import game.terrain.Plant;
-import game.terrain.PlantGrowth;
+import game.terrain.ParsnipCrop;
+import game.terrain.PlantableGround;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +107,7 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
 
         for (Location adjacent : AdjacentLocations.from(station))
         {
-            if (adjacent.getGround().hasAbility(GroundAbility.FERTILE))
+            if (adjacent.getGroundAs(PlantableGround.class) != null)
             {
                 plantableLocations.add(adjacent);
             }
@@ -121,7 +120,7 @@ public class ParsnipItem extends Item implements Consumable, AnimalFood, Process
         }
 
         Location plantedLocation = plantableLocations.get(random.nextInt(plantableLocations.size()));
-        plantedLocation.setGround(PlantGrowth.crop(PlantGrowth.Species.PARSNIP));
+        plantedLocation.setGround(new ParsnipCrop());
 
         return "A Parsnip Crop has been planted next to the Cooking Station";
     }

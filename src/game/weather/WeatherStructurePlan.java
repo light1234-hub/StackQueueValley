@@ -60,8 +60,7 @@ public class WeatherStructurePlan {
      * Creates the appropriate ground structure.
      * @return the newly created ground
      */
-    public Ground createGround() {
-
+    public WeatherResponseStructure createGround() {
         switch (type) {
             case DRAINAGE:
                 return new DrainageStructure();

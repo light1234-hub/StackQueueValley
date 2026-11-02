@@ -205,14 +205,6 @@ We will introduce a dynamic weather system that uses real world weather informat
 ### Weather System
 The game retrieves weather information using the Open-Meteo Forecast API. The API will then generate a request that uses  the Farmer's current in game coordinates, mapped to geographical coordinates. The response provides temperature, rainfall and wind speed. Weather updates occur periodically rather than making an API request every game turn. Different weather conditions activate different environment effects.
 
-In order for the StackQueueValleyWorld Game initialisation to work properly, environment variables need to be created. Follow the below steps in order to ensure that the game can be created. 
-
-1. In IntelliJ click on RUN and find the EDIT CONFIGURATIONS BUTTON
-2. If there is already a run configuration added, click on it and find the ENVIRONMENT VARIABLES
-3. Add a WEATHER_LATITUDE and WEATHER_LONGITUDE variables and initialize them to any coordinate of a real life location that you wish to use in the game, an example would be WEATHER_LATITUDE=3.1390; WEATHER_LONGITUDE=101.6869 (these coordinates represent Kuala Lumpur, Malaysia)
-4. If there are no existing run configurations, click on the PLUS sign to create a new run configuration
-5. Click on APPLICATION and go back to Step 2 to continue initializing the environment variables.
-
 ### Weather Events
 **Rainstorm**: Heavy rainful causes selected ground to turn into puddles temporarily and applies a soaked status to actors within the affected area. It is important to note that Ground that is flooded upon drying first turns into Mud. Mud also has a slowed affect similar to the SoakedStatus and it dries depending on the temperature of the current tile.  Mud then dries back into its original terrain.
 

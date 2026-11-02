@@ -31,7 +31,13 @@ public class ConsumeAction extends Action {
      * @return a description of the consumption result
      */
     @Override
-    public String execute(Actor actor, GameMap map) {
+    public String execute(Actor actor, GameMap map)
+    {
+        if (!actor.getInventory().getItems().contains(item.getItem()))
+        {
+            return "This item is no longer in the inventory";
+        }
+
         String result = item.consume(actor);
         actor.getInventory().remove(item.getItem());
         return result;
